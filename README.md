@@ -14,7 +14,6 @@ Additionally, the treatments-risk paper excludes those younger than 35 ([GitHub]
 
 ## Baseline covariates 
 Calculate during first 6 months (washout period). These already exist in `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/mediator_df.rds`
-
 -  Age
 -  Sex
 -  race/ethnicity
@@ -30,21 +29,22 @@ Calculate during first 6 months (washout period). These already exist in `/mnt/g
 -  other mental disorder
 -  mental helth counseling
 
-## Pain/disability group (*is this needed?*)
-Use the washout period to group patients into:
-1. low back pain alone
-2. low back pain and physical disability
-
 ## Treatments
 Calculate during months 7-12. These may already exist in `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/mediator_df.rds`
 - non-opioid therapies
-    - spinal injections
-    - counseling?
-    - non-opioid rx?
-    - physical therapy?
-    - counseling?
-    - acupuncture?
-    - anything else?
+    - spinal injections and others
+- Max daily dose MME `mediator_max_daily_dose_mme`
+- Proportion of days covered `mediator_opioid_days_covered`
+- Unique prescribers `mediator_prescribers_6mo_sum`
+- Tapering `mediator_has_tapering`
+- Opioid coprescribed with benzodiazepine `mediator_opioid_benzo_copresc`
+- Opioid coprescribed with stimulants `mediator_opioid_stimulant_copresc`
+- Opioid coprescribed with muscle relaxants `mediator_opioid_mrelax_copresc`
+- Opioid coprescribed with gabapentenoids `mediator_opioid_gaba_copresc`
+- Nonopioid presription medications for pain `mediator_nonopioid_pain_rx`
+- Physical therapy `mediator_has_physical_therapy`
+- Multimodal pain treatment `mediator_has_multimodal_pain_treatment_restrict`
+
 
 ## Outcomes
 - prolonged opioid use
