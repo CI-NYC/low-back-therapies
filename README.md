@@ -10,7 +10,8 @@ Patients with low back pain
 The cohort found at `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/analysis_df.rds` already applies all exclusions except for:
 - Must have low back pain. "Back pain" category exists in ([ICD pain codes file](https://github.com/CI-NYC/disability/blob/main/projects/create_cohort/input/ICD_codes/chronic_pain_icd10_20230216.csv)). But need a way to subset it to just low back pain. *Perhaps `grepl("low back",...)` will do?*
 
-Additionally, the treatments-risk paper excludes those younger than 35 ([GitHub](https://github.com/CI-NYC/medicaid-treatments-oud-risk/blob/main/scripts/05_create_cohort/06mo/01_create_final_analysis_cohort.R)). *Might expand this to include 18-64?*
+Adjust age range to 18-65
+
 
 ## Baseline covariates 
 Calculate during first 6 months (washout period). These already exist in `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/mediator_df.rds`
