@@ -33,6 +33,7 @@ Calculate during first 6 months (washout period). These already exist in `/mnt/g
 Calculate during months 7-12. These may already exist in `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/mediator_df.rds`
 - non-opioid therapies
     - spinal injections and others
+    - Other than phyical therapy, currently these are all combined as mediator_has_multimodal_pain_treatment_restrict. *Should spinal injections also be separated?*
 - Max daily dose MME `mediator_max_daily_dose_mme`
 - Proportion of days covered `mediator_opioid_days_covered`
 - Unique prescribers `mediator_prescribers_6mo_sum`
@@ -52,5 +53,8 @@ Calculate during months 7-12. These may already exist in `/mnt/general-data/disa
     - whether they are continuing to use opioids after 3 months? 6 months? 12 months?
 
 ## Analysis
-... To do ...
+
+- Intervene on non-opioid therapies, multimodal, and spinal injections by comparing the risk of ___ when all patients are set to 1 vs the risk of ___ using observed values
+- Remaining treatments possibly won't be intervened on - so the run_main script can be condensed into a single loop
+
 
