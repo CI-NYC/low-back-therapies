@@ -56,6 +56,6 @@ Calculate during months 7-12. These may already exist in `/mnt/general-data/disa
 ## Analysis
 
 - Intervene on non-opioid therapies, multimodal, and spinal injections by comparing the risk of ___ when all patients are set to 1 vs the risk of ___ using observed values
-- Remaining treatments possibly won't be intervened on - so the run_main script can be condensed into a single loop
+- Opioid treatments might not be intervened on
 
 
