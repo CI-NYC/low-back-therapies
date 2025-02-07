@@ -13,10 +13,14 @@ library(lubridate)
 library(purrr)
 
 drv_root <- "/mnt/general-data/disability/mediation_unsafe_pain_mgmt"
-low_back_dir <- "/mnt/general-data/disability/low-back-therapies/exclusion"
+low_back_dir <- "/mnt/general-data/disability/low-back-therapies"
 
-cohort <- readRDS(file.path(low_back_dir, "low_back_cohort.rds")) # Cohort
+cohort <- readRDS(file.path(low_back_dir, "exclusion/low_back_cohort.rds")) # Cohort
 mediators <- readRDS(file.path(drv_root, "mediator_df.rds"))                              # Mediator vars
+
+new_nonopioid <- readRDS(file.path(low_back_dir, "treatments/mediator_nonopioid_pain_rx_bin.rds"))
+new_mme <- readRDS(file.path(low_back_dir, "treatments/mediator_max_daily_dose_mme.rds"))
+
 censoring_df <- readRDS(file.path(drv_root, "censoring_24mo.rds"))                   # Censoring vars
 oud_df <- readRDS(file.path(drv_root, "oud_12mo_to_24mo.rds"))                          # OUD outcomes
 depression_df <- readRDS(file.path(drv_root, "post_exposure_depression.rds"))             # post-exposure confounders
@@ -40,7 +44,7 @@ mediation_analysis_df <-
               counseling), 
          merge, all.x = TRUE, all.y = TRUE)
 
-rm(cohort, 
+rm(#cohort, 
    mediators, 
    censoring_df, 
    oud_df, 
@@ -48,6 +52,24 @@ rm(cohort,
    anxiety_df,
    bipolar_df, 
    counseling)
+
+###############
+# replacing MME and nonopioid columns with what are believed to be the corrected values 
+mediation_analysis_df <- mediation_analysis_df |>
+  filter(BENE_ID %in% cohort$BENE_ID) |>
+  select(-c(mediator_max_daily_dose_mme,
+            mediator_nonopioid_pain_rx,
+            mediator_nonopioid_gabapentin_rx,
+            mediator_nonopioid_other_analgesic_rx,
+            mediator_nonopioid_antidepressant_rx,
+            mediator_nonopioid_muscle_relaxant_rx,
+            mediator_nonopioid_antiinflammatory_rx,
+            mediator_nonopioid_topical_rx,
+            mediator_nonopioid_benzodiazepine_rx)) |>
+  left_join(new_mme) |>
+  left_join(new_nonopioid)
+
+###############
 
 # Apply inclusion/exclusion logic ----------------------------------------------
 
@@ -79,4 +101,4 @@ mediation_analysis_df[, oud_24mo_icd := fifelse(uncens_24mo == 0, NA_real_, oud_
 mediation_analysis_df <- mediation_analysis_df[dem_age >= 18, ]
 
 # Save
-saveRDS(mediation_analysis_df, file.path(low_back_dir, "../final/low_back_analysis_df.rds"))
+saveRDS(mediation_analysis_df, file.path(low_back_dir, "final/low_back_analysis_df.rds"))

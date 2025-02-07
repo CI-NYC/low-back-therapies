@@ -1,0 +1,146 @@
+---
+title: "01_summarise_treatments"
+author: "Anton Hung"
+date: "2025-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+drv_root <- "/mnt/general-data/disability/mediation_unsafe_pain_mgmt"
+
+data <- readRDS("/mnt/general-data/disability/low-back-therapies/exclusion/low_back_cohort.rds")
+mediators <- readRDS(file.path(drv_root, "mediator_df.rds"))
+oud_df <- readRDS(file.path(drv_root, "oud_12mo_to_24mo.rds"))                          # OUD outcomes
+overdose_df <- readRDS(file.path(drv_root, "washout_12mo_oud_overdose_18mo_to_24mo.rds"))     
+new_nonopioid <- readRDS("/mnt/general-data/disability/low-back-therapies/treatments/mediator_nonopioid_pain_rx_bin.rds")
+new_mme <- readRDS("/mnt/general-data/disability/low-back-therapies/treatments/mediator_max_daily_dose_mme.rds")
+```
+
+```{r}
+columns <- c("mediator_has_physical_therapy",
+             "mediator_has_minimally_invasive_spinal_procedure",
+             "mediator_has_ablative_techniques",
+             "mediator_has_acupuncture",
+             "mediator_has_blocks",
+             "mediator_has_botulinum_toxin",
+             "mediator_has_chiropractic",
+             "mediator_has_electrical_nerve_stimulation",
+             "mediator_has_epidural_steroid",
+             "mediator_has_intrathecal_drug_therapy",
+             "mediator_has_massage_therapy",
+             "mediator_has_trigger_point_injection")
+
+data <- data |>
+  left_join(mediators) |>
+  select(BENE_ID,
+         columns) |>
+  left_join(new_mme) |>
+  left_join(new_nonopioid) |>
+  left_join(oud_df) |>
+  left_join(overdose_df)
+```
+
+# Non-opioid treatments
+```{r}
+treatments <- c("Physical therapy",
+                "Spinal injections",
+                "Ablative techniques",
+                "Acupuncture",
+                "Blocks",
+                "Botulinum toxin",
+                "Chiropractic",
+                "Electrical nerve stimulation",
+                "Epidural steroid",
+                "Intrathecal drug therapy",
+                "Massage therapy",
+                "Trigger point injection",
+                "Non-opioid prescription for pain")
+columns <- c(columns, "mediator_nonopioid_pain_rx")
+
+number <- sapply(data[,columns], function(x) sum(x))
+proportion <- sapply(data[,columns], function(x) prop.table(table(x))[2])
+
+number_proportion <- paste0(number, " (", round(proportion*100,2), "\\%)")
+
+
+```
+
+
+```{r}
+# Create a function to compute Jaccard similarity
+jaccard_similarity <- function(x, y) {
+  intersection = sum(x & y)
+  union = sum(x | y)
+  return(intersection / union)
+}
+
+# Define your 12 binary vectors (example vectors)
+vectors <- list(
+  data$mediator_has_physical_therapy,
+  data$mediator_has_minimally_invasive_spinal_procedure,
+  data$mediator_has_ablative_techniques,
+  data$mediator_has_acupuncture,
+  data$mediator_has_blocks,
+  data$mediator_has_botulinum_toxin,
+  data$mediator_has_chiropractic,
+  data$mediator_has_electrical_nerve_stimulation,
+  data$mediator_has_epidural_steroid,
+  data$mediator_has_intrathecal_drug_therapy,
+  data$mediator_has_massage_therapy,
+  data$mediator_has_trigger_point_injection,
+  data$mediator_nonopioid_pain_rx
+)
+
+# Number of vectors
+n <- length(vectors)
+
+# Initialize a matrix to store the Jaccard similarity results
+similarity_matrix <- matrix(0, n, n, dimnames=list(treatments,treatments))
+
+# Compute the Jaccard similarity for all possible pairs
+for (i in 1:n) {
+  for (j in i:n) {
+    similarity_matrix[i, j] <- jaccard_similarity(vectors[[i]], vectors[[j]])
+    similarity_matrix[j, i] <- similarity_matrix[i, j]  # Since similarity is symmetric
+  }
+}
+
+# print(similarity_matrix)
+# # Print the similarity matrix
+# png("~/medicaid/low-back-therapies/R/00_summarise_data/jaccard_similarity_heatmap.png", width = 200, height = 200)
+# heatmap(similarity_matrix, main = "Jaccard Similarity Heatmap")
+# dev.off()
+
+df <- as.data.frame(as.table(similarity_matrix))
+colnames(df) <- c("X", "Y", "Value")
+
+# Create the heatmap
+heatmap_plot <- ggplot(df, aes(x = X, y = Y, fill = Value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(title = "Jaccard Similarity Heatmap", x=NULL, y=NULL) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), 
+        legend.position = "none") +
+  geom_text(aes(label = ifelse(Value > 0.09, round(Value, 2), "")), color = "black")
+
+# Display the heatmap
+print(heatmap_plot)
+ggsave("~/medicaid/low-back-therapies/R/00_summarise_data/jaccard_similarity_heatmap.png", width=6,height=6)
+```
+
+
+```{r}
+treatments <- c("OUD",
+                "Overdose")
+columns <- c("oud_24mo",
+             "oud_overdose_24mo")
+number <- sapply(data[,columns], function(x) sum(x))
+proportion <- sapply(data[,columns], function(x) prop.table(table(x))[2])
+
+number_proportion <- paste0(number, " (", round(proportion*100,2), "\\%)")
+```
+

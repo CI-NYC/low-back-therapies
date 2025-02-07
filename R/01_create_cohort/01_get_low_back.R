@@ -11,7 +11,8 @@ dts_cohorts <- readRDS("/mnt/general-data/disability/create_cohort/final/analysi
 
 low_back_pain_icds <- read.csv("~/medicaid/pain-severity/input/chronic_pain_icd10_20230216.csv") |>
   filter(grepl("low back", ICD_DESC, ignore.case = TRUE) |
-           grepl("lumbar", ICD_DESC, ignore.case = TRUE)) |>
+         grepl("lumb", ICD_DESC, ignore.case = TRUE) |
+         grepl("sciatica", ICD_DESC, ignore.case = TRUE)) |>
   filter(CRITERIA == "Inclusion")
 
 pain_all <- readRDS("/mnt/general-data/disability/disenrollment/tmp/pain_all.rds")

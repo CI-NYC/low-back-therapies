@@ -20,7 +20,7 @@ vars_to_keep <- c(
   "oud_24mo",
   "oud_24mo_icd",
   # Exposure
-  "disability_pain_cal",
+  # "disability_pain_cal",
   # Baseline confounders
   "dem_age",
   "dem_sex",
@@ -53,6 +53,13 @@ vars_to_keep <- c(
   "mediator_opioid_mrelax_copresc",
   "mediator_opioid_gaba_copresc",
   "mediator_nonopioid_pain_rx",
+  "mediator_nonopioid_gabapentin_rx",
+  "mediator_nonopioid_other_analgesic_rx",
+  "mediator_nonopioid_antidepressant_rx",
+  "mediator_nonopioid_muscle_relaxant_rx",
+  "mediator_nonopioid_antiinflammatory_rx",
+  "mediator_nonopioid_topical_rx",
+  "mediator_nonopioid_benzodiazepine_rx",
   "mediator_has_physical_therapy",
   "mediator_has_multimodal_pain_treatment_restrict",
   # Censoring
