@@ -38,34 +38,42 @@ nonopioid_pain_rx_df <- bind_rows(nonopioid_pain_rx_otl, nonopioid_pain_rx_rxl)
 
 #####################
 
-terms <- "^M03|^N06A|^M01|^M02A|^N02BF|^N02B|^N03AE|^N05BA|^N05CD"
-
-
-BENE_IDs <- nonopioid_pain_rx_df |>
-  left_join(nonopioid_rds |> select(NDC, atc)) |>
-  filter(BENE_ID %in% analysis_df$BENE_ID) |>
-  # filter(!is.na(NDC) & !is.na(NDC_QTY)) |>
-  group_by(BENE_ID) |>
-  summarise(contains = as.integer(any(grepl(terms, atc))),
-            does_not_contain = as.integer(!any(grepl(terms, atc)))) |>
-  pull(BENE_ID)
-
-nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
-  left_join(nonopioid_rds |> select(NDC, atc)) |>
-  filter(BENE_ID %in% analysis_df$BENE_ID) |>
-  filter(!is.na(NDC) & !is.na(NDC_QTY)) |>
-  group_by(BENE_ID) |>
-  summarise(contains = as.integer(any(grepl(terms, atc))),
-            does_not_contain = as.integer(!any(grepl(terms, atc))))
+# terms <- "^M03|^N06A|^M01|^M02A|^N02BF|^N02B|^N03AE|^N05BA|^N05CD"
+# 
+# 
+# BENE_IDs <- nonopioid_pain_rx_df |>
+#   left_join(nonopioid_rds |> select(NDC, atc)) |>
+#   filter(BENE_ID %in% analysis_df$BENE_ID) |>
+#   # filter(!is.na(NDC) & !is.na(NDC_QTY)) |>
+#   group_by(BENE_ID) |>
+#   summarise(contains = as.integer(any(grepl(terms, atc))),
+#             does_not_contain = as.integer(!any(grepl(terms, atc)))) |>
+#   pull(BENE_ID)
+# 
+# nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
+#   left_join(nonopioid_rds |> select(NDC, atc)) |>
+#   filter(BENE_ID %in% analysis_df$BENE_ID) |>
+#   filter(!is.na(NDC) & !is.na(NDC_QTY)) |>
+#   group_by(BENE_ID) |>
+#   summarise(contains = as.integer(any(grepl(terms, atc))),
+#             does_not_contain = as.integer(!any(grepl(terms, atc))))
 #####################
 
 
 # Create a binary variable to indicate whether a beneficiary received a prescription
+# nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
+#   group_by(BENE_ID) |>
+#   mutate(mediator_nonopioid_pain_rx = as.integer(any(!is.na(NDC) & !is.na(NDC_QTY)))) |>
+#   ungroup() |>
+#   select(BENE_ID, NDC, mediator_nonopioid_pain_rx)
+
 nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
-  group_by(BENE_ID) |>
-  mutate(mediator_nonopioid_pain_rx = as.integer(any(!is.na(NDC) & !is.na(NDC_QTY)))) |>
-  ungroup() |>
-  select(BENE_ID, NDC, mediator_nonopioid_pain_rx)
+  # group_by(BENE_ID) |>
+  filter(!is.na(NDC) & !is.na(NDC_QTY)) |>
+  # mutate(mediator_nonopioid_pain_rx = as.integer(any(!is.na(NDC) & !is.na(NDC_QTY)))) |>
+  # ungroup() |>
+  select(BENE_ID, NDC)
+
 
 # Create a binary variable to indicate whether a beneficiary received a prescription for an antidepressant (ATC code N06A)
 # Filter and save NDC list for values starting with "N06A"
@@ -185,7 +193,7 @@ nonopioid_pain_rx_df <- nonopioid_pain_rx_df %>%
 
 # Perform the left join and fill in 0s for missing mediator values
 nonopioid_pain_rx_df <- left_join(analysis_df, nonopioid_pain_rx_df, by = "BENE_ID") |>
-  mutate(mediator_nonopioid_pain_rx = ifelse(is.na(mediator_nonopioid_pain_rx), 0, mediator_nonopioid_pain_rx),
+  mutate(#mediator_nonopioid_pain_rx = ifelse(is.na(mediator_nonopioid_pain_rx), 0, mediator_nonopioid_pain_rx),
          mediator_nonopioid_gabapentin_rx = ifelse(is.na(mediator_nonopioid_gabapentin_rx), 0, mediator_nonopioid_gabapentin_rx),
          mediator_nonopioid_other_analgesic_rx = ifelse(is.na(mediator_nonopioid_other_analgesic_rx), 0, mediator_nonopioid_other_analgesic_rx),
          mediator_nonopioid_antidepressant_rx = ifelse(is.na(mediator_nonopioid_antidepressant_rx), 0, mediator_nonopioid_antidepressant_rx),
@@ -199,31 +207,22 @@ nonopioid_pain_rx_df <- left_join(analysis_df, nonopioid_pain_rx_df, by = "BENE_
 
 # Select only the needed relevant variables
 nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
+  mutate(mediator_nonopioid_pain_rx = as.numeric(mediator_nonopioid_other_analgesic_rx |
+                                                   mediator_nonopioid_antidepressant_rx |
+                                                   mediator_nonopioid_antiinflammatory_rx |
+                                                   mediator_nonopioid_topical_rx)) |>
   select(BENE_ID, 
          mediator_nonopioid_pain_rx, 
-         mediator_nonopioid_gabapentin_rx,
+         # mediator_nonopioid_gabapentin_rx,
          mediator_nonopioid_other_analgesic_rx,
          mediator_nonopioid_antidepressant_rx,
-         mediator_nonopioid_muscle_relaxant_rx,
+         # mediator_nonopioid_muscle_relaxant_rx,
          mediator_nonopioid_antiinflammatory_rx,
          mediator_nonopioid_topical_rx,
-         mediator_nonopioid_benzodiazepine_rx
+         # mediator_nonopioid_benzodiazepine_rx
          # mediator_nonopioid_analgesic_antispasmodic_rx,
          # mediator_nonopioid_analgesic_antispasmodic_psycholeptic_rx
   )
-
-# nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
-#   mutate(mediator_nonopioid_pain_rx2 = as.numeric(mediator_nonopioid_antiinflammatory_rx | 
-#                                                     mediator_nonopioid_topical_rx |
-#                                                     mediator_nonopioid_muscle_relaxant_rx |
-#                                                     mediator_nonopioid_other_analgesic_rx |
-#                                                     mediator_nonopioid_antidepressant_rx |
-#                                                     mediator_nonopioid_gabapentin_rx |
-#                                                     mediator_nonopioid_benzodiazepine_rx))
-# 
-# # BENE_ID_pain <- analysis_df |> filter(disability_pain_cal=="chronic pain only") |> pull(BENE_ID)
-# nonopioid_cp <- nonopioid_pain_rx_df |> filter(BENE_ID %in% BENE_ID_pain)
-# table(nonopioid_cp$mediator_nonopioid_pain_rx2)
 
 
 # Save as R dataset

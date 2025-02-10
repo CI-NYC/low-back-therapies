@@ -53,15 +53,26 @@ vars_to_keep <- c(
   "mediator_opioid_mrelax_copresc",
   "mediator_opioid_gaba_copresc",
   "mediator_nonopioid_pain_rx",
-  "mediator_nonopioid_gabapentin_rx",
+  # "mediator_nonopioid_gabapentin_rx",
   "mediator_nonopioid_other_analgesic_rx",
   "mediator_nonopioid_antidepressant_rx",
-  "mediator_nonopioid_muscle_relaxant_rx",
+  # "mediator_nonopioid_muscle_relaxant_rx",
   "mediator_nonopioid_antiinflammatory_rx",
   "mediator_nonopioid_topical_rx",
-  "mediator_nonopioid_benzodiazepine_rx",
+  # "mediator_nonopioid_benzodiazepine_rx",
   "mediator_has_physical_therapy",
   "mediator_has_multimodal_pain_treatment_restrict",
+  "mediator_has_ablative_techniques",
+  "mediator_has_botulinum_toxin",
+  "mediator_has_electrical_nerve_stimulation",
+  "mediator_has_intrathecal_drug_therapy",
+  "mediator_has_acupuncture",
+  "mediator_has_blocks",
+  "mediator_has_chiropractic",
+  "mediator_has_epidural_steroid",
+  "mediator_has_massage_therapy",
+  "mediator_has_trigger_point_injection",
+  "mediator_has_minimally_invasive_spinal_procedure",
   # Censoring
   "uncens_24mo"
 )
@@ -140,8 +151,12 @@ clean[, `:=`(dem_sex_m = fifelse(dem_sex == "M", 1, 0), # Sex (reference categor
              # Household size (reference category set to 1)
              dem_household_size_2 = fifelse(dem_household_size == "2", 1, 0),
              dem_household_size_2plus = fifelse(dem_household_size == "2+", 1, 0),
+             dem_household_size = fifelse(dem_household_size == "1", 1, 0),
+             
              # SSI benefits (reference category set to not applicable)
              dem_ssi_benefits_mandatory_optional = fifelse(
-               dem_ssi_benefits == "Mandatory or optional", 1, 0))]
+               dem_ssi_benefits == "Mandatory or optional", 1, 0),
+             dem_ssi_benefits = fifelse(
+               dem_ssi_benefits == "Not Applicable", 1, 0))]
 
 saveRDS(clean, file.path(low_back_dir, "low_back_analysis_df_clean.rds"))

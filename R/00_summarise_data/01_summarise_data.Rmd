@@ -10,9 +10,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
 drv_root <- "/mnt/general-data/disability/mediation_unsafe_pain_mgmt"
 
-data <- readRDS("/mnt/general-data/disability/low-back-therapies/exclusion/low_back_cohort.rds")
+data <- readRDS("/mnt/general-data/disability/low-back-therapies/final/low_back_analysis_df_clean.rds") |> select(BENE_ID)
 mediators <- readRDS(file.path(drv_root, "mediator_df.rds"))
 oud_df <- readRDS(file.path(drv_root, "oud_12mo_to_24mo.rds"))                          # OUD outcomes
 overdose_df <- readRDS(file.path(drv_root, "washout_12mo_oud_overdose_18mo_to_24mo.rds"))     
@@ -21,8 +26,7 @@ new_mme <- readRDS("/mnt/general-data/disability/low-back-therapies/treatments/m
 ```
 
 ```{r}
-columns <- c("mediator_has_physical_therapy",
-             "mediator_has_minimally_invasive_spinal_procedure",
+columns <- c("mediator_has_minimally_invasive_spinal_procedure",
              "mediator_has_ablative_techniques",
              "mediator_has_acupuncture",
              "mediator_has_blocks",
@@ -46,8 +50,7 @@ data <- data |>
 
 # Non-opioid treatments
 ```{r}
-treatments <- c("Physical therapy",
-                "Spinal injections",
+treatments <- c("Spinal injections",
                 "Ablative techniques",
                 "Acupuncture",
                 "Blocks",
@@ -57,9 +60,8 @@ treatments <- c("Physical therapy",
                 "Epidural steroid",
                 "Intrathecal drug therapy",
                 "Massage therapy",
-                "Trigger point injection",
-                "Non-opioid prescription for pain")
-columns <- c(columns, "mediator_nonopioid_pain_rx")
+                "Trigger point injection")
+columns <- c(columns)
 
 number <- sapply(data[,columns], function(x) sum(x))
 proportion <- sapply(data[,columns], function(x) prop.table(table(x))[2])
@@ -80,7 +82,7 @@ jaccard_similarity <- function(x, y) {
 
 # Define your 12 binary vectors (example vectors)
 vectors <- list(
-  data$mediator_has_physical_therapy,
+  # data$mediator_has_physical_therapy,
   data$mediator_has_minimally_invasive_spinal_procedure,
   data$mediator_has_ablative_techniques,
   data$mediator_has_acupuncture,
@@ -91,8 +93,8 @@ vectors <- list(
   data$mediator_has_epidural_steroid,
   data$mediator_has_intrathecal_drug_therapy,
   data$mediator_has_massage_therapy,
-  data$mediator_has_trigger_point_injection,
-  data$mediator_nonopioid_pain_rx
+  data$mediator_has_trigger_point_injection
+  # data$mediator_nonopioid_pain_rx
 )
 
 # Number of vectors
@@ -122,14 +124,14 @@ colnames(df) <- c("X", "Y", "Value")
 heatmap_plot <- ggplot(df, aes(x = X, y = Y, fill = Value)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "blue") +
-  labs(title = "Jaccard Similarity Heatmap", x=NULL, y=NULL) +
+  labs(title = "Jaccard Similarity - Multimodal pain treatments", x=NULL, y=NULL) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), 
         legend.position = "none") +
-  geom_text(aes(label = ifelse(Value > 0.09, round(Value, 2), "")), color = "black")
+  geom_text(aes(label = ifelse(Value > 0.05, round(Value, 2), "")), color = "black")
 
 # Display the heatmap
 print(heatmap_plot)
-ggsave("~/medicaid/low-back-therapies/R/00_summarise_data/jaccard_similarity_heatmap.png", width=6,height=6)
+ggsave("~/medicaid/low-back-therapies/R/00_summarise_data/jaccard_similarity_heatmap.png", width=6.5,height=6.5)
 ```
 
 

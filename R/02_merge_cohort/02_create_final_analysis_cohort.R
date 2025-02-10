@@ -11,6 +11,7 @@
 library(data.table)
 library(lubridate)
 library(purrr)
+library(dplyr)
 
 drv_root <- "/mnt/general-data/disability/mediation_unsafe_pain_mgmt"
 low_back_dir <- "/mnt/general-data/disability/low-back-therapies"
@@ -20,6 +21,7 @@ mediators <- readRDS(file.path(drv_root, "mediator_df.rds"))                    
 
 new_nonopioid <- readRDS(file.path(low_back_dir, "treatments/mediator_nonopioid_pain_rx_bin.rds"))
 new_mme <- readRDS(file.path(low_back_dir, "treatments/mediator_max_daily_dose_mme.rds"))
+multimodal <- readRDS(file.path(low_back_dir, "treatments/mediator_has_multimodal_pain_treatment_restrict.rds"))
 
 censoring_df <- readRDS(file.path(drv_root, "censoring_24mo.rds"))                   # Censoring vars
 oud_df <- readRDS(file.path(drv_root, "oud_12mo_to_24mo.rds"))                          # OUD outcomes
