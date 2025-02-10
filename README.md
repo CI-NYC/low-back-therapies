@@ -52,6 +52,13 @@ Calculate during months 7-12. These may already exist in `/mnt/general-data/disa
 - prolonged opioid use
     - Wait to hear back from Lisa on how this should be defined
     - whether they are continuing to use opioids after 3 months? 6 months? 12 months?
+ 
+    - Possible:
+    - at least 1 opioid prescription fulfillment between 90 and 180 days after the procedure
+    - "any opioid use pattern occurring 3 months after surgery. An exception is use of the term chronic opioid use. Based on previous literature,2,11,37-40 we defined chronic opioid use as the receipt of at least 10 opioid prescription fills, at least 90 consecutive days’ supply of opioids, or 120 cumulative days in the first year after surgery, excluding the initial 90 postoperative days" (https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2767637)
+    - Other definitions (https://pmc.ncbi.nlm.nih.gov/articles/PMC7058495/#:~:text=More%20than%2090%20days%20of,d%20of%20the%20first%20prescription.&text=Preoperative%20long%2Dterm%20use%20was,during%20the%20year%20before%20surgery.&text=No%20explicit%20definition.)
+    - more than 1 year supply of opioids within a 3-year follow up (equivalent to 6 months supply in 1.5 year follow up)
+    - Looking for just 1 opioid does not accurately reflect consistent use. Utilizing days supply seems to be effective and prevalent in previous research
 
 ## Analysis
 
