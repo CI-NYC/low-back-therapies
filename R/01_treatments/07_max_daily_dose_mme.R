@@ -26,7 +26,7 @@ low_back_dir <- "/mnt/general-data/disability/low-back-therapies"
 # Read in cohort and dates
 dts_cohorts <- readRDS(file.path(low_back_dir, "exclusion/low_back_cohort.rds"))
 setDT(dts_cohorts)
-dts_cohorts <- dts_cohorts[, .(BENE_ID, washout_cal_end_dt)]
+dts_cohorts <- dts_cohorts[, .(BENE_ID, washout_cal_end_dt, trt_end_dt)]
 setkey(dts_cohorts, BENE_ID)
 
 all_opioids_clean <- readRDS(file.path(data_dir, "all_pain_opioids.rds"))
@@ -40,7 +40,7 @@ all_opioids_clean_merged <- merge(all_opioids_clean, dts_cohorts, by = "BENE_ID"
 # Filter opioid prescriptions to only contain those within mediator period
 all_opioids_clean_mediator_period <- all_opioids_clean_merged[
   all_opioids_clean_merged$rx_start_dt %within% interval(
-    all_opioids_clean_merged$washout_cal_end_dt, all_opioids_clean_merged$washout_cal_end_dt + days(182)
+    all_opioids_clean_merged$washout_cal_end_dt, all_opioids_clean_merged$trt_end_dt
   ), 
 ]
 
@@ -57,7 +57,7 @@ calculate_max_daily_dose <- function(data) {
   #           .SDcols = c("rx_start_dt", "rx_end_dt")]
   
   # Calculate the date limit based on washout_cal_end_dt + 182 days
-  washout_date_limit <- to_modify$washout_cal_end_dt + lubridate::days(182)
+  washout_date_limit <- to_modify$trt_end_dt
   
   long <- to_modify[, .(date = seq(rx_start_dt, rx_end_dt - 1, by = "1 day"), 
                         NDC, opioid, mme_strength_per_day), by = .(seq_len(nrow(data)))

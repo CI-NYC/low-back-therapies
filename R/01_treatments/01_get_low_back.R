@@ -6,6 +6,8 @@
 # -------------------------------------
 
 library(dplyr)
+library(lubridate)
+library(data.table)
 
 dts_cohorts <- readRDS("/mnt/general-data/disability/create_cohort/final/analysis_cohort.rds")
 
@@ -38,6 +40,10 @@ pain_df <- pain_df |>
   filter(low_back_washout_cal == 1)
 
 pain_df <- pain_df |>
-  left_join(dts_cohorts)
+  left_join(dts_cohorts) |>
+  mutate(trt_end_dt = washout_cal_end_dt %m+% days(91),
+         followup_6mos_dt = trt_end_dt %m+% days(182),
+         followup_12mos_dt = trt_end_dt %m+% days(365)) |>
+  as.data.table()
 
 saveRDS(pain_df, "/mnt/general-data/disability/low-back-therapies/exclusion/low_back_cohort.rds")

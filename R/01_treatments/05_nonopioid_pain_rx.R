@@ -29,7 +29,6 @@ low_back_dir <- "/mnt/general-data/disability/low-back-therapies"
 analysis_df <- readRDS(file.path(low_back_dir, "exclusion/low_back_cohort.rds"))
 nonopioid_rds <- readRDS(file.path(drv_root, "mediation_unsafe_pain_mgmt_nonopioid_pain_ndc.rds"))
 
-# Read the mediator datasets for nonopiod pain prescriptions without an without an overlapping opioid prescription
 nonopioid_pain_rx_otl <- readRDS(file.path(drv_root, "mediator_otl_nonopioid_pain_rx.rds"))
 nonopioid_pain_rx_rxl <- readRDS(file.path(drv_root, "mediator_rxl_nonopioid_pain_rx.rds"))
 
@@ -218,7 +217,7 @@ nonopioid_pain_rx_df <- nonopioid_pain_rx_df |>
          mediator_nonopioid_antidepressant_rx,
          # mediator_nonopioid_muscle_relaxant_rx,
          mediator_nonopioid_antiinflammatory_rx,
-         mediator_nonopioid_topical_rx,
+         mediator_nonopioid_topical_rx
          # mediator_nonopioid_benzodiazepine_rx
          # mediator_nonopioid_analgesic_antispasmodic_rx,
          # mediator_nonopioid_analgesic_antispasmodic_psycholeptic_rx
