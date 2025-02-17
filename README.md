@@ -6,6 +6,13 @@ Associations between the use of non-opioid therapies, including spinal injection
 ## Study sample
 Patients with low back pain
 
+Maybe:
+Population 1: Patients with acute low back pain who transition to chronic low back pain
+    - evaluating the impact of early therapies (while pain is diagnosed as acute) 
+    - acute low back pain diagnosis is defined as no prior diagnosis during washout period.
+Population 2: Patients with chronic low back pain
+    - same analysis as before with multimodal therapies. Possibly also including spinal cord stimulation and dorsal root ganglion stimulation
+
 ## Exclusions
 The cohort found at `/mnt/general-data/disability/mediation-unsafe-pain-mgmt/analysis_df.rds` already applies all exclusions except for:
 - Must have low back pain. "Back pain" category exists in ([ICD pain codes file](https://github.com/CI-NYC/disability/blob/main/projects/create_cohort/input/ICD_codes/chronic_pain_icd10_20230216.csv)). But need a way to subset it to just low back pain. *Perhaps `grepl("low back",...)` will do?*
