@@ -17,11 +17,10 @@ library(purrr)
 library(stringr)
 
 source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion)
 
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/eligibility_codes.yml")
+codes <- read_yaml("~/medicaid/low-bath-therapies/data/public/eligibility_codes.yml")
 
 # Load demographics dataset
 demo <- open_demo()
@@ -155,4 +154,4 @@ exclusions <-
             as.numeric((exclusion_dual_eligible_1 + exclusion_dual_eligible) >= 1)) |> 
   fselect(-exclusion_dual_eligible_1)
 
-write_data(exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", save_dir)
+write_data(exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion))
