@@ -19,7 +19,7 @@ library(fst)
 local <- FALSE
 
 # Load list of NDCs
-ndc <- read_fst("~/medicaid/undertreated-pain/data/public/study_period_unique_ndc.fst") |> as.data.table()
+ndc <- read_fst("~/medicaid/low-back-therapies/data/public/study_period_unique_ndc.fst") |> as.data.table()
 
 # Convert NDC -> RxCUI -> ATC
 plan(multisession, workers = 10)
@@ -93,4 +93,4 @@ rxname <- foreach(code = unclassified[, rxcui]) %dofuture% {
 
 unclassified[, rxname := rxname]
 
-saveRDS(ndc, "~/medicaid/undertreated-pain/data/public/ndc_to_atc_crosswalk.rds")
+saveRDS(ndc, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
