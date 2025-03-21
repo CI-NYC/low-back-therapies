@@ -13,7 +13,6 @@ library(lubridate)
 library(dplyr)
 
 source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
@@ -21,7 +20,7 @@ rxl <- open_rxl()
 # Read in OTL (Other services line) 
 otl <- open_otl()
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", save_dir) |> as.data.table()
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion") |> as.data.table()
 cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(91))]
 
 # OTL ---------------------------------------------------------------------
