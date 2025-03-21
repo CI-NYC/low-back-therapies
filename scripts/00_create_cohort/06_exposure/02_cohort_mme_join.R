@@ -20,7 +20,7 @@ save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort
 rxl <- open_rxl()
 
 #  Read in OTL (Other services line) 
-# otl <- open_otl()
+otl <- open_otl()
 
 # load cohort
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
@@ -36,25 +36,25 @@ rxl_opioids <-
 
 rxl_opioids <- left_join(cohort, rxl_opioids)
 
-# otl_opioids <- 
-#   otl |>
-#   filter(NDC %in% mme$NDC) |>
-#   mutate(LINE_SRVC_BGN_DT = ifelse(is.na(LINE_SRVC_BGN_DT), LINE_SRVC_END_DT, LINE_SRVC_BGN_DT)) |>
-#   select(BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, contains("NDC")) |>
-#   collect() |>
-#   left_join(mme)
-# 
-# otl_opioids <- left_join(cohort, otl_opioids)
+otl_opioids <- 
+  otl |>
+  filter(NDC %in% mme$NDC) |>
+  mutate(LINE_SRVC_BGN_DT = ifelse(is.na(LINE_SRVC_BGN_DT), LINE_SRVC_END_DT, LINE_SRVC_BGN_DT)) |>
+  select(BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, contains("NDC")) |>
+  collect() |>
+  left_join(mme)
+
+otl_opioids <- left_join(cohort, otl_opioids)
 
 rxl_opioids <- 
   rxl_opioids |> 
   filter((RX_FILL_DT > pain_diagnosis_dt) & 
            (RX_FILL_DT <= exposure_end_dt))
 
-# otl_opioids <- 
-#   otl_opioids |> 
-#   filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
-#            (LINE_SRVC_BGN_DT <= exposure_end_dt))
+otl_opioids <- 
+  otl_opioids |> 
+  filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
+           (LINE_SRVC_BGN_DT <= exposure_end_dt))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
 # no caps on number of pills, days supply, and pills per day
@@ -89,28 +89,28 @@ rxl_opioids <-
          rx_start_dt = RX_FILL_DT) |>
   arrange(BENE_ID, rx_start_dt, opioid)
 
-# # filter to opioids for pain, calculate strength per day in Milligram Morphine Equivalent (MME) units
-# otl_opioids <-
-#   otl_opioids |>
-#   drop_na(BENE_ID) |>
-#   mutate(strength = parse_number(numeratorValue),
-#          # we assume all OTL opioids are one day supply (outpatient)
-#          mme_strength_per_day = strength * conversion) 
-# 
-# # keep only relevant vars for OTL opioids
-# otl_opioids <-
-#   otl_opioids |>
-#   select(BENE_ID,
-#          pain_diagnosis_dt, 
-#          exposure_end_dt,
-#          NDC,
-#          dose_form,
-#          opioid,
-#          strength,
-#          mme_strength_per_day,
-#          rx_start_dt = LINE_SRVC_BGN_DT) |>
-#   mutate(rx_end_dt = rx_start_dt + 1) |> # 1 day supply assumption
-#   arrange(BENE_ID, rx_start_dt, opioid)
+# filter to opioids for pain, calculate strength per day in Milligram Morphine Equivalent (MME) units
+otl_opioids <-
+  otl_opioids |>
+  drop_na(BENE_ID) |>
+  mutate(strength = parse_number(numeratorValue),
+         # we assume all OTL opioids are one day supply (outpatient)
+         mme_strength_per_day = strength * conversion) 
+
+# keep only relevant vars for OTL opioids
+otl_opioids <-
+  otl_opioids |>
+  select(BENE_ID,
+         pain_diagnosis_dt, 
+         exposure_end_dt,
+         NDC,
+         dose_form,
+         opioid,
+         strength,
+         mme_strength_per_day,
+         rx_start_dt = LINE_SRVC_BGN_DT) |>
+  mutate(rx_end_dt = rx_start_dt + 1) |> # 1 day supply assumption
+  arrange(BENE_ID, rx_start_dt, opioid)
 
 opioids <- rxl_opioids |>
   # bind_rows(rxl_opioids, otl_opioids) |> 
