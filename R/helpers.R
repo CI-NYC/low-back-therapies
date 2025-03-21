@@ -9,6 +9,8 @@
 library(arrow)
 library(fst)
 
+drv_root <- "/mnt/general-data/disability/low-back-therapies"
+
 write_data <- function(data, file, dir) {
   write_fst(data, file.path(dir, file))
 }
