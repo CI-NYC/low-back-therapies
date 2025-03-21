@@ -61,4 +61,4 @@ study_ndc <-
   unique() |> 
   na.omit()
 
-write_data(study_ndc, "study_period_unique_ndc.fst", "~/medicaid/undertreated-pain/data/public")
+write_data(study_ndc, "study_period_unique_ndc.fst", "~/medicaid/low-back-therapies/data/public")
