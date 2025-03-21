@@ -12,14 +12,13 @@ library(foreach)
 library(fst)
 library(arrow)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
-ndc <- readRDS("~/medicaid/undertreated-pain/data/public/ndc_to_atc_crosswalk.rds")
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/drug_codes.yml")
+ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 
 # load initial continuous enrollment cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")
 cohort <- cohort |>
   mutate(exposure_end_dt = pain_diagnosis_dt + days(91))
 
@@ -33,7 +32,7 @@ opioid_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
 
 ndc_opioids <- ndc[opioid_flag]
 
-saveRDS(ndc_opioids, "~/medicaid/undertreated-pain/data/public/ndc_to_atc_opioids.rds")
+saveRDS(ndc_opioids, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
 
 # filter rxl and otl files ------------------------------------------------
 
@@ -83,25 +82,25 @@ cohort <- anti_join(cohort, remove)
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
 
-# # Read in OTL (Other services line) 
-# otl <- open_otl()
-# 
-# # Find beneficiaries with an opioid in the exposure period in OTL
-# otl <- 
-#   select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
-#   inner_join(cohort, by = "BENE_ID") |> 
-#   mutate(LINE_SRVC_BGN_DT = ifelse(
-#     is.na(LINE_SRVC_BGN_DT), 
-#     LINE_SRVC_END_DT, 
-#     LINE_SRVC_BGN_DT
-#   )) |> 
-#   filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
-#            (LINE_SRVC_BGN_DT <= exposure_end_dt), 
-#          NDC %in% ndc_opioids$NDC) |> 
-#   select(BENE_ID) |> 
-#   distinct()
-# 
-# otl <- collect(otl) |> as.data.table()
+# Read in OTL (Other services line) 
+otl <- open_otl()
+
+# Find beneficiaries with an opioid in the exposure period in OTL
+otl <- 
+  select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
+  inner_join(cohort, by = "BENE_ID") |> 
+  mutate(LINE_SRVC_BGN_DT = ifelse(
+    is.na(LINE_SRVC_BGN_DT), 
+    LINE_SRVC_END_DT, 
+    LINE_SRVC_BGN_DT
+  )) |> 
+  filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
+           (LINE_SRVC_BGN_DT <= exposure_end_dt), 
+         NDC %in% ndc_opioids$NDC) |> 
+  select(BENE_ID) |> 
+  distinct()
+
+otl <- collect(otl) |> as.data.table()
 
 # Find beneficiaries with an opioid in the exposure period in RXL
 rxl <- 
@@ -116,8 +115,8 @@ rxl <-
 rxl <- collect(rxl) |> as.data.table()
 
 # Combine and export
-# keep <- unique(rbind(otl, rxl))
-keep <- unique(rxl)
+keep <- unique(rbind(otl, rxl))
+# keep <- unique(rxl)
 cohort <- unique(left_join(keep, cohort))
 
-write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", drv_root)
