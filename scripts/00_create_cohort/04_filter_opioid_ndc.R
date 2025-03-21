@@ -79,44 +79,44 @@ remove |> nrow()
 
 cohort <- anti_join(cohort, remove)
 
-# Read in RXL (pharmacy line)
-rxl <- open_rxl()
+# # Read in RXL (pharmacy line)
+# rxl <- open_rxl()
 
-# Read in OTL (Other services line) 
-otl <- open_otl()
+# # Read in OTL (Other services line) 
+# otl <- open_otl()
 
-# Find beneficiaries with an opioid in the exposure period in OTL
-otl <- 
-  select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
-  inner_join(cohort, by = "BENE_ID") |> 
-  mutate(LINE_SRVC_BGN_DT = ifelse(
-    is.na(LINE_SRVC_BGN_DT), 
-    LINE_SRVC_END_DT, 
-    LINE_SRVC_BGN_DT
-  )) |> 
-  filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
-           (LINE_SRVC_BGN_DT <= exposure_end_dt), 
-         NDC %in% ndc_opioids$NDC) |> 
-  select(BENE_ID) |> 
-  distinct()
+# # Find beneficiaries with an opioid in the exposure period in OTL
+# otl <- 
+#   select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
+#   inner_join(cohort, by = "BENE_ID") |> 
+#   mutate(LINE_SRVC_BGN_DT = ifelse(
+#     is.na(LINE_SRVC_BGN_DT), 
+#     LINE_SRVC_END_DT, 
+#     LINE_SRVC_BGN_DT
+#   )) |> 
+#   filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
+#            (LINE_SRVC_BGN_DT <= exposure_end_dt), 
+#          NDC %in% ndc_opioids$NDC) |> 
+#   select(BENE_ID) |> 
+#   distinct()
 
-otl <- collect(otl) |> as.data.table()
+# otl <- collect(otl) |> as.data.table()
 
-# Find beneficiaries with an opioid in the exposure period in RXL
-rxl <- 
-  select(rxl, BENE_ID, CLM_ID, RX_FILL_DT, NDC) |> 
-  inner_join(cohort, by = "BENE_ID") |> 
-  filter((RX_FILL_DT > pain_diagnosis_dt) & 
-           (RX_FILL_DT <= exposure_end_dt), 
-         NDC %in% ndc_opioids$NDC) |> 
-  select(BENE_ID) |> 
-  distinct()
+# # Find beneficiaries with an opioid in the exposure period in RXL
+# rxl <- 
+#   select(rxl, BENE_ID, CLM_ID, RX_FILL_DT, NDC) |> 
+#   inner_join(cohort, by = "BENE_ID") |> 
+#   filter((RX_FILL_DT > pain_diagnosis_dt) & 
+#            (RX_FILL_DT <= exposure_end_dt), 
+#          NDC %in% ndc_opioids$NDC) |> 
+#   select(BENE_ID) |> 
+#   distinct()
 
-rxl <- collect(rxl) |> as.data.table()
+# rxl <- collect(rxl) |> as.data.table()
 
-# Combine and export
-keep <- unique(rbind(otl, rxl))
-# keep <- unique(rxl)
-cohort <- unique(left_join(keep, cohort))
+# # Combine and export
+# keep <- unique(rbind(otl, rxl))
+# # keep <- unique(rxl)
+# cohort <- unique(left_join(keep, cohort))
 
 write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", drv_root)
