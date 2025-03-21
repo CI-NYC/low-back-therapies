@@ -9,8 +9,8 @@
 library(tidyverse)
 library(fuzzyjoin)
 
-opioids <- readRDS("~/medicaid/undertreated-pain/data/public/ndc_to_atc_opioids_with_strength.rds")
-mme_conversion <- read_csv("~/medicaid/undertreated-pain/data/public/mme.csv")
+opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids_with_strength.rds")
+mme_conversion <- read_csv("~/medicaid/low-back-therapies/data/public/mme.csv")
 
 ci_str_detect <- function(x, y) str_detect(x, regex(y, ignore_case = TRUE))
 
