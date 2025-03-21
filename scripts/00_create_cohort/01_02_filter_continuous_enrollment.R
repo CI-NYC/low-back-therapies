@@ -15,10 +15,9 @@ library(doFuture)
 library(dplyr)
 
 source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Load washout dates
-washout <- load_data("pain_washout_dts.fst", save_dir)
+washout <- load_data("pain_washout_dts.fst", file.path(drv_root, "exclusion")
 
 # Load temporary files for 01_01_filter_continuous_enrollment.R
 files <- 
