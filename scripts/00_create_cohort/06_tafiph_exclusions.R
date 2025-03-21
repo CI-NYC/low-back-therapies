@@ -14,8 +14,7 @@ library(fst)
 library(collapse)
 library(yaml)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Source ICD codes from the disability and chronic pain paper
 codes <- read_yaml("~/medicaid/undertreated-pain/data/public/icd_codes.yml")
@@ -23,7 +22,7 @@ codes <- read_yaml("~/medicaid/undertreated-pain/data/public/icd_codes.yml")
 # Read in IPH dataset
 iph <- open_iph()
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 icd <-
   iph |>
@@ -55,4 +54,4 @@ icd_exclusions <-
   fselect(BENE_ID, exclusion_pall_iph, exclusion_cancer_iph)
 
 # export
-write_data(icd_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", save_dir)
+write_data(icd_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root, "exclusion"))
