@@ -10,7 +10,6 @@ library(fst)
 library(collapse)
 
 source("~/medicaid/undertreated-pain/R/helpers.R")
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 # base cohort
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst",file.path(drv_root, "exclusion"))
