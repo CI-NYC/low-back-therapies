@@ -14,12 +14,11 @@ library(foreach)
 library(doFuture)
 library(collapse)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(save_dir, "exclusion"))
-opioids <- load_data("exposure_period_opioids.fst", file.path(save_dir, "exposures"))
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "exposures"))
 
 days_supply <- function(data) {
   dur <- 0
@@ -104,4 +103,4 @@ opioids <-
   funique() |>
   fmutate(exposure_days_supply = days)
 
-write_data(opioids, "exposure_days_supply.fst", file.path(save_dir, "exposures"))
+write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "exposures"))
