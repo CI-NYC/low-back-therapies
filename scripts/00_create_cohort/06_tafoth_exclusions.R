@@ -15,12 +15,11 @@ library(yaml)
 library(data.table)
 
 source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 # Load icd codes
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/icd_codes.yml")
+codes <- read_yaml("~/medicaid/low_back_therapies/data/public/icd_codes.yml")
 
 # Read in OTH dataset
 oth <- open_oth()
@@ -52,4 +51,4 @@ oth_exclusions <-
   ungroup()
 
 # export
-write_data(oth_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", save_dir)
+write_data(oth_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
