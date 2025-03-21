@@ -12,7 +12,7 @@ library(foreach)
 library(doFuture)
 library(furrr)
 
-opioids <- readRDS("~/medicaid/undertreated-pain/data/public/ndc_to_atc_opioids.rds")
+opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
 local <- FALSE
 
 plan(multisession)
