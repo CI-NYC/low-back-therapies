@@ -18,7 +18,7 @@ ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.r
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 
 # load initial continuous enrollment cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 cohort <- cohort |>
   mutate(exposure_end_dt = pain_diagnosis_dt + days(91))
 
@@ -119,4 +119,4 @@ cohort <- anti_join(cohort, remove)
 # # keep <- unique(rxl)
 # cohort <- unique(left_join(keep, cohort))
 
-write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", drv_root)
+write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))

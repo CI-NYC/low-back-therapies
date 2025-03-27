@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
-opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "exposures"))
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatments"))
 
 days_supply <- function(data) {
   dur <- 0
@@ -103,4 +103,4 @@ opioids <-
   funique() |>
   fmutate(exposure_days_supply = days)
 
-write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "exposures"))
+write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "treatments"))

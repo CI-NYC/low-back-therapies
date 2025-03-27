@@ -9,8 +9,8 @@ library(tidyverse)
 library(fst)
 library(collapse)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 # load demographics dataset
 demo <- open_demo()
@@ -19,12 +19,12 @@ demo <- open_demo()
 cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root, "final"))
 
 probable_income <- load_data("probable_high_income_cal.fst", file.path(drv_root, "exclusion"))
-urbanicity <- load_data("covariate_urbanicity.fst", file.path(drv_root, "baseline_covariates"))
-adhd <- load_data("adhd.rds", file.path(drv_root, "baseline_covariates"))
-anxiety <- load_data("anxiety.rds", file.path(drv_root, "baseline_covariates"))
-bipolar <- load_data("bipolar.rds", file.path(drv_root, "baseline_covariates"))
-depression <- load_data("depression.rds", file.path(drv_root, "baseline_covariates"))
-mental_ill <- load_data("mental_ill.rds", file.path(drv_root, "baseline_covariates"))
+# urbanicity <- load_data("covariate_urbanicity.fst", file.path(drv_root, "baseline_covariates"))
+# adhd <- load_data("adhd.rds", file.path(drv_root, "baseline_covariates"))
+# anxiety <- load_data("anxiety.rds", file.path(drv_root, "baseline_covariates"))
+# bipolar <- load_data("bipolar.rds", file.path(drv_root, "baseline_covariates"))
+# depression <- load_data("depression.rds", file.path(drv_root, "baseline_covariates"))
+# mental_ill <- load_data("mental_ill.rds", file.path(drv_root, "baseline_covariates"))
 
 demo <- 
   filter(demo, BENE_ID %in% cohort$BENE_ID) |> 
@@ -47,14 +47,15 @@ demo <-
          TANF_CASH_CD,
          SSI_STATE_SPLMT_CD,
          TPL_INSRNC_CVRG_IND) |> 
-  funique()
+  distinct()
 
 fill_vals <- function(data, x) {
   select(data, BENE_ID, RFRNC_YR, one_of(x))  |>
     roworder(BENE_ID, RFRNC_YR) |>
     filter(if (x == "BIRTH_DT" | x == "SEX_CD") !is.na(.data[[x]]) else TRUE) |> # these values shouldn't change
     group_by(BENE_ID) |>
-    filter(row_number() == 1) |>
+    filter(RFRNC_YR = year(washout_start_dt)) |>
+    slice(1) |>
     fselect(-RFRNC_YR) |>
     ungroup() 
 }
@@ -104,28 +105,28 @@ cohort <-
                                          as.numeric(INCM_CD) >= 3 ~ 1, # https://resdac.org/cms-data/variables/income-relative-federal-poverty-level-latest-year
                                          TRUE ~ 0)
   ) |> 
-  left_join(urbanicity) |>
-  left_join(adhd |> select(BENE_ID, adhd_washout_cal)) |>
-  left_join(anxiety |> select(BENE_ID, anxiety_washout_cal)) |>
-  left_join(bipolar |> select(BENE_ID, bipolar_washout_cal)) |>
-  left_join(depression |> select(BENE_ID, depression_washout_cal)) |>
-  left_join(mental_ill |> select(BENE_ID, mental_ill_washout_cal)) |>
+  # left_join(urbanicity) |>
+  # left_join(adhd |> select(BENE_ID, adhd_washout_cal)) |>
+  # left_join(anxiety |> select(BENE_ID, anxiety_washout_cal)) |>
+  # left_join(bipolar |> select(BENE_ID, bipolar_washout_cal)) |>
+  # left_join(depression |> select(BENE_ID, depression_washout_cal)) |>
+  # left_join(mental_ill |> select(BENE_ID, mental_ill_washout_cal)) |>
   select(BENE_ID, 
-         ends_with("dt", ignore.case = FALSE), 
+         ends_with("dt", ignore.case = FALSE),
          starts_with("dem"),
-         ends_with("_washout_cal"),
+         # ends_with("_washout_cal"),
          starts_with("exposure"), 
-         starts_with("subset"))#, 
-        # cens_period_1, oud_period_1, 
-        # cens_period_2, oud_period_2, 
-        # cens_period_3, oud_period_3, 
-        # cens_period_4, oud_period_4, 
-        # cens_period_5, oud_period_5,
-        # cens_hillary_period_1, oud_hillary_period_1,
-        # cens_hillary_period_2, oud_hillary_period_2,
-        # cens_hillary_period_3, oud_hillary_period_3,
-        # cens_hillary_period_4, oud_hillary_period_4,
-        # cens_hillary_period_5, oud_hillary_period_5)
+         starts_with("subset"), 
+        cens_period_1, oud_period_1,
+        cens_period_2, oud_period_2,
+        cens_period_3, oud_period_3,
+        cens_period_4, oud_period_4,
+        cens_period_5, oud_period_5,
+        cens_hillary_period_1, oud_hillary_period_1,
+        cens_hillary_period_2, oud_hillary_period_2,
+        cens_hillary_period_3, oud_hillary_period_3,
+        cens_hillary_period_4, oud_hillary_period_4,
+        cens_hillary_period_5, oud_hillary_period_5)
 
 write_data(cohort, "pain_cohort.fst", file.path(drv_root, "final"))
 

@@ -3,8 +3,8 @@ library(data.table)
 library(stringr)
 library(readr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 cohort <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 

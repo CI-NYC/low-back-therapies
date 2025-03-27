@@ -13,8 +13,8 @@ library(lubridate)
 library(data.table)
 library(arrow)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies//R/helpers.R")
+drv_root <- "/mnt/general-data/disability/low-back-therapies"
 
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
@@ -23,9 +23,9 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 # load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
-mme <- readRDS("~/medicaid/undertreated-pain/data/public/opioids_mme.rds")
+mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
 
 rxl_opioids <-
   rxl |>
@@ -119,4 +119,4 @@ opioids <- rxl_opioids |>
          rx_end_dt = pmin(rx_start_dt %m+% days(days_supply), exposure_end_dt %m+% weeks(1)))
   
 
-write_data(opioids, "exposure_period_opioids.fst", file.path(save_dir, "../exposures"))
+write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatments"))

@@ -10,10 +10,10 @@ library(data.table)
 library(stringr)
 library(readr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
-df <- load_data("pain_cohort.fst", file.path(drv_root, "final")) |> as.data.table()
+df <- load_data("pain_cohort_with_MH.fst", file.path(drv_root, "final")) |> as.data.table()
 
 # Check for NAs in all variables before addressing
 na_check <- sapply(df, \(x) any(is.na(x)))
@@ -85,14 +85,16 @@ df[, `:=`(dem_sex_m = fifelse(dem_sex == "M", 1, 0), # Sex (reference category s
           dem_household_size_2plus = fifelse(dem_household_size == "2+", 1, 0),
           # SSI benefits (reference category set to not applicable)
           dem_ssi_benefits_mandatory_optional = fifelse(
-            dem_ssi_benefits == "Mandatory or optional", 1, 0),
+            dem_ssi_benefits == "Mandatory or optional", 1, 0)
           # dem_RUCC_urban = fifelse(dem_RUCC_category == "Urban", 1, 0), 
-          dem_RUCC_suburban = fifelse(dem_RUCC_category == "Suburban", 1, 0),
-          dem_RUCC_rural = fifelse(dem_RUCC_category == "Rural", 1, 0))]
+          # dem_RUCC_suburban = fifelse(dem_RUCC_category == "Suburban", 1, 0),
+          # dem_RUCC_rural = fifelse(dem_RUCC_category == "Rural", 1, 0)
+          )
+   ]
 
 
 # truncating max MME exposure due to low coverage (99th percentile as discussed)
-df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.99)))]
+df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.99, na.rm=T)))]
 # 240 MME
 
 # Save in the mediation folder

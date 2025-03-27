@@ -9,7 +9,7 @@ library(tidyverse)
 library(fst)
 library(collapse)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # base cohort
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst",file.path(drv_root, "exclusion"))

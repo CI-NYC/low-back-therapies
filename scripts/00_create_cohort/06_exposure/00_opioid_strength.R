@@ -26,4 +26,4 @@ opioids[, dose_form := future_map_chr(opioids$rxcui, get_dose_form, local_host =
 
 plan(sequential)
 
-saveRDS(opioids, "~/medicaid/undertreated-pain/data/public/ndc_to_atc_opioids_with_strength.rds")
+saveRDS(opioids, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids_with_strength.rds")

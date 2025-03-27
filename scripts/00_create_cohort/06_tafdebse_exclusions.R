@@ -16,11 +16,11 @@ library(yaml)
 library(purrr)
 library(stringr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
-codes <- read_yaml("~/medicaid/low-bath-therapies/data/public/eligibility_codes.yml")
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/eligibility_codes.yml")
 
 # Load demographics dataset
 demo <- open_demo()
@@ -29,13 +29,12 @@ demo <- right_join(demo, cohort) |>
   collect()
 
 # exclude maryland --------------------------------------------------------
-
-exclusion_md <- 
-  fselect(demo, BENE_ID, washout_start_dt, RFRNC_YR, STATE_CD) |> 
-  fsubset(year(washout_start_dt) == as.numeric(RFRNC_YR)) |> 
-  fmutate(exclusion_maryland = as.numeric("MD" == STATE_CD)) |> 
-  fselect(BENE_ID, exclusion_maryland) |> 
-  funique()
+exclusion_md <-
+  fselect(demo, BENE_ID, washout_start_dt, RFRNC_YR, STATE_CD) |>
+  fsubset(year(washout_start_dt) == as.numeric(RFRNC_YR)) |>
+  fmutate(exclusion_maryland = as.numeric("MD" == STATE_CD)) |>
+  fselect(BENE_ID, exclusion_maryland) |>
+  distinct()
 
 exclusion_md <- fselect(cohort, BENE_ID) |> 
   join(exclusion_md, how = "left")
@@ -45,7 +44,7 @@ exclusion_md <- fselect(cohort, BENE_ID) |>
 # Remove observations with more than 1 birthdate? 
 exclusion_age <- 
   fselect(demo, BENE_ID, washout_start_dt, BIRTH_DT) |> 
-  funique() |> 
+  distinct() |> 
   drop_na() |> 
   fmutate(age_enrollment = floor(time_length(interval(BIRTH_DT, washout_start_dt), "years")), 
           exclusion_age = fcase(age_enrollment < 19, 1, 
@@ -63,7 +62,7 @@ exclusion_age <- fselect(cohort, BENE_ID) |>
 
 exclusion_sex <- 
   fselect(demo, BENE_ID, SEX_CD) |> 
-  funique() |> 
+  distinct() |> 
   fmutate(exclusion_missing_sex = as.numeric(is.na(SEX_CD)), 
           .keep = c("BENE_ID", "exclusion_missing_sex"))
 
@@ -110,7 +109,7 @@ exclusion_codes <-
 income_codes <- exclusion_codes |>
   fselect(BENE_ID, probable_high_income_cal)
 
-write_data(income_codes, "probable_high_income_cal.fst", save_dir)
+write_data(income_codes, "probable_high_income_cal.fst", file.path(drv_root, "exclusion"))
 
 exclusion_codes <- exclusion_codes |> 
   fselect(BENE_ID, exclusion_pregnancy, exclusion_institution, exclusion_cancer, exclusion_dual_eligible_1)
@@ -134,7 +133,7 @@ exclusion_dual_eligible <-
   fmutate(exclusion_dual_eligible = elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt)) |> 
   fsubset(exclusion_dual_eligible) |> 
   fselect(BENE_ID, exclusion_dual_eligible) |> 
-  funique() |> 
+  distinct() |> 
   join(fselect(cohort, BENE_ID), how = "right") |> 
   fmutate(exclusion_dual_eligible = replace_na(as.numeric(exclusion_dual_eligible)))
 
@@ -154,4 +153,4 @@ exclusions <-
             as.numeric((exclusion_dual_eligible_1 + exclusion_dual_eligible) >= 1)) |> 
   fselect(-exclusion_dual_eligible_1)
 
-write_data(exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion))
+write_data(exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))

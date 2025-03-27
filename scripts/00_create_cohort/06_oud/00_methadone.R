@@ -15,14 +15,14 @@ library(fst)
 library(yaml)
 library(data.table)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 otl <- open_otl()
 
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/hcpcs_codes.yml")$methadone
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$methadone
 
 # - Limit otl to MOUD methadone codes
 otl_methadone <- 
@@ -52,7 +52,7 @@ otl_methadone <-
   fselect(BENE_ID, moud_start_dt, moud_end_dt)
 
 # - Save all moud periods for the initial cohort
-write_data(otl_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", save_dir)
+write_data(otl_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", file.path(drv_root, "exclusion"))
 
 # - Filter to moud periods where the start or end date is within the washout period
 # - If any moud periods are within the washout period, obs is considered as having moud in washout
@@ -71,4 +71,4 @@ moud_methadone <-
   join(cohort, moud_methadone, how = "left") |> 
   fmutate(moud_methadone_washout = replace_na(moud_methadone_washout, 0))
 
-write_data(moud_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", save_dir)
+write_data(moud_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root, "exclusion"))

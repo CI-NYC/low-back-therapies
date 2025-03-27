@@ -10,14 +10,14 @@ library(lubridate)
 library(fst)
 library(collapse)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 # Load study pain opioids
-opioids <- load_data("pain_washout_continuous_enrollment_opioid_requirements_pain_opioids_dts.fst", save_dir)
+opioids <- load_data("pain_washout_continuous_enrollment_opioid_requirements_pain_opioids_dts.fst", file.path(drv_root, "exclusion"))
 
 washout_oud_misuse <- 
   fsubset(opioids, RX_FILL_DT %within% interval(washout_start_dt, pain_diagnosis_dt)) |> 
@@ -49,4 +49,4 @@ washout_oud_misuse <-
   fmutate(exclusion_oud_misuse = replace_na(exclusion_oud_misuse, 0))
 
 # export
-write_data(washout_oud_misuse, "pain_washout_continuous_enrollment_opioid_requirements_washout_oud_misuse.fst", save_dir)
+write_data(washout_oud_misuse, "pain_washout_continuous_enrollment_opioid_requirements_washout_oud_misuse.fst", file.path(drv_root, "exclusion"))

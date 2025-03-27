@@ -17,7 +17,7 @@ library(yaml)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Source ICD codes from the disability and chronic pain paper
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/icd_codes.yml")
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/icd_codes.yml")
 
 # Read in IPH dataset
 iph <- open_iph()

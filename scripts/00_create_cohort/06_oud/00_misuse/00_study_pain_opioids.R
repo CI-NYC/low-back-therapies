@@ -13,14 +13,14 @@ library(fst)
 library(yaml)
 library(collapse)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 # Load opioid pain NDC
-opioids <- read_csv("~/medicaid/undertreated-pain/data/public/opioid_pain_ndc.csv")
+opioids <- read_csv("~/medicaid/low-back-therapies/data/public/opioid_pain_ndc.csv")
 
 # Open RX datasets
 rxl <- open_rxl()
@@ -63,4 +63,4 @@ opioids <-
   ) |> 
   join(cohort, how = "inner")
 
-write_data(opioids, "pain_washout_continuous_enrollment_opioid_requirements_pain_opioids_dts.fst", save_dir)
+write_data(opioids, "pain_washout_continuous_enrollment_opioid_requirements_pain_opioids_dts.fst", file.path(drv_root, "exclusion"))

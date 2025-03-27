@@ -14,12 +14,12 @@ library(fst)
 library(yaml)
 library(data.table)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 # Load icd codes
-codes <- read_yaml("~/medicaid/low_back_therapies/data/public/icd_codes.yml")
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/icd_codes.yml")
 
 # Read in OTH dataset
 oth <- open_oth()

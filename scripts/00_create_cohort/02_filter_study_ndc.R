@@ -12,7 +12,7 @@ library(data.table)
 library(lubridate)
 library(dplyr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
@@ -20,7 +20,7 @@ rxl <- open_rxl()
 # Read in OTL (Other services line) 
 otl <- open_otl()
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion") |> as.data.table()
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(91))]
 
 # OTL ---------------------------------------------------------------------

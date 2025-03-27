@@ -14,7 +14,7 @@ library(fst)
 library(collapse)
 library(yaml)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)

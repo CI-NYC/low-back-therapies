@@ -13,10 +13,10 @@ library(foreach)
 library(doFuture)
 library(dplyr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load washout dates
-washout <- load_data("pain_washout_dts.fst", file.path(drv_root, "exclusion") |> as.data.table()
+washout <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 
 washout[, let(exposure_end_dt = pain_diagnosis_dt + days(91))]
 
@@ -50,7 +50,7 @@ chunks <- split_list_into_chunks(tmp, 1e5)
 
 # Save each chunk to a separate RDS file
 for (i in seq_along(chunks)) {
-  file_name <- paste0(save_dir,
+  file_name <- paste0(drv_root,
     "/tmp/enrollment_period_chunk_", 
     i, ".rds"
   )

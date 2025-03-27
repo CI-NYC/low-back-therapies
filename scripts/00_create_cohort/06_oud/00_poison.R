@@ -12,13 +12,13 @@ library(data.table)
 library(fst)
 library(yaml)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
+# save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
 # Source ICD codes
-codes <- read_yaml("~/medicaid/undertreated-pain/data/public/oud_codes.yml")$cochran_poison
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/oud_codes.yml")$cochran_poison
 
 # Read in IPH dataset
 iph <- open_iph()
@@ -60,4 +60,4 @@ oud_poison <-
   inner_join(oud_poison, cohort) |> 
   filter(oud_poison_dt %within% interval(washout_start_dt, exposure_end_dt + 455))
 
-write_data(oud_poison, "pain_washout_continuous_enrollment_opioid_requirements_oud_poison_dts.fst", save_dir)
+write_data(oud_poison, "pain_washout_continuous_enrollment_opioid_requirements_oud_poison_dts.fst", file.path(drv_root, "exclusion"))

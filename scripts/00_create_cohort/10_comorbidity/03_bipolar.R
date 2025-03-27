@@ -19,11 +19,11 @@ library(data.table)
 library(tictoc)
 library(foreach)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Read in OTH and IPH as arrow datsets -----------------------------------------------------------------------
 
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
+# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 oth <- open_oth()
 
 iph <- open_iph()
@@ -33,7 +33,7 @@ dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final")) |>
   mutate(washout_end_dt_6mo = washout_start_dt + days(182))
 
 # read in all icd bipolar codes
-bipolar_icds <- read_csv("~/medicaid/undertreated-pain/data/public/bipolar_icd10_20230323.csv", col_names = F) |>
+bipolar_icds <- read_csv("~/medicaid/low-back-therapies/data/public/bipolar_icd10_20230323.csv", col_names = F) |>
   rename(ICD9_OR_10 = X1)
 
 ############################################################################

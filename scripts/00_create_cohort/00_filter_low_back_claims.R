@@ -13,9 +13,7 @@ library(data.table)
 library(yaml)
 library(fst)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
-
-drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load necessary datasets
 oth <- open_oth()
@@ -93,7 +91,7 @@ iph_pain[, let(washout_start_dt = min(SRVC_BGN_DT)), BENE_ID]
 iph_pain <- iph_pain[SRVC_BGN_DT == washout_start_dt]
 iph_pain[, let(washout_start_dt = washout_start_dt - days(182))]
 
-oth_pain <- unique(oth_pain[, .(BENE_ID, washout_start_dt, SRVC_BGN_DT, dgns_cd)], by = 1)
+oth_pain <- unique(oth_pain[, .(BENE_ID, washout_start_dt, SRVC_BGN_DT)], by = 1)
 iph_pain <- unique(iph_pain[, .(BENE_ID, washout_start_dt, SRVC_BGN_DT)], by = 1)
 
 low_back <- rbindlist(list(oth_pain, iph_pain))
@@ -107,7 +105,7 @@ setnames(low_back, "SRVC_BGN_DT", "pain_diagnosis_dt")
 #   distinct() |>
 #   left_join(chronic_pain_df, by = c("dgns_cd" = "ICD9_OR_10"))
 
-write_data(distinct(oth_pain), "low_back_washout_dts.fst", drv_root)
+write_data(distinct(low_back), "low_back_washout_dts.fst", file.path(drv_root, "exclusion"))
 
 # number of people with MSK pain claims
 oth_pain |> nrow()

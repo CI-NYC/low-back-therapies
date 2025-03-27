@@ -14,14 +14,15 @@ library(foreach)
 library(doFuture)
 library(dplyr)
 
-source("~/medicaid/undertreated-pain/R/helpers.R")
+source("~/medicaid/low-back-therapies//R/helpers.R")
 
 # Load washout dates
-washout <- load_data("pain_washout_dts.fst", file.path(drv_root, "exclusion")
+# drv_root <- file.path(drv_root, "exclusion")
+washout <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion"))
 
 # Load temporary files for 01_01_filter_continuous_enrollment.R
 files <- 
-  file.path(save_dir, "tmp") |> 
+  file.path(drv_root, "tmp") |> 
   list.files(full.names = TRUE)
 
 #' Creates continuous enrollment periods
@@ -95,7 +96,7 @@ for (i in seq_along(files)) {
   write_data(
     valid_periods, 
     paste0("enrollment_period_chunk_", i, ".fst"), 
-    file.path(save_dir, "valid_enrollment_periods")
+    file.path(drv_root, "valid_enrollment_periods")
   )
 }
 
@@ -105,7 +106,7 @@ gc()
 plan(sequential)
 
 cohort <- 
-  file.path(save_dir, "valid_enrollment_periods") |> 
+  file.path(drv_root, "valid_enrollment_periods") |> 
   list.files(full.names = TRUE) |> 
   lapply(\(x) read_fst(x, columns = "BENE_ID", as.data.table = TRUE)) |> 
   rbindlist()
@@ -113,4 +114,4 @@ cohort <-
 washout <- merge(washout, cohort)
 
 # export
-write_data(washout, "pain_washout_continuous_enrollment_dts.fst", save_dir)
+write_data(washout, "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
