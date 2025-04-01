@@ -20,7 +20,8 @@ codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 # load initial continuous enrollment cohort
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 cohort <- cohort |>
-  mutate(exposure_end_dt = pain_diagnosis_dt + days(91))
+  distinct() |>
+  mutate(exposure_end_dt = pain_diagnosis_dt + days(90))
 
 # find opioid ndcs --------------------------------------------------------
 
@@ -52,7 +53,7 @@ otl <-
     LINE_SRVC_BGN_DT)
   ) |> 
   filter((LINE_SRVC_BGN_DT >= washout_start_dt) & 
-           (LINE_SRVC_BGN_DT <= pain_diagnosis_dt), 
+           (LINE_SRVC_BGN_DT < pain_diagnosis_dt), 
          NDC %in% ndc_opioids$NDC) |> 
   select(BENE_ID) |> 
   distinct()
@@ -64,7 +65,7 @@ rxl <-
   select(rxl, BENE_ID, CLM_ID, RX_FILL_DT, NDC) |> 
   inner_join(cohort, by = "BENE_ID") |> 
   filter((RX_FILL_DT >= washout_start_dt) & 
-           (RX_FILL_DT <= pain_diagnosis_dt), 
+           (RX_FILL_DT < pain_diagnosis_dt), 
          NDC %in% ndc_opioids$NDC) |> 
   select(BENE_ID) |> 
   distinct()

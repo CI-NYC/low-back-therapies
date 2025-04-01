@@ -15,12 +15,11 @@ library(collapse)
 library(yaml)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
-save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
+# save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", save_dir)
+cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
 
-bup_list <- read_fst("~/medicaid/undertreated-pain/data/public/bup_list.fst")
-hcpcs <- read_yaml("~/medicaid/undertreated-pain/data/public/hcpcs_codes.yml")$naltrexone
+hcpcs <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$naltrexone
 
 # other services line file
 otl <- open_otl()
@@ -114,7 +113,7 @@ nal <-
   funique()
 
 # - Save all moud periods for the initial cohort
-write_data(nal, "pain_washout_continuous_enrollment_opioid_requirements_moud_nal_intervals.fst", save_dir)
+write_data(nal, "pain_washout_continuous_enrollment_opioid_requirements_moud_nal_intervals.fst", file.path(drv_root, "exclusion"))
 
 moud_nal <- 
   roworder(nal, BENE_ID, moud_start_dt) |> 
@@ -131,4 +130,4 @@ moud_nal <-
   join(cohort, moud_nal, how = "left") |> 
   fmutate(moud_nal_washout = replace_na(moud_nal_washout, 0))
 
-write_data(moud_nal, "pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", save_dir)
+write_data(moud_nal, "pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", file.path(drv_root, "exclusion"))

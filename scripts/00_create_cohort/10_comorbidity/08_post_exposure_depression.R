@@ -78,28 +78,22 @@ all_dg_clean_function  <- function(data, x)
     x == 0 ~ 0,
     x == 1 ~ 30,
     x == 2 ~ 60,
-    x == 3 ~ 90,
-    x == 4 ~ 121,
-    x == 5 ~ 151,
-    x == 6 ~ 181
+    x == 3 ~ 90
   ))
   
   num_days_end <- days(case_when(
     x == 0 ~ 0,
     x == 1 ~ 30,
     x == 2 ~ 60,
-    x == 3 ~ 91,
-    x == 4 ~ 121,
-    x == 5 ~ 151,
-    x == 6 ~ 182
+    x == 3 ~ 91
   ))
   
   data |>
-    left_join(dts_cohorts |> select(BENE_ID, washout_start_dt)) |>
+    left_join(dts_cohorts |> select(BENE_ID, pain_diagnosis_dt)) |>
     group_by(BENE_ID) |>
-    filter(SRVC_BGN_DT <= washout_start_dt + num_days_end + days(182),
-           SRVC_END_DT >= washout_start_dt + num_days_start) |>
-    mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < washout_start_dt + num_days_start, washout_start_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
+    filter(SRVC_BGN_DT <= pain_diagnosis_dt + num_days_end + days(91),
+           SRVC_END_DT >= pain_diagnosis_dt + num_days_start) |>
+    mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < pain_diagnosis_dt + num_days_start, pain_diagnosis_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
     mutate(SRVC_BGN_DT = as.Date(SRVC_BGN_DT)) |>
     summarize(!!paste0("min_depression_dt", "_", x) := min(SRVC_BGN_DT)) |>
     ungroup()
@@ -128,30 +122,24 @@ iph_dg_clean_function  <- function(data, x)
     x == 0 ~ 0,
     x == 1 ~ 30,
     x == 2 ~ 60,
-    x == 3 ~ 90,
-    x == 4 ~ 121,
-    x == 5 ~ 151,
-    x == 6 ~ 181
+    x == 3 ~ 90
   ))
   
   num_days_end <- days(case_when(
     x == 0 ~ 0,
     x == 1 ~ 30,
     x == 2 ~ 60,
-    x == 3 ~ 91,
-    x == 4 ~ 121,
-    x == 5 ~ 151,
-    x == 6 ~ 182
+    x == 3 ~ 91
   ))
   
   data |>
     mutate(depression = +(if_any(starts_with("DGNS_CD"),  ~. %in% depression_icds$ICD9_OR_10))) |>
     filter(depression == T) |> # only keep depression codes
-    left_join(dts_cohorts |> select(BENE_ID, washout_start_dt)) |> # join washout start date in
+    left_join(dts_cohorts |> select(BENE_ID, pain_diagnosis_dt)) |> # join washout start date in
     group_by(BENE_ID) |>
-    filter(SRVC_BGN_DT <= washout_start_dt + num_days_end + days(182),
-           SRVC_END_DT >= washout_start_dt + num_days_start) |>
-    mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < washout_start_dt + num_days_start, washout_start_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
+    filter(SRVC_BGN_DT <= pain_diagnosis_dt + num_days_end + days(91),
+           SRVC_END_DT >= pain_diagnosis_dt + num_days_start) |>
+    mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < pain_diagnosis_dt + num_days_start, pain_diagnosis_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
     mutate(SRVC_BGN_DT = as.Date(SRVC_BGN_DT)) |>
     summarize(!!paste0("min_depression_dt", "_", x, "_iph") := min(SRVC_BGN_DT))
 }
@@ -203,9 +191,9 @@ all_depression <-
 all_depression_clean <- 
   dts_cohorts |>
   left_join(all_depression) |>
-  mutate(depression_washout_cal = case_when(min_depression_dt_0 %within% interval(washout_start_dt, pain_diagnosis_dt - 1) ~ 1,
-                                                 TRUE ~ 0)) |>
+  mutate(depression_post_exposure_cal = case_when(min_depression_dt_0 %within% interval(pain_diagnosis_dt, exposure_end_dt) ~ 1,
+                                            TRUE ~ 0)) |>
   select(BENE_ID, min_depression_dt_0,
-         depression_washout_cal)
+         depression_post_exposure_cal)
 
-write_data(all_depression_clean, "depression.rds", file.path(drv_root, "baseline_covariates")) # save final data file
+write_data(all_depression_clean, "depression_post_exposure.rds", file.path(drv_root, "baseline_covariates")) # save final data file

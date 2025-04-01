@@ -28,8 +28,7 @@ oth <- open_oth()
 iph <- open_iph()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final")) |>
-  mutate(washout_end_dt_6mo = washout_start_dt + days(182))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
 
 # read in all icd bipolar codes
 mental_ill_icds <- read_csv("~/medicaid/low-back-therapies/data/public/mental_illness_20230504.csv", col_names = F) |>
@@ -207,7 +206,7 @@ all_mental_ill <-
 all_mental_ill_clean <- 
   dts_cohorts |>
   left_join(all_mental_ill) |>
-  mutate(mental_ill_washout_cal = case_when(min_mental_ill_dt_0 %within% interval(washout_start_dt, washout_end_dt_6mo) ~ 1,
+  mutate(mental_ill_washout_cal = case_when(min_mental_ill_dt_0 %within% interval(washout_start_dt, pain_diagnosis_dt - 1) ~ 1,
                                                  TRUE ~ 0)) |>
   select(BENE_ID, min_mental_ill_dt_0,
          mental_ill_washout_cal)

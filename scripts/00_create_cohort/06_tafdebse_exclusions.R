@@ -84,7 +84,7 @@ eligibility_codes <-
   fselect(BENE_ID, washout_start_dt, pain_diagnosis_dt, code, elig_dt)
 
 eligibility_codes <- 
-  fsubset(eligibility_codes, elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt))
+  fsubset(eligibility_codes, elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt - 1))
 
 # Filter to last eligiblity code in washout time period
 wo_eligibility_codes <- 
@@ -130,7 +130,7 @@ dual_codes <-
 
 exclusion_dual_eligible <- 
   join(cohort, dual_codes, how = "inner") |> 
-  fmutate(exclusion_dual_eligible = elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt)) |> 
+  fmutate(exclusion_dual_eligible = elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt - 1)) |> 
   fsubset(exclusion_dual_eligible) |> 
   fselect(BENE_ID, exclusion_dual_eligible) |> 
   distinct() |> 

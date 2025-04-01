@@ -34,7 +34,7 @@ icd_washout <-
        icd, 
        how = "inner") |> 
   fmutate(SRVC_BGN_DT = fifelse(is.na(SRVC_BGN_DT), SRVC_END_DT, SRVC_BGN_DT)) |> 
-  fsubset(SRVC_BGN_DT %within% interval(washout_start_dt, pain_diagnosis_dt)) |> 
+  fsubset(SRVC_BGN_DT %within% interval(washout_start_dt, pain_diagnosis_dt - 1)) |> 
   as_tibble()
 
 # Identify whether exclusion ICD code of interest occurs in washout ICDs

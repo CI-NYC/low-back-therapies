@@ -22,7 +22,7 @@ oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 # oud exclusions
 oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
 # exposures
-exposures <- load_data("exposures_with_subsets.fst", file.path(drv_root, "exposures"))
+# exposures <- load_data("exposures_with_subsets.fst", file.path(drv_root, "treatments"))
 # censoring
 # cens <- load_data("pain_washout_continuous_enrollment_opioid_requirements_censoring.fst", file.path(drv_root, "outcome"))
 # # outcomes

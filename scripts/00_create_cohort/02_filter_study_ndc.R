@@ -21,7 +21,7 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
-cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(91))]
+cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
 
 # OTL ---------------------------------------------------------------------
 

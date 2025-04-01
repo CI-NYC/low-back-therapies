@@ -36,8 +36,7 @@ oth <- open_oth()
 iph <- open_iph()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final")) |>
-  mutate(washout_end_dt_6mo = washout_start_dt + days(182))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
 
 # read in all icd adhd codes
 adhd_icds <- read_csv("~/medicaid/low-back-therapies/data/public/adhd_icd10_20230323.csv", col_names = F) |>
@@ -220,7 +219,7 @@ all_adhd <-
 all_adhd_clean <- 
   dts_cohorts |>
   left_join(all_adhd) |>
-  mutate(adhd_washout_cal = case_when(min_adhd_dt_0 %within% interval(washout_start_dt, washout_end_dt_6mo) ~ 1,
+  mutate(adhd_washout_cal = case_when(min_adhd_dt_0 %within% interval(washout_start_dt, pain_diagnosis_dt - 1) ~ 1,
                                            TRUE ~ 0)) |>
   select(BENE_ID, min_adhd_dt_0,
          adhd_washout_cal)

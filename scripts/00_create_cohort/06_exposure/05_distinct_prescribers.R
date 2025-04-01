@@ -24,7 +24,7 @@ rxl_claims <- open_rxl() |>
   collect()
 
 rxl <- opioids |>
-  filter(CLM_ID %in% rxl$CLM_ID)
+  filter(CLM_ID %in% rxl_claims$CLM_ID)
 
 # Read in cohort and dates
 cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion")) |>
@@ -71,7 +71,7 @@ prescribers_per_month <-
   prescribers[, .(mediator_prescribers_month1 = sum(uniqueN(PRSCRBNG_PRVDR_ID[month1])),
                   mediator_prescribers_month2 = sum(uniqueN(PRSCRBNG_PRVDR_ID[month2])),
                   mediator_prescribers_month3 = sum(uniqueN(PRSCRBNG_PRVDR_ID[month3])),
-                  distinct_prescribers = uniqueN(c(PRSCRBNG_PRVDR_ID[month1],
+                  exposure_distinct_prescribers = uniqueN(c(PRSCRBNG_PRVDR_ID[month1],
                                                            PRSCRBNG_PRVDR_ID[month2],
                                                            PRSCRBNG_PRVDR_ID[month3]
                                                            ))),
@@ -80,11 +80,11 @@ prescribers_per_month <-
 # Merge with analysis cohort  --------------------------------------------------
 
 # Right join with the analysis cohort
-distinct_prescribers <- 
+exposure_distinct_prescribers <- 
   merge(prescribers_per_month, cohort[, .(BENE_ID)], all.y = TRUE, by = "BENE_ID") |>
-  mutate(distinct_prescribers = ifelse(is.na(distinct_prescribers), 0, distinct_prescribers)) |>
-  select(BENE_ID, distinct_prescribers)
+  mutate(exposure_distinct_prescribers = ifelse(is.na(exposure_distinct_prescribers), 0, exposure_distinct_prescribers)) |>
+  select(BENE_ID, exposure_distinct_prescribers)
 
 
 # Save final dataset -----------------------------------------------------------
-write_data(distinct_prescribers, "distinct_prescribers.fst", file.path(drv_root, "treatments"))
+write_data(exposure_distinct_prescribers, "exposure_distinct_prescribers.fst", file.path(drv_root, "treatments"))

@@ -48,12 +48,12 @@ otl_opioids <- left_join(cohort, otl_opioids)
 
 rxl_opioids <- 
   rxl_opioids |> 
-  filter((RX_FILL_DT > pain_diagnosis_dt) & 
+  filter((RX_FILL_DT >= pain_diagnosis_dt) & 
            (RX_FILL_DT <= exposure_end_dt))
 
 otl_opioids <- 
   otl_opioids |> 
-  filter((LINE_SRVC_BGN_DT > pain_diagnosis_dt) & 
+  filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
            (LINE_SRVC_BGN_DT <= exposure_end_dt))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
@@ -75,6 +75,7 @@ rxl_opioids <-
 rxl_opioids <-
   rxl_opioids |>
   select(BENE_ID,
+         CLM_ID,
          pain_diagnosis_dt, 
          exposure_end_dt,
          opioid,
@@ -87,6 +88,7 @@ rxl_opioids <-
          mme_strength_per_day,
          days_supply,
          rx_start_dt = RX_FILL_DT) |>
+  mutate(rx_end_dt = rx_start_dt %m+% days(days_supply)) |>
   arrange(BENE_ID, rx_start_dt, opioid)
 
 # filter to opioids for pain, calculate strength per day in Milligram Morphine Equivalent (MME) units
@@ -101,6 +103,7 @@ otl_opioids <-
 otl_opioids <-
   otl_opioids |>
   select(BENE_ID,
+         CLM_ID,
          pain_diagnosis_dt, 
          exposure_end_dt,
          NDC,
@@ -113,10 +116,10 @@ otl_opioids <-
   arrange(BENE_ID, rx_start_dt, opioid)
 
 opioids <- rxl_opioids |>
-  # bind_rows(rxl_opioids, otl_opioids) |> 
+  bind_rows(rxl_opioids, otl_opioids) |>
   unique() |> 
-  mutate(days_supply = replace_na(days_supply, 1),
-         rx_end_dt = pmin(rx_start_dt %m+% days(days_supply), exposure_end_dt %m+% weeks(1)))
+  mutate(days_supply = replace_na(days_supply, 1))#,
+         #rx_end_dt = pmin(rx_start_dt %m+% days(days_supply), exposure_end_dt %m+% weeks(1)))
   
 
 write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatments"))

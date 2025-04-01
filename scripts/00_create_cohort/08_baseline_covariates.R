@@ -54,12 +54,12 @@ fill_vals <- function(data, x) {
     roworder(BENE_ID, RFRNC_YR) |>
     filter(if (x == "BIRTH_DT" | x == "SEX_CD") !is.na(.data[[x]]) else TRUE) |> # these values shouldn't change
     group_by(BENE_ID) |>
-    filter(RFRNC_YR = year(washout_start_dt)) |>
-    slice(1) |>
+    filter(row_number() == 1) |>
     fselect(-RFRNC_YR) |>
     ungroup() 
 }
 
+set.seed(1)
 covar <- map(names(demo)[3:fncol(demo)], \(x) fill_vals(demo, x))
 covar <- reduce(covar, left_join)
 
