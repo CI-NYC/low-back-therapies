@@ -16,10 +16,11 @@ library(glue)
 library(doFuture)
 library(fst)
 
+source("~/medicaid/low-back-therapies/R/helpers.R")
 local <- FALSE
 
 # Load list of NDCs
-ndc <- read_fst("~/medicaid/low-back-therapies/data/public/study_period_unique_ndc.fst") |> as.data.table()
+ndc <- read_fst(file.path(drv_root, "exclusion/study_period_unique_ndc.fst")) |> as.data.table()
 
 # Convert NDC -> RxCUI -> ATC
 plan(multisession, workers = 10)
@@ -57,6 +58,9 @@ plan(multisession, workers = 10)
 new_rxcui <- 
   foreach(code = obsolete[, rxcui], 
           status = obsolete[, rxcui_status]) %dofuture% {
+            if (is.na(status)) {
+              return(NA)
+            }
             if (status %in% c("Remapped", "NotCurrent")) {
               return(get_remapped_rxcui(code, local_host = local))
             }
@@ -93,4 +97,4 @@ rxname <- foreach(code = unclassified[, rxcui]) %dofuture% {
 
 unclassified[, rxname := rxname]
 
-saveRDS(ndc, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
+saveRDS(ndc, file.path(drv_root,"exclusion/ndc_to_atc_crosswalk.rds"))

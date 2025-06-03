@@ -19,7 +19,8 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 otl <- open_otl()
 
 # Read in cohort and dates
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion")) |>
+cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
+  mutate(exposure_end_dt = pain_diagnosis_dt + days(90)) |>
   select(BENE_ID, pain_diagnosis_dt, exposure_end_dt)
 
 # Read in CPT, HCPC, and Modifier codes for mediator claims
@@ -67,7 +68,16 @@ claims <- unique(merge(claims, cohort, by = "BENE_ID"))
 # Filter to claims within mediator time-frame
 claims <- claims[LINE_SRVC_BGN_DT %within% interval(pain_diagnosis_dt, 
                                                     exposure_end_dt), 
-                 .(BENE_ID, LINE_SRVC_BGN_DT, pain_diagnosis_dt, exposure_end_dt, LINE_PRCDR_CD)]
+                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, pain_diagnosis_dt, exposure_end_dt, LINE_PRCDR_CD)]
+
+treatments_dts <- claims |>
+  left_join(treatments_df |> distinct(cd, .keep_all=T), 
+            by = c("LINE_PRCDR_CD" = "cd")) |>
+  select(BENE_ID, treatment_start_dt = LINE_SRVC_BGN_DT, treatment_end_dt = LINE_SRVC_END_DT, treatment) |>
+  arrange(treatment_start_dt, desc(treatment_end_dt))
+
+saveRDS(treatments_dts, file.path(drv_root, "exclusion/treatments_dts.rds"))
+
 
 counseling <- treatments_df[treatment == "Counseling"]
 physical_therapy <- treatments_df[treatment == "Physical therapy"]

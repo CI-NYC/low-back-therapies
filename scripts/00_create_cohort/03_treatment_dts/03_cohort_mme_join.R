@@ -13,8 +13,7 @@ library(lubridate)
 library(data.table)
 library(arrow)
 
-source("~/medicaid/low-back-therapies//R/helpers.R")
-drv_root <- "/mnt/general-data/disability/low-back-therapies"
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
@@ -23,7 +22,8 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 # load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
+cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
 
 mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
 
@@ -123,3 +123,11 @@ opioids <- rxl_opioids |>
   
 
 write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatments"))
+
+
+opioids <- opioids |>
+  select(BENE_ID, treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt) |>
+  mutate(treatment = "opioid") |>
+  arrange(treatment_start_dt, desc(treatment_end_dt))
+
+write_data(opioids, "opioid_dts.fst", file.path(drv_root, "exclusion"))
