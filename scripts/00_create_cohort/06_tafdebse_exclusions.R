@@ -18,7 +18,7 @@ library(stringr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/eligibility_codes.yml")
 
@@ -81,10 +81,10 @@ eligibility_codes <-
           year = as.numeric(RFRNC_YR),
           elig_dt = as.Date(paste0(year, "-", month, "-01"))) |> 
   join(cohort, how = "inner") |> 
-  fselect(BENE_ID, washout_start_dt, pain_diagnosis_dt, code, elig_dt)
+  fselect(BENE_ID, washout_start_dt, washout_end_dt, code, elig_dt)
 
 eligibility_codes <- 
-  fsubset(eligibility_codes, elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt - 1))
+  fsubset(eligibility_codes, elig_dt %within% interval(washout_start_dt, washout_end_dt))
 
 # Filter to last eligiblity code in washout time period
 wo_eligibility_codes <- 
@@ -130,7 +130,7 @@ dual_codes <-
 
 exclusion_dual_eligible <- 
   join(cohort, dual_codes, how = "inner") |> 
-  fmutate(exclusion_dual_eligible = elig_dt %within% interval(washout_start_dt, pain_diagnosis_dt - 1)) |> 
+  fmutate(exclusion_dual_eligible = elig_dt %within% interval(washout_start_dt, washout_end_dt)) |> 
   fsubset(exclusion_dual_eligible) |> 
   fselect(BENE_ID, exclusion_dual_eligible) |> 
   distinct() |> 

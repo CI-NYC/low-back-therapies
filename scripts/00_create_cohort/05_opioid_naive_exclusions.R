@@ -14,28 +14,10 @@ library(arrow)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-ndc <- readRDS(file.path(drv_root,"exclusion/ndc_to_atc_crosswalk.rds"))
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
-
 # load initial continuous enrollment cohort
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
-cohort <- cohort |>
-  distinct() |>
-  mutate(exposure_end_dt = pain_diagnosis_dt + days(90))
 
-ndc_opioids <- readRDS(file.path(drv_root, "exclusion/ndc_to_atc_opioids.rds"))
-  
-# # find opioid ndcs --------------------------------------------------------
-# 
-# opioids <- names(codes[["Opioid pain"]]$ATC)
-# 
-# opioid_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
-#   any(sapply(opioids, \(x) str_detect(code, x)), na.rm = TRUE)
-# }
-# 
-# ndc_opioids <- ndc[opioid_flag]
-# 
-# saveRDS(ndc_opioids, file.path(drv_root, "exclusion/ndc_to_atc_opioids.rds"))
+ndc_opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
 
 # filter rxl and otl files ------------------------------------------------
 
@@ -80,7 +62,7 @@ remove <- rbind(otl, rxl) |> unique()
 # number of patients with opioids in washout
 remove |> nrow()
 
-cohort <- anti_join(cohort, remove)
+# cohort <- anti_join(cohort, remove)
 
 # # Read in RXL (pharmacy line)
 # rxl <- open_rxl()
@@ -122,4 +104,8 @@ cohort <- anti_join(cohort, remove)
 # # keep <- unique(rxl)
 # cohort <- unique(left_join(keep, cohort))
 
-write_data(cohort, "pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- cohort |>
+  mutate(exclusion_opioid_naive = ifelse(BENE_ID %in% remove$BENE_ID, 1, 0)) |>
+  select(BENE_ID, exclusion_opioid_naive)
+
+write_data(cohort, "pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))

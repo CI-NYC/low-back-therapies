@@ -16,9 +16,10 @@ library(dplyr)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load washout dates
-washout <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
+washout <- load_data("low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 
-washout[, let(exposure_end_dt = pain_diagnosis_dt + days(91))]
+washout[, let(washout_start_dt = first_treatment_dt - days(182),
+              washout_end_dt = first_treatment_dt - days(1))]
 
 # Load all dates
 dates <- open_dedts()
@@ -33,7 +34,7 @@ setDT(dates, key = "BENE_ID")
 
 dates <- dates[order(rleid(BENE_ID), ENRLMT_START_DT)]
 dates <- dates[!is.na(ENRLMT_START_DT) & !is.na(ENRLMT_END_DT)]
-dates <- dates[ENRLMT_START_DT <= exposure_end_dt]
+dates <- dates[ENRLMT_START_DT <= washout_end_dt]
 
 idx <- split(seq_len(nrow(dates)), list(dates$BENE_ID))
 tmp <- lapply(idx, \(x) dates[x])
@@ -51,7 +52,7 @@ chunks <- split_list_into_chunks(tmp, 1e5)
 # Save each chunk to a separate RDS file
 for (i in seq_along(chunks)) {
   file_name <- paste0(drv_root,
-    "/tmp/enrollment_period_chunk_", 
+    "/exclusion/tmp/enrollment_period_chunk_", 
     i, ".rds"
   )
   saveRDS(tmp[chunks[[i]]], file = file_name)

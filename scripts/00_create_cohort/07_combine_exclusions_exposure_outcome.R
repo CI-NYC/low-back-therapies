@@ -14,7 +14,9 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 # base cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+# opioid naive exclusion
+opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
 # debse exclusions
 debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
 # iph exclusions
@@ -23,21 +25,20 @@ iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
 # oud exclusions
 oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
-# exposures
-exposures <- load_data("exposures.fst", file.path(drv_root, "treatments"))
-# censoring
-cens <- load_data("pain_washout_continuous_enrollment_opioid_requirements_censoring.fst", file.path(drv_root, "outcomes"))
-# outcomes
-outcomes <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_outcomes.fst", file.path(drv_root, "outcomes"))
-hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst", file.path(drv_root, "outcomes"))
+# # exposures
+# exposures <- load_data("exposures.fst", file.path(drv_root, "treatments"))
+# # censoring
+# cens <- load_data("pain_washout_continuous_enrollment_opioid_requirements_censoring.fst", file.path(drv_root, "outcomes"))
+# # outcomes
+# outcomes <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_outcomes.fst", file.path(drv_root, "outcomes"))
+# hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst", file.path(drv_root, "outcomes"))
 
 
 cohort <- list(
   cohort, 
   debse_exclusions, 
   iph_exclusions, 
-  oth_exclusions, 
-  oud_exclusions
+  oth_exclusions
 ) |> 
   reduce(join, how = "left") |>
   mutate(across(everything(), ~ replace_na(., 0)))
@@ -109,4 +110,17 @@ cohort <- cohort |>
                                   TRUE ~ oud_hillary_period_5)
          )
 
-write_data(cohort, "inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root, "final"))
+OUD_NO_cohort <- cohort |>
+  left_join(opioid_naive_exclusion)|>
+  left_join(oud_exclusions) |>
+  filter(exclusion_opioid_naive == 0,
+         exclusion_oud == 0) |>
+  select(-exclusion_opioid_naive, -exclusion_oud)
+  
+OUD_YES_cohort <- cohort |>
+  left_join(oud_exclusions) |>
+  filter(exclusion_oud == 1) |>
+  select(-exclusion_oud)
+  
+write_data(OUD_NO_cohort, "cohort_final.fst", file.path(drv_root, "final"))
+write_data(OUD_YES_cohort, "cohort_OUD_final.fst", file.path(drv_root, "final"))

@@ -12,7 +12,9 @@ library(collapse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # base cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst",file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+# opioid naive exclusion
+opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
 # debse exclusions
 debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
 # iph exclusions
@@ -30,6 +32,7 @@ oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 
 cohort <- list(
   cohort, 
+  opioid_naive_exclusion,
   debse_exclusions, 
   iph_exclusions, 
   oth_exclusions, 
@@ -39,6 +42,25 @@ cohort <- list(
   mutate(across(everything(), ~ replace_na(., 0)))
 
 nrow(cohort)
+
+# exclusion oud
+cohort |>
+  filter(exclusion_oud == 1) |>
+  nrow()
+
+cohort <- cohort |>
+  filter(exclusion_oud == 0)
+
+# exclusion opioid_naive
+cohort |>
+  filter(exclusion_opioid_naive == 1) |>
+  nrow()
+
+cohort <- cohort |>
+  filter(exclusion_opioid_naive == 0)
+
+nrow(cohort)
+
 
 # exclusion MD
 cohort |>
@@ -117,14 +139,6 @@ cohort <- cohort |>
 
 nrow(cohort)
 
-# exclusion oud
-cohort |>
-  filter(exclusion_oud == 1) |>
-  nrow()
 
-cohort <- cohort |>
-  filter(exclusion_oud == 0)
-
-nrow(cohort)
 
 

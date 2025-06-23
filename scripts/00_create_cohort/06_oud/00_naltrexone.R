@@ -17,7 +17,7 @@ library(yaml)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 hcpcs <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$naltrexone
 
@@ -120,7 +120,7 @@ moud_nal <-
   join(cohort, how = "left") |> 
   fmutate(moud_nal_washout = int_overlaps(
     interval(moud_start_dt, moud_end_dt),
-    interval(washout_start_dt, pain_diagnosis_dt)
+    interval(washout_start_dt, washout_end_dt)
   )) |> 
   fgroup_by(BENE_ID) |> 
   fsummarise(moud_nal_washout = as.numeric(sum(moud_nal_washout) > 0))
@@ -128,6 +128,7 @@ moud_nal <-
 # - Rejoin entire initial cohort and save
 moud_nal <- 
   join(cohort, moud_nal, how = "left") |> 
-  fmutate(moud_nal_washout = replace_na(moud_nal_washout, 0))
+  fmutate(moud_nal_washout = replace_na(moud_nal_washout, 0)) |>
+  select(BENE_ID, moud_nal_washout)
 
 write_data(moud_nal, "pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", file.path(drv_root, "exclusion"))

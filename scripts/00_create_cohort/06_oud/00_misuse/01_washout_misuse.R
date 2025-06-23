@@ -14,13 +14,13 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 # Load study pain opioids
 opioids <- load_data("pain_washout_continuous_enrollment_opioid_requirements_pain_opioids_dts.fst", file.path(drv_root, "exclusion"))
 
 washout_oud_misuse <- 
-  fsubset(opioids, RX_FILL_DT %within% interval(washout_start_dt, pain_diagnosis_dt)) |> 
+  fsubset(opioids, RX_FILL_DT %within% interval(washout_start_dt, washout_end_dt)) |> 
   fgroup_by(BENE_ID) |> 
   fsummarise(distinct_providers = n_distinct(PRSCRBNG_PRVDR_NPI), 
              distinct_dispensers = n_distinct(DSPNSNG_PRVDR_NPI),
@@ -46,7 +46,8 @@ washout_oud_misuse <-
   ) |> 
   fselect(BENE_ID, exclusion_oud_misuse) |> 
   join(cohort, how = "right") |> 
-  fmutate(exclusion_oud_misuse = replace_na(exclusion_oud_misuse, 0))
+  fmutate(exclusion_oud_misuse = replace_na(exclusion_oud_misuse, 0)) |>
+  select(BENE_ID, exclusion_oud_misuse)
 
 # export
 write_data(washout_oud_misuse, "pain_washout_continuous_enrollment_opioid_requirements_washout_oud_misuse.fst", file.path(drv_root, "exclusion"))

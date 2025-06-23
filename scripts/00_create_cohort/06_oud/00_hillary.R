@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/oud_codes.yml")$hillary
 
 # load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 # Read in IPH dataset
 iph <- open_iph()
@@ -58,6 +58,6 @@ oud_hillary <-
 
 oud_hillary <- 
   inner_join(oud_hillary, cohort) |> 
-  filter(oud_hillary_dt %within% interval(washout_start_dt, exposure_end_dt + 455))
+  filter(oud_hillary_dt %within% interval(washout_start_dt, first_treatment_dt + 455))
 
 write_data(oud_hillary, "pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_dts.fst", file.path(drv_root, "exclusion"))

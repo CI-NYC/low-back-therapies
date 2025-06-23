@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
 # Load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 # Load opioid pain NDC
 opioids <- read_csv("~/medicaid/low-back-therapies/data/public/opioid_pain_ndc.csv")
@@ -41,7 +41,7 @@ prescribers <-
   select(BENE_ID, CLM_ID, PRSCRBNG_PRVDR_ID, PRSCRBNG_PRVDR_NPI, DSPNSNG_PRVDR_ID, DSPNSNG_PRVDR_NPI, RX_FILL_DT) |>
   inner_join(cohort) |> 
   collect() |> 
-  fsubset(RX_FILL_DT %within% interval(washout_start_dt, exposure_end_dt + 455)) |> 
+  fsubset(RX_FILL_DT %within% interval(washout_start_dt, first_treatment_dt + 455)) |> 
   fsubset(CLM_ID %in% opioids$CLM_ID)
 
 opioids <- join(opioids, prescribers, how = "right")

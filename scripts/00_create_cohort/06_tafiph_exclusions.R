@@ -22,7 +22,7 @@ codes <- read_yaml("~/medicaid/low-back-therapies/data/public/icd_codes.yml")
 # Read in IPH dataset
 iph <- open_iph()
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 icd <-
   iph |>
@@ -30,11 +30,11 @@ icd <-
   collect()
 
 icd_washout <- 
-  join(fselect(cohort, BENE_ID, washout_start_dt, pain_diagnosis_dt), 
+  join(fselect(cohort, BENE_ID, washout_start_dt, washout_end_dt), 
        icd, 
        how = "inner") |> 
   fmutate(SRVC_BGN_DT = fifelse(is.na(SRVC_BGN_DT), SRVC_END_DT, SRVC_BGN_DT)) |> 
-  fsubset(SRVC_BGN_DT %within% interval(washout_start_dt, pain_diagnosis_dt - 1)) |> 
+  fsubset(SRVC_BGN_DT %within% interval(washout_start_dt, washout_end_dt)) |> 
   as_tibble()
 
 # Identify whether exclusion ICD code of interest occurs in washout ICDs

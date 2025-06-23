@@ -14,7 +14,7 @@ library(fst)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 # load component files ----------------------------------------------------
 
@@ -30,7 +30,7 @@ nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_na
 # - combine MOUD files
 cohort <- 
   list(bup, methadone, nal) |> 
-  map(\(x) fselect(x, BENE_ID, 5)) |> 
+  map(\(x) fselect(x, BENE_ID, 2)) |> 
   reduce(join, how = "left") |> 
   join(cohort, how = "left")
 
@@ -43,7 +43,7 @@ cohort <-
 cohort <- 
   fmutate(hillary, 
         exclusion_oud_hillary = 
-          as.numeric(oud_hillary_dt %within% interval(washout_start_dt, pain_diagnosis_dt))) |> 
+          as.numeric(oud_hillary_dt %within% interval(washout_start_dt, washout_end_dt))) |> 
   fselect(BENE_ID, exclusion_oud_hillary) |> 
   distinct() |> 
   join(cohort, how = "right") |> 
@@ -53,7 +53,7 @@ cohort <-
 cohort <- 
   fmutate(poison, 
           exclusion_oud_poison = 
-            as.numeric(oud_poison_dt %within% interval(washout_start_dt, pain_diagnosis_dt))) |> 
+            as.numeric(oud_poison_dt %within% interval(washout_start_dt, washout_end_dt))) |> 
   fselect(BENE_ID, exclusion_oud_poison) |> 
   distinct() |> 
   join(cohort, how = "right") |> 

@@ -16,10 +16,10 @@ library(yaml)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-drv_root <- "/mnt/general-data/disability/low-back-therapies/exclusion"
+# drv_root <- "/mnt/general-data/disability/low-back-therapies/exclusion"
 
 # Load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", drv_root)
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
 hcpcs <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$buprenorphine
@@ -151,15 +151,15 @@ bup <-
 ) |> 
   funique()
 
-# - Save all moud periods for the initial cohort
-write_data(bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_intervals.fst", drv_root)
+# # - Save all moud periods for the initial cohort
+# write_data(bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_intervals.fst", drv_root)
 
 moud_bup <- 
   roworder(bup, BENE_ID, moud_start_dt) |> 
   join(cohort, how = "left") |> 
   fmutate(moud_bup_washout = int_overlaps(
     interval(moud_start_dt, moud_end_dt),
-    interval(washout_start_dt, pain_diagnosis_dt)
+    interval(washout_start_dt, washout_end_dt)
   )) |> 
   fgroup_by(BENE_ID) |> 
   fsummarise(moud_bup_washout = as.numeric(sum(moud_bup_washout) > 0))
@@ -167,6 +167,7 @@ moud_bup <-
 # - Rejoin entire initial cohort and save
 moud_bup <- 
   join(cohort, moud_bup, how = "left") |> 
-  fmutate(moud_bup_washout = replace_na(moud_bup_washout, 0))
+  fmutate(moud_bup_washout = replace_na(moud_bup_washout, 0)) |>
+  select(BENE_ID, moud_bup_washout)
 
-write_data(moud_bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_washout.fst", drv_root)
+write_data(moud_bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_washout.fst", file.path(drv_root,"exclusion"))
