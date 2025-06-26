@@ -54,7 +54,7 @@ get_duration <- function(data, gap = 30) {
   
   result <- data.table(min(last_elig_treatment_date, data$treatment_start_dt_possible_latest[1]))
   
-  names(result) <- c("last_treatment_date")
+  names(result) <- c("last_treatment_dt")
   return(result)
 }
 

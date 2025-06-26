@@ -16,15 +16,16 @@ library(doFuture)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
-opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatments"))
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatments")) |>
+  mutate(rx_end_dt = pmin(rx_end_dt, exposure_end_dt)) |>
+  mutate(rx_end_dt = as.Date(rx_end_dt))
 
 setDT(opioids)
 setkey(opioids, BENE_ID)
 
-opioids <- opioids[, .(BENE_ID, pain_diagnosis_dt, exposure_end_dt, 
-                       rx_start_dt, rx_end_dt, NDC, opioid, mme_strength_per_day)] |>
-  mutate(rx_end_dt = rx_end_dt - days(1)) # true exposure end date should be 1 less than what was previously used
+opioids <- opioids[, .(BENE_ID, first_treatment_dt, last_treatment_dt, 
+                       rx_start_dt, rx_end_dt, NDC, opioid, mme_strength_per_day)]
+  
 
 num_opioids <- opioids |>
   group_by(BENE_ID) |>
@@ -39,16 +40,14 @@ opioids <- opioids[, list(data = list(data.table(.SD))), by = BENE_ID]
 calculate_max_daily_dose <- function(data) {
   to_modify <- copy(data)
   
-  to_modify[, .(date = seq(rx_start_dt, rx_end_dt, by = "1 day"), 
-                exposure_end_dt, NDC, opioid, mme_strength_per_day), 
+  to_modify[, .(date = seq(rx_start_dt, rx_end_dt, by = "1 day"), NDC, opioid, mme_strength_per_day), 
             by = .(seq_len(nrow(data)))
-  ][date <= exposure_end_dt, 
   ][, .(total_mme_strength = sum(mme_strength_per_day, na.rm = TRUE)), 
     by = .(date)
   ][, .(exposure_max_daily_dose_mme = max(total_mme_strength))]
 }
 
-plan(multisession, workers = 50)
+plan(multisession, workers = 10)
 
 # Apply function
 out <- foreach(data = opioids$data, 

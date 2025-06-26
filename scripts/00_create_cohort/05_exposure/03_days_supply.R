@@ -17,8 +17,10 @@ library(collapse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion"))
-opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatments"))
+# cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |>
+#   mutate(exposure_end_dt = first_treatment_dt + days(90))
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment"))
+  
 
 days_supply <- function(data) {
   dur <- 0
@@ -40,8 +42,7 @@ days_supply <- function(data) {
 
 opioids <- 
   opioids |> 
-  mutate(rx_int = interval(rx_start_dt, rx_end_dt), 
-         rx_int = intersect(rx_int, interval(pain_diagnosis_dt, as.Date(ifelse(rx_end_dt > exposure_end_dt, exposure_end_dt + days(1), exposure_end_dt))))) |> # bug where if exposure end date and rx end overlap, interval is 1 less than should be
+  mutate(rx_int = interval(rx_start_dt, pmin(rx_end_dt+1, exposure_end_dt))) |> # +1 because "as.duration", a function used below, counts the time elapsed between two dates. A prescription that starts and ends on the same day should have 1 day supply, but as.duration will return 0.
   select(BENE_ID, NDC, opioid, rx_int) |> 
   as_tibble() |> 
   mutate(interval_days_supply = as.numeric(as.duration(rx_int), "days")) |> 
@@ -87,7 +88,7 @@ opioids <-
 #   }, 30)
 # )
 
-plan(multisession, workers = 50)
+plan(multisession, workers = 10)
 
 days <- foreach(id = unique(opioids$BENE_ID), 
                 .combine = "c",
@@ -103,4 +104,4 @@ opioids <-
   funique() |>
   fmutate(exposure_days_supply = days)
 
-write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "treatments"))
+write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "treatment"))

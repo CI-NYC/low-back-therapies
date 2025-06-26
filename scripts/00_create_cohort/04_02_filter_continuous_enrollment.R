@@ -14,7 +14,7 @@ library(foreach)
 library(doFuture)
 library(dplyr)
 
-source("~/medicaid/low-back-therapies//R/helpers.R")
+source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load washout dates
 # drv_root <- file.path(drv_root, "exclusion")

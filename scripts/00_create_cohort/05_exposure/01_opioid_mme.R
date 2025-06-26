@@ -9,7 +9,9 @@
 library(tidyverse)
 library(fuzzyjoin)
 
-opioids <- readRDS(file.path(drv_root, "exclusion/ndc_to_atc_opioids_with_strength.rds"))
+source("~/medicaid/low-back-therapies/R/helpers.R")
+
+opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids_with_strength.rds")
 mme_conversion <- read_csv("~/medicaid/low-back-therapies/data/public/mme.csv")
 
 ci_str_detect <- function(x, y) str_detect(x, regex(y, ignore_case = TRUE))
@@ -29,9 +31,9 @@ opioids_mme <- filter(opioids_mme, !(NDC %in% remove_codeine & opioid == "codein
 # Should only be drugs used for MOUD
 no_mme <- anti_join(opioids, opioids_mme, by = "NDC")
 
-# unnest(no_mme, cols = "strength") |> 
-#   select(activeIngredientName) |> 
-#   unique()
+unnest(no_mme, cols = "strength") |>
+  select(activeIngredientName) |>
+  unique()
 
 opioids_mme <- opioids_mme |> 
   mutate(

@@ -16,7 +16,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 rxh <- open_rxh()
 
 # RXL
-opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatments"))
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment"))
 
 rxl_claims <- open_rxl() |>
   filter(CLM_ID %in% opioids$CLM_ID) |>
@@ -27,7 +27,7 @@ rxl <- opioids |>
   filter(CLM_ID %in% rxl_claims$CLM_ID)
 
 # Read in cohort and dates
-cohort <- load_data("pain_washout_continuous_enrollment_opioid_requirements.fst", file.path(drv_root, "exclusion")) |>
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |>
   select(BENE_ID, pain_diagnosis_dt) |>
   as.data.table()
 
@@ -61,9 +61,9 @@ prescribers <- merge(cohort, prescribers) |> as.data.table()
 
 # Set up month variables
 prescribers[, c("month1", "month2", "month3") := 
-              .(rx_start_dt %within% interval(pain_diagnosis_dt, pain_diagnosis_dt + days(30)),
-                rx_start_dt %within% interval(pain_diagnosis_dt + days(31), pain_diagnosis_dt + days(60)),
-                rx_start_dt %within% interval(pain_diagnosis_dt + days(61), pain_diagnosis_dt + days(90)))
+              .(rx_start_dt %within% interval(first_treatment_dt, first_treatment_dt + days(30)),
+                rx_start_dt %within% interval(first_treatment_dt + days(31), first_treatment_dt + days(60)),
+                rx_start_dt %within% interval(first_treatment_dt + days(61), first_treatment_dt + days(90)))
               ]
 
 # Calculate the sum of unique prescriber IDs for each month and sum variable for the 6-month period
@@ -87,4 +87,4 @@ exposure_distinct_prescribers <-
 
 
 # Save final dataset -----------------------------------------------------------
-write_data(exposure_distinct_prescribers, "exposure_distinct_prescribers.fst", file.path(drv_root, "treatments"))
+write_data(exposure_distinct_prescribers, "exposure_distinct_prescribers.fst", file.path(drv_root, "treatment"))

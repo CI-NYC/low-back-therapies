@@ -25,8 +25,8 @@ iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
 # oud exclusions
 oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
-# # exposures
-# exposures <- load_data("exposures.fst", file.path(drv_root, "treatments"))
+# exposures
+exposures <- load_data("exposures.fst", file.path(drv_root, "treatment"))
 # # censoring
 # cens <- load_data("pain_washout_continuous_enrollment_opioid_requirements_censoring.fst", file.path(drv_root, "outcomes"))
 # # outcomes
@@ -36,6 +36,8 @@ oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 
 cohort <- list(
   cohort, 
+  # opioid_naive_exclusion,
+  # oud_exclusions,
   debse_exclusions, 
   iph_exclusions, 
   oth_exclusions
@@ -48,16 +50,16 @@ cohort <- filter(cohort, if_all(starts_with("exclusion"), \(x) x == 0))
 
 # Add in exposure, outcome, and censoring data
 cohort <- 
-  join(cohort, exposures, how = "left") |>
-  join(outcomes, how = "left") |>
-  join(hillary, how = "left") |>
-  join(cens, how = "left") |>
-  mutate(cens_hillary_period_1 = cens_period_1,
-         cens_hillary_period_2 = cens_period_2,
-         cens_hillary_period_3 = cens_period_3,
-         cens_hillary_period_4 = cens_period_4,
-         cens_hillary_period_5 = cens_period_5
-  )
+  join(cohort, exposures, how = "left") #|>
+  # join(outcomes, how = "left") |>
+  # join(hillary, how = "left") |>
+  # join(cens, how = "left") |>
+  # mutate(cens_hillary_period_1 = cens_period_1,
+  #        cens_hillary_period_2 = cens_period_2,
+  #        cens_hillary_period_3 = cens_period_3,
+  #        cens_hillary_period_4 = cens_period_4,
+  #        cens_hillary_period_5 = cens_period_5
+  # )
 
 convert_cens_to_na <- function (data, outcomes, cens) {
   DT <- as.data.table(data)
@@ -91,36 +93,49 @@ convert_outcome_to_na <- function (data, outcomes, cens) {
 }
 
 cohort <- cohort |>
-  convert_outcome_to_na(paste0("oud_period_", 1:5), paste0("cens_period_", 1:5)) |>
-  convert_cens_to_na(paste0("oud_period_", 1:5), paste0("cens_period_", 1:5)) |>
-  convert_outcome_to_na(paste0("oud_hillary_period_", 1:5), paste0("cens_hillary_period_", 1:5)) |>
-  convert_cens_to_na(paste0("oud_hillary_period_", 1:5), paste0("cens_hillary_period_", 1:5)) |>
-  select(BENE_ID, washout_start_dt, pain_diagnosis_dt,
-         starts_with("exposure"), 
-         starts_with("subset"), 
-  starts_with("cens_period"),
-  starts_with("cens_hillary_period"),
-  starts_with("oud_period"),
-  starts_with("oud_hillary_period")) |>
-  mutate(oud_period_5 = case_when(oud_period_4 == 1 ~ 1,
-                                  cens_period_5 == 0 ~ as.numeric(NA),
-                                  TRUE ~ oud_period_5),
-         oud_hillary_period_5 = case_when(oud_hillary_period_4 == 1 ~ 1,
-                                  cens_hillary_period_5 == 0 ~ as.numeric(NA),
-                                  TRUE ~ oud_hillary_period_5)
-         )
-
-OUD_NO_cohort <- cohort |>
   left_join(opioid_naive_exclusion)|>
   left_join(oud_exclusions) |>
-  filter(exclusion_opioid_naive == 0,
-         exclusion_oud == 0) |>
-  select(-exclusion_opioid_naive, -exclusion_oud)
-  
-OUD_YES_cohort <- cohort |>
-  left_join(oud_exclusions) |>
-  filter(exclusion_oud == 1) |>
-  select(-exclusion_oud)
-  
-write_data(OUD_NO_cohort, "cohort_final.fst", file.path(drv_root, "final"))
-write_data(OUD_YES_cohort, "cohort_OUD_final.fst", file.path(drv_root, "final"))
+  mutate(subset_oud = ifelse(exclusion_opioid_naive == 0 & exclusion_oud == 0, 0,
+                             ifelse(exclusion_oud == 1, 1, NA))) |>
+  filter(!is.na(subset_oud))
+
+cohort <- cohort |>
+  # convert_outcome_to_na(paste0("oud_period_", 1:5), paste0("cens_period_", 1:5)) |>
+  # convert_cens_to_na(paste0("oud_period_", 1:5), paste0("cens_period_", 1:5)) |>
+  # convert_outcome_to_na(paste0("oud_hillary_period_", 1:5), paste0("cens_hillary_period_", 1:5)) |>
+  # convert_cens_to_na(paste0("oud_hillary_period_", 1:5), paste0("cens_hillary_period_", 1:5)) |>
+  select(BENE_ID, 
+         ends_with("dt"),
+         starts_with("exposure"),
+         starts_with("subset")
+         # starts_with("cens_period"),
+         # starts_with("cens_hillary_period"),
+         # starts_with("oud_period"),
+         # starts_with("oud_hillary_period"),
+         # starts_with("ed_visit_period")
+         ) #|>
+  # mutate(oud_period_5 = case_when(oud_period_4 == 1 ~ 1,
+  #                                 cens_period_5 == 0 ~ as.numeric(NA),
+  #                                 TRUE ~ oud_period_5),
+  #        oud_hillary_period_5 = case_when(oud_hillary_period_4 == 1 ~ 1,
+  #                                 cens_hillary_period_5 == 0 ~ as.numeric(NA),
+  #                                 TRUE ~ oud_hillary_period_5)
+  #        )
+
+# OUD_NO_cohort <- cohort |>
+#   left_join(opioid_naive_exclusion)|>
+#   left_join(oud_exclusions) |>
+#   filter(exclusion_opioid_naive == 0,
+#          exclusion_oud == 0) |>
+#   select(-exclusion_opioid_naive, -exclusion_oud)
+#   
+# OUD_YES_cohort <- cohort |>
+#   left_join(oud_exclusions) |>
+#   filter(exclusion_oud == 1) |>
+#   select(-exclusion_oud)
+# 
+#   
+# write_data(OUD_NO_cohort, "cohort_final.fst", file.path(drv_root, "final"))
+# write_data(OUD_YES_cohort, "cohort_OUD_final.fst", file.path(drv_root, "final"))
+
+write_data(cohort, "inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root, "exclusion"))
