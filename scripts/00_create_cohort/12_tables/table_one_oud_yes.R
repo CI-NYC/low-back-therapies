@@ -181,10 +181,10 @@ continuous_names <- c("Age",
 
 summarise_continuous_variable <- function(data, variable){
   if (variable != "dem_age"){
-    # data <- data[exposure_days_supply > 0,]
-    return(paste0(sum(data[[variable]]>1),
-                  " (", round(mean(data[[variable]]>1)*100,2), "\\%)")
-    )
+    data <- data[exposure_days_supply > 0,]
+    # return(paste0(sum(data[[variable]]>1),
+    #               " (", round(mean(data[[variable]]>1)*100,2), "\\%)")
+    # )
   }
   
   return(paste0(round(median(data[[variable]]),2)," (",
