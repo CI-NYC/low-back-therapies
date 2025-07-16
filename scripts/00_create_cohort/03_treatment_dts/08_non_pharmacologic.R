@@ -1,10 +1,8 @@
 # -------------------------------------
-# Script: 08_mediator_physical_therapy.R
-# Author: Nick Williams
+# Script: 08_non_pharmaceuticals.R
+# Author: Anton Hung
 # Updated:
-# Purpose: Creates an indicator variable for whether or not an observation in
-#   the analysis cohort had a claim for physical therapy
-#   during the mediator period.
+# Purpose: Finds dates for all claims for non-pharmacologic therapies
 # Notes:
 # -------------------------------------
 
@@ -33,11 +31,13 @@ mediators <- c("Physical therapy",
                "Blocks",
                "Ablative techniques", ##
                "Botulinum toxin injections", ## 
+               "Spinal cord stimulation",
                "Electrical nerve stimulation", ##
                "Intrathecal drug therapies", ## 
                "Epidural steroids", ##
                "Minimally invasive spinal procedures", ##
-               "Trigger point injection") ##
+               "Trigger point injection"
+               ) ##
 treatments_df <- data.frame()
 for (mediator in mediators) {
   for (code in codes[[mediator]]){
@@ -51,7 +51,9 @@ treatments_df <- treatments_df  |>
   mutate(treatment = ifelse(treatment %in% c("Physical therapy",
                                              "Acupuncture",
                                              "Chiropractic",
-                                             "Blocks"), treatment, "Intervention"))
+                                             "Blocks",
+                                             "Spinal cord stimulation"
+                                             ), treatment, "Intervention"))
 
 # Filter OTL to claims codes
 claims_vars <- c("BENE_ID", "LINE_SRVC_BGN_DT", "LINE_SRVC_END_DT", "LINE_PRCDR_CD_SYS", "LINE_PRCDR_CD")
@@ -81,4 +83,5 @@ treatments_dts <- claims |>
   arrange(treatment_start_dt, desc(treatment_end_dt))
 
 write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
+write_data(unique(treatments_dts), "nonpharma_dts_with_scs.fst", file.path(drv_root, "treatment"))
 # saveRDS(treatments_dts, file.path(drv_root, "exclusion/treatments_dts.rds"))

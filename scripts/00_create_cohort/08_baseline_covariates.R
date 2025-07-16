@@ -108,18 +108,11 @@ cohort <-
   select(BENE_ID, 
          ends_with("dt", ignore.case = FALSE),
          starts_with("dem"),
-         starts_with("exposure"), 
-         starts_with("subset")#, 
-        # cens_period_1, oud_period_1,
-        # cens_period_2, oud_period_2,
-        # cens_period_3, oud_period_3,
-        # cens_period_4, oud_period_4,
-        # cens_period_5, oud_period_5,
-        # cens_hillary_period_1, oud_hillary_period_1,
-        # cens_hillary_period_2, oud_hillary_period_2,
-        # cens_hillary_period_3, oud_hillary_period_3,
-        # cens_hillary_period_4, oud_hillary_period_4,
-        # cens_hillary_period_5, oud_hillary_period_5
+         starts_with("exposure"),
+         starts_with("subset"),
+         starts_with("cens"),
+         starts_with("oud"),
+         starts_with("outcome")
         )
 
 write_data(cohort, "pain_cohort.fst", file.path(drv_root, "final"))

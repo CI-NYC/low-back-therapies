@@ -363,3 +363,28 @@ Trigger point injection:
         '20552': Trigger point injection, or TPI, is a medical procedure that involves injecting an anesthetic or corticosteroid substance to relieve a trigger point, which is a painful area or knot in a muscle.
         '20553': Trigger point injection, or TPI, is a medical procedure in which the provider injects an anesthetic or corticosteroid substance into three or more muscles to relieve painful areas or knots in muscles that form when muscles don’t relax.
     HCPC:
+
+Spinal cord stimulation:
+# https://www.sciencedirect.com/science/article/pii/S1094715922006821
+# https://www.sciencedirect.com/science/article/pii/S1094715922007292
+# https://www.sciencedirect.com/science/article/pii/S1094715924012686
+    CPT:
+      # 63685: SCS - IPG implant
+      # # 63688: IPG explant
+      # # 63688: IPG revision
+      # # 95970: SCS programming
+      # # 95971: SCS programming
+      # # 95972: SCS programming
+      # # 95972: SCS programming
+      # 63655: Lead implant - Laminectomy
+      # # 63664: Lead implant - Laminectomy
+      # 63650: Lead implant - Percutaneous
+      # 63663: Lead implant - Percutaneous
+      "63650": In this procedure, the provider places electrodes in the epidural space to relieve pain and reduce or eliminate spasms.
+      "63655": In this procedure, the provider removes a portion of the vertebra called the lamina and places a permanent plate/paddle electrode in the epidural space, or area between the dura membrane and the wall of the vertebra for spinal cord stimulation.
+      "63661": The provider removes one or more spinal neurostimulator electrode percutaneous arrays.
+      "63662": In this procedure, the provider removes the spinal neurostimulator electrode plates or paddles previously placed through laminotomy or laminectomy, which removed either the entire lamina or part of the lamina.
+      "63663": The provider revises and or replaces a previous placed permanent percutaneous electrode array for spinal cord stimulation.
+      "63664": In this procedure, the provider revises the spinal neurostimulator electrode plates or paddles that were previously placed through laminotomy or laminectomy, which removed either the entire lamina or part of the lamina.
+      "63685": The provider inserts or replaces a spinal neurostimulator pulse generator or receiver into a subcutaneous pocket he surgically creates.
+      "63688": The provider revises or removes a previously implanted spinal neurostimulator pulse generator or receiver.

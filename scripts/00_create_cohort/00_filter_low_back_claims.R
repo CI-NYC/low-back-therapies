@@ -1,7 +1,7 @@
 # -------------------------------------
-# Script: 00_filter_msk_claims.R
+# Script: 00_filter_low_back_claims.R
 # Author: Nick Williams
-# Purpose: Find all msk claims within the specified date range 
+# Purpose: Find all low back pain claims within the specified date range 
 #   in the Other Services and Inpatient files
 # Notes:
 # -------------------------------------
@@ -19,6 +19,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 oth <- open_oth()
 iph <- open_iph()
 
+# codes for low back pain, based on search terms
 low_back_pain_icds <- read.csv("~/medicaid/low-back-therapies/data/public/chronic_pain_icd10_20230216.csv") |>
   filter(grepl("low back", ICD_DESC, ignore.case = TRUE) |
            grepl("lumb", ICD_DESC, ignore.case = TRUE) |

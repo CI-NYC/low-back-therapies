@@ -22,6 +22,18 @@ library(purrr)
 # plan(multicore)
 # getDoParWorkers()
 
+# test
+for (i in 1:15) {
+       tmp <- names(readRDS(files[i]))
+       
+       # only keep those in the cohort
+       #tmp <- tmp[names(tmp) %in% washout_ID]
+       
+       # combine into 1 large df
+       tmp_all <- unique(c(tmp_all, tmp))
+}
+
+
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -76,7 +88,7 @@ getdates <- function(df) {
 }
 
 # applying function to each chunk
-for (i in 1:15) {
+for (i in 1:8) {
   tmp <- readRDS(files[i])
   
   # only keep those in the cohort
@@ -101,24 +113,24 @@ for (i in 1:15) {
   )
 }
 
-# # combining results into a list
-# results_list <- list()
-# for (i in seq_along(files)){
-#   print(i)
-#   final_df <- load_data(paste0("outcome/all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_", sprintf("%02d", i), ".fst"), drv_root)
-#   # filter(BENE_ID %in% washout_ID) |>
-#   # left_join(washout) |>
-#   # filter(date >= first_treatment_dt) |> # only need dates from post-exposure start
-#   # select(BENE_ID, ENRLMT_START_DT, ENRLMT_END_DT)
-#   
-#   results_list[[i]] <- final_df
-# }
-# #
-# # # combining list into a dataframe
-# combined_all_df <- bind_rows(results_list)
-# 
-# 
-# write_data(
-#   combined_all_df,
-#   paste0("all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_ALL", ".fst"), file.path(drv_root, "outcome")
-# )
+# combining results into a list
+results_list <- list()
+for (i in seq_along(files)){
+  print(i)
+  final_df <- load_data(paste0("outcome/all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_", sprintf("%02d", i), ".fst"), drv_root)
+  # filter(BENE_ID %in% washout_ID) |>
+  # left_join(washout) |>
+  # filter(date >= first_treatment_dt) |> # only need dates from post-exposure start
+  # select(BENE_ID, ENRLMT_START_DT, ENRLMT_END_DT)
+
+  results_list[[i]] <- final_df
+}
+#
+# # combining list into a dataframe
+combined_all_df <- bind_rows(results_list)
+
+
+write_data(
+  combined_all_df,
+  paste0("all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_ALL", ".fst"), file.path(drv_root, "outcome")
+)

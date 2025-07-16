@@ -1,3 +1,12 @@
+# -------------------------------------
+# Script: 08_non_pharmaceuticals.R
+# Author: Anton Hung
+# Updated:
+# Purpose: Looks through compiled treatments after low back pain diagnosis and 
+#           Keeps treatments only if they are within a 30 day (or 7 day) gap
+#           of the previous treatment.
+# Notes:
+# -------------------------------------
 
 library(tidyverse)
 library(fst)
@@ -26,7 +35,6 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_
 cohort <- cohort |>
   right_join(treatments) |> # 1 634 900 unique BENE_ID
   group_by(BENE_ID) |>
-  # mutate(first_treatment_dt = min(treatment_start_dt)) |>
   select(BENE_ID, treatment_start_dt_possible_latest, treatment_start_dt, treatment_end_dt) |>
   as.data.table()
 
@@ -37,6 +45,7 @@ cohort <- cohort[, list(data = list(data.table(.SD))), by = BENE_ID]
 
 
 get_duration <- function(data, gap = 30) {
+# returns the last possible start date for a treatment where the previous treatment is no more than 7 days before.
   
   observation_start_dt <- data$treatment_start_dt
   observation_end_dt   <- data$treatment_end_dt

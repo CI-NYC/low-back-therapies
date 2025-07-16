@@ -1,9 +1,10 @@
 # -------------------------------------
 # Script: 04_filter_opioid_ndc.R
 # Author: Nick Williams
-# Purpose: find opioids within 3 months of a low back pain claim - record all dates
+# Purpose: find opioid fills for 1 year after follow-up
 # Notes:
 # -------------------------------------
+# 
 
 library(data.table)
 library(tidyverse)
@@ -18,21 +19,10 @@ ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.r
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 
 # load initial continuous enrollment cohort
-cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
-  as.data.table() |>
-  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(90)) # latest date to check
-
-# find opioid ndcs --------------------------------------------------------
-
-opioids <- names(codes[["Opioid pain"]]$ATC)
-
-opioid_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
-  any(sapply(opioids, \(x) str_detect(code, x)), na.rm = TRUE)
-}
-
-ndc_opioids <- ndc[opioid_flag]
-
-saveRDS(ndc_opioids, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
+cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
+  mutate(followup_start_dt = exposure_period_end_dt + days(1), # start of follow-up
+         followup_12mos_dt = exposure_period_end_dt + days(366)) |> # 1 year follow-up
+  select(BENE_ID, followup_start_dt, followup_12mos_dt)
 
 # filter rxl and otl files ------------------------------------------------
 
@@ -53,8 +43,8 @@ otl <-
     LINE_SRVC_END_DT, 
     LINE_SRVC_BGN_DT)
   ) |> 
-  filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
-           (LINE_SRVC_BGN_DT <= treatment_start_dt_possible_latest), 
+  filter((LINE_SRVC_BGN_DT >= followup_start_dt) & 
+           (LINE_SRVC_BGN_DT <= followup_12mos_dt), 
          NDC %in% ndc_opioids$NDC,
          !(NDC %in% c("27505005036", "27505005096"))) |> # lucemyra -- not an opioid
   select(BENE_ID, rx_start_dt = LINE_SRVC_BGN_DT, rx_end_dt = LINE_SRVC_BGN_DT) |>
@@ -66,8 +56,8 @@ otl <- collect(otl) |> as.data.table()
 rxl <- 
   rxl |>
   inner_join(cohort, by = "BENE_ID") |> 
-  filter((RX_FILL_DT >= pain_diagnosis_dt) & 
-           (RX_FILL_DT <= treatment_start_dt_possible_latest), 
+  filter((RX_FILL_DT >= followup_start_dt) & 
+           (RX_FILL_DT <= followup_12mos_dt),
          NDC %in% ndc_opioids$NDC,
          !(NDC %in% c("27505005036", "27505005096"))) |> # lucemyra -- not an opioid
   distinct()
@@ -82,4 +72,4 @@ opioid_claims <- unique(rbind(otl, rxl)) |>
   mutate(treatment_name = "opioid")
 
 
-write_data(opioid_claims, "opioid_dts.fst", file.path(drv_root,"treatment"))
+write_data(opioid_claims, "opioid_dts_12mos.fst", file.path(drv_root,"treatment"))

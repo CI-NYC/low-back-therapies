@@ -151,8 +151,8 @@ bup <-
 ) |> 
   funique()
 
-# # - Save all moud periods for the initial cohort
-# write_data(bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_intervals.fst", drv_root)
+# - Save all moud periods for the initial cohort
+write_data(bup, "pain_washout_continuous_enrollment_opioid_requirements_moud_bup_intervals.fst", drv_root, "exclusion")
 
 moud_bup <- 
   roworder(bup, BENE_ID, moud_start_dt) |> 

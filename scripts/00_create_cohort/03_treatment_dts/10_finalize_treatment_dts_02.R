@@ -1,3 +1,13 @@
+# -------------------------------------
+# Script: 08_non_pharmaceuticals.R
+# Author: Anton Hung
+# Updated:
+# Purpose: Looks through compiled treatments after low back pain diagnosis and 
+#           Keeps treatments only if they are within a 30 day (or 7 day) gap
+#           of the previous treatment.
+# Notes:
+# -------------------------------------
+
 library(tidyverse)
 library(fst)
 library(lubridate)
@@ -17,9 +27,10 @@ opioid_dts <- load_data("opioid_dts.fst", file.path(drv_root, "treatment")) |>
   rename(treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt)
 nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment")) |>
   rename(treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt)
-nonpharma_dts <- load_data("nonpharma_dts.fst", file.path(drv_root, "treatment"))
+nonpharma_dts <- load_data("nonpharma_dts_with_scs.fst", file.path(drv_root, "treatment"))
 treatment_end_dt <- load_data("exposure_end_dt_30_days.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, last_treatment_dt)
+
 
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> 
   left_join(treatment_end_dt) |>
@@ -45,4 +56,6 @@ cohort_dts <- cohort |>
   distinct()
 
 write_data(cohort_dts, "low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion"))
+
+
 

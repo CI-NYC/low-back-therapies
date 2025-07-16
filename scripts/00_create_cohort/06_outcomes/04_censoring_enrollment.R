@@ -23,7 +23,7 @@ cohort_7_day_gap <- load_data("pain_washout_continuous_enrollment_with_exposures
 
 all_enrollment_dates <- load_data("all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_ALL.fst", file.path(drv_root, "outcome")) |>
   left_join(cohort) |>
-  left_join(cohort_7_day_gap) |>
+  # left_join(cohort_7_day_gap) |>
   filter(date >= first_treatment_dt) # only need dates from post-exposure start
 
 
@@ -34,12 +34,12 @@ all_enrollment_dates <- all_enrollment_dates |>
          period_2_end_dt = period_1_end_dt + days(91),
          period_3_end_dt = period_2_end_dt + days(91),
          period_4_end_dt = period_3_end_dt + days(91),
-         period_5_end_dt = period_4_end_dt + days(91),
-         period_1_end_dt_7_day_gap = exposure_period_end_dt_7_day_gap + days(91),
-         period_2_end_dt_7_day_gap = period_1_end_dt_7_day_gap + days(91),
-         period_3_end_dt_7_day_gap = period_2_end_dt_7_day_gap + days(91),
-         period_4_end_dt_7_day_gap = period_3_end_dt_7_day_gap + days(91),
-         period_5_end_dt_7_day_gap = period_4_end_dt_7_day_gap + days(91)
+         period_5_end_dt = period_4_end_dt + days(91)
+         # period_1_end_dt_7_day_gap = exposure_period_end_dt_7_day_gap + days(91),
+         # period_2_end_dt_7_day_gap = period_1_end_dt_7_day_gap + days(91),
+         # period_3_end_dt_7_day_gap = period_2_end_dt_7_day_gap + days(91),
+         # period_4_end_dt_7_day_gap = period_3_end_dt_7_day_gap + days(91),
+         # period_5_end_dt_7_day_gap = period_4_end_dt_7_day_gap + days(91)
   )
 
 # creating indicator for each period
@@ -58,19 +58,19 @@ all_enrollment_dates <- all_enrollment_dates |>
          study_end_dt = exposure_period_end_dt + days(455),
          enrolled_during_study_end_dt = case_when(date == study_end_dt & enrolled == 1 ~ 1,
                                                   TRUE ~ 0),
-         enrolled_during_period_1_7_day_gap = case_when(date >= exposure_period_end_dt_7_day_gap + days(1) & date <= period_1_end_dt_7_day_gap & enrolled == 1 ~ 1,
-                                                        TRUE ~ 0),
-         enrolled_during_period_2_7_day_gap = case_when(date >= period_1_end_dt_7_day_gap + days(0) & date <= period_2_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
-                                                        TRUE ~ 0),
-         enrolled_during_period_3_7_day_gap = case_when(date >= period_2_end_dt_7_day_gap + days(0) & date <= period_3_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
-                                                        TRUE ~ 0),
-         enrolled_during_period_4_7_day_gap = case_when(date >= period_3_end_dt_7_day_gap + days(0) & date <= period_4_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
-                                                        TRUE ~ 0),
-         enrolled_during_period_5_7_day_gap = case_when(date >= period_4_end_dt_7_day_gap + days(0) & date <= period_5_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
-                                                        TRUE ~ 0),
-         study_end_dt_7_day_gap = exposure_period_end_dt_7_day_gap + days(455),
-         enrolled_during_study_end_dt_7_day_gap = case_when(date == study_end_dt_7_day_gap & enrolled == 1 ~ 1,
-                                                            TRUE ~ 0),
+         # enrolled_during_period_1_7_day_gap = case_when(date >= exposure_period_end_dt_7_day_gap + days(1) & date <= period_1_end_dt_7_day_gap & enrolled == 1 ~ 1,
+         #                                                TRUE ~ 0),
+         # enrolled_during_period_2_7_day_gap = case_when(date >= period_1_end_dt_7_day_gap + days(0) & date <= period_2_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
+         #                                                TRUE ~ 0),
+         # enrolled_during_period_3_7_day_gap = case_when(date >= period_2_end_dt_7_day_gap + days(0) & date <= period_3_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
+         #                                                TRUE ~ 0),
+         # enrolled_during_period_4_7_day_gap = case_when(date >= period_3_end_dt_7_day_gap + days(0) & date <= period_4_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
+         #                                                TRUE ~ 0),
+         # enrolled_during_period_5_7_day_gap = case_when(date >= period_4_end_dt_7_day_gap + days(0) & date <= period_5_end_dt_7_day_gap & enrolled == 1 ~ 1, # if they were enrolled on the LAST day of the previous period, their censoring should start in this period
+         #                                                TRUE ~ 0),
+         # study_end_dt_7_day_gap = exposure_period_end_dt_7_day_gap + days(455),
+         # enrolled_during_study_end_dt_7_day_gap = case_when(date == study_end_dt_7_day_gap & enrolled == 1 ~ 1,
+         #                                                    TRUE ~ 0),
   )
 
 all_enrollment_dates_grouped <- all_enrollment_dates |>

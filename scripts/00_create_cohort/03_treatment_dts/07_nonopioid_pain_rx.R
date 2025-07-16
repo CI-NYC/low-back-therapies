@@ -86,7 +86,7 @@ rxl <- open_rxl()
 # Read in OTL (Other services line) 
 otl <- open_otl()
 
-# Find beneficiaries with an opioid following MSK in OTL
+# Find non-opioids in OTL following diagnosis
 otl <- 
   select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
   inner_join(cohort, by = "BENE_ID") |> 
@@ -103,9 +103,8 @@ otl <-
 
 otl <- collect(otl) |> as.data.table()
 
-# Find beneficiaries with an opioid following MSK in OTL
+# Find non-opioids in RXL following diagnosis
 rxl <- 
-  #select(rxl, BENE_ID, CLM_ID, RX_FILL_DT, NDC) |> 
   rxl |>
   inner_join(cohort, by = "BENE_ID") |> 
   filter((RX_FILL_DT >= pain_diagnosis_dt) & 

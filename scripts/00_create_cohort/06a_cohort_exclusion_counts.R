@@ -23,6 +23,8 @@ iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
 # oud exclusions
 oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
+# pain washout
+pain_washout <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
 # exposures
 # exposures <- load_data("exposures_with_subsets.fst", file.path(drv_root, "treatments"))
 # censoring
@@ -36,7 +38,8 @@ cohort <- list(
   debse_exclusions, 
   iph_exclusions, 
   oth_exclusions, 
-  oud_exclusions
+  oud_exclusions,
+  pain_washout
 ) |> 
   reduce(join, how = "left") |>
   mutate(across(everything(), ~ replace_na(., 0)))
@@ -45,11 +48,11 @@ nrow(cohort)
 
 # exclusion oud
 cohort |>
-  filter(exclusion_oud == 1) |>
+  filter(exclusion_oud == 0) |>
   nrow()
 
 cohort <- cohort |>
-  filter(exclusion_oud == 0)
+  filter(exclusion_oud == 1)
 
 # exclusion opioid_naive
 cohort |>
@@ -61,6 +64,14 @@ cohort <- cohort |>
 
 nrow(cohort)
 
+
+# exclusion prior pain
+cohort |>
+  filter(exclusion_washout_pain == 1) |>
+  nrow()
+
+cohort <- cohort |>
+  filter(exclusion_washout_pain == 0)
 
 # exclusion MD
 cohort |>

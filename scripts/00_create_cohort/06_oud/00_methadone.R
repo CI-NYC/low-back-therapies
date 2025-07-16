@@ -52,7 +52,7 @@ otl_methadone <-
   fselect(BENE_ID, moud_start_dt, moud_end_dt)
 
 # # - Save all moud periods for the initial cohort
-# write_data(otl_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", file.path(drv_root, "exclusion"))
+write_data(otl_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", file.path(drv_root, "exclusion"))
 
 # - Filter to moud periods where the start or end date is within the washout period
 # - If any moud periods are within the washout period, obs is considered as having moud in washout
