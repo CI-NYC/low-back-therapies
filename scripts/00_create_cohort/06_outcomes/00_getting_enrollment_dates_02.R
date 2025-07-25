@@ -23,15 +23,15 @@ library(purrr)
 # getDoParWorkers()
 
 # test
-for (i in 1:15) {
-       tmp <- names(readRDS(files[i]))
-       
-       # only keep those in the cohort
-       #tmp <- tmp[names(tmp) %in% washout_ID]
-       
-       # combine into 1 large df
-       tmp_all <- unique(c(tmp_all, tmp))
-}
+# for (i in 1:15) {
+#        tmp <- names(readRDS(files[i]))
+#        
+#        # only keep those in the cohort
+#        #tmp <- tmp[names(tmp) %in% washout_ID]
+#        
+#        # combine into 1 large df
+#        tmp_all <- unique(c(tmp_all, tmp))
+# }
 
 
 
@@ -88,7 +88,7 @@ getdates <- function(df) {
 }
 
 # applying function to each chunk
-for (i in 1:8) {
+for (i in 16:19) {
   tmp <- readRDS(files[i])
   
   # only keep those in the cohort

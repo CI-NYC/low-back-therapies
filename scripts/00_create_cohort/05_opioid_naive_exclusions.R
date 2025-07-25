@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # load initial continuous enrollment cohort
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
-ndc_opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
+ndc_opioids <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
 
 # filter rxl and otl files ------------------------------------------------
 

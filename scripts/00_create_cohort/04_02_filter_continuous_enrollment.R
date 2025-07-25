@@ -23,6 +23,12 @@ washout <- load_data("low_back_cohort_treatment_dts.fst", file.path(drv_root, "e
 washout[, let(washout_start_dt = first_treatment_dt - days(182),
               washout_end_dt = first_treatment_dt - days(1))]
 
+washout_7day_gap <- load_data("low_back_cohort_treatment_dts_7day_gap.fst", file.path(drv_root, "exclusion")) |> as.data.table()
+
+washout_7day_gap[, let(washout_start_dt = first_treatment_dt - days(182),
+              washout_end_dt = first_treatment_dt - days(1))]
+
+
 
 # Load temporary files for 01_01_filter_continuous_enrollment.R
 files <- 
@@ -118,6 +124,19 @@ cohort <-
   rbindlist()
 
 washout <- merge(washout, cohort)
+washout_7day_gap <- merge(washout_7day_gap, cohort)
 
 # export
 write_data(distinct(washout), "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+write_data(distinct(washout_7day_gap), "pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
+
+# # TEMPORARY FIX
+# tmp <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+# tmp2 <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
+# 
+# tmp <- tmp |>
+#   filter(BENE_ID %in% tmp2$BENE_ID)
+# tmp2 <- tmp2 |>
+#   filter(BENE_ID %in% tmp$BENE_ID)
+# 
+# write_data(tmp, "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))

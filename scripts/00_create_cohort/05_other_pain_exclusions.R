@@ -7,7 +7,8 @@ library(fst)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |>
+  mutate(exclusion_start_dt = washout_start_dt + days(91))
 
 # Load necessary datasets
 oth <- open_oth()
@@ -40,8 +41,8 @@ oth_pain <-
     SRVC_END_DT, 
     SRVC_BGN_DT)
   ) |> 
-  filter((SRVC_BGN_DT >= washout_start_dt) & 
-           (SRVC_BGN_DT < pain_diagnosis_dt), 
+  filter((SRVC_BGN_DT >= exclusion_start_dt) & 
+           (SRVC_BGN_DT < first_treatment_dt), 
          DGNS_CD_1 %in% codes | DGNS_CD_2 %in% codes) |> 
   select(BENE_ID) |> 
   distinct()
@@ -57,8 +58,8 @@ iph_pain <-
     SRVC_END_DT, 
     SRVC_BGN_DT)
   ) |> 
-  filter((SRVC_BGN_DT >= washout_start_dt) & 
-           (SRVC_BGN_DT < pain_diagnosis_dt)) |>
+  filter((SRVC_BGN_DT >= exclusion_start_dt) & 
+           (SRVC_BGN_DT < first_treatment_dt)) |>
   filter(DGNS_CD_1 %in% codes |
            DGNS_CD_2 %in% codes |
            DGNS_CD_3 %in% codes |

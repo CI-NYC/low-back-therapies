@@ -20,6 +20,23 @@ library(arrow)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
+source("~/medicaid/low-back-therapies/R/helpers.R")
+
+ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
+codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
+
+# find opioid ndcs --------------------------------------------------------
+
+opioids <- names(codes[["Opioid pain"]]$ATC)
+
+opioid_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
+  any(sapply(opioids, \(x) str_detect(code, x)), na.rm = TRUE)
+}
+
+opioids <- ndc[opioid_flag]
+
+
+# filter rxl and otl files ------------------------------------------------
 
 opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
 local <- FALSE

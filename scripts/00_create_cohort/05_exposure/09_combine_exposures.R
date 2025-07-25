@@ -17,8 +17,9 @@ mme <- load_data("exposure_max_daily_dose_mme.fst", file.path(drv_root, "treatme
 days_supply <- load_data("exposure_days_supply.fst", file.path(drv_root, "treatment"))
 # distinct_prescribers <- load_data("exposure_distinct_prescribers.fst", file.path(drv_root, "treatment"))
 
-opioid_dts <- load_data("opioid_dts.fst", file.path(drv_root, "treatment")) |>
-  rename(treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt)
+opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
+  select(BENE_ID, treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt, treatment_name) |>
+  distinct()
 nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment")) |>
   rename(treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt)
 nonpharma_dts <- load_data("nonpharma_dts_with_scs.fst", file.path(drv_root, "treatment"))
@@ -67,14 +68,14 @@ rm(mme)
 rm(days_supply)
 
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
-# mme <- load_data("exposure_max_daily_dose_mme_7_day_gap.fst", file.path(drv_root, "treatment"))
-# days_supply <- load_data("exposure_days_supply_7_day_gap.fst", file.path(drv_root, "treatment"))
+mme <- load_data("exposure_max_daily_dose_mme_7day_gap.fst", file.path(drv_root, "treatment"))
+days_supply <- load_data("exposure_days_supply_7day_gap.fst", file.path(drv_root, "treatment"))
 
 # Exposure: Which treatments were present during the exposure period? -----------
 
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> 
   left_join(treatment_end_dt_7_days) |>
-  filter(treatment_start_dt <= last_treatment_date) |>
+  filter(treatment_start_dt <= last_treatment_dt) |>
   as.data.table()
 
 combinations_wide <- cohort %>%
@@ -96,10 +97,10 @@ exposures <- combinations_wide |>
   left_join(mme) |>
   left_join(days_supply)
 
-write_data(combinations_wide, "exposures_7_day_gap.fst", file.path(drv_root, "treatment"))
+write_data(exposures, "exposures_with_scs_7day_gap.fst", file.path(drv_root, "treatment"))
 
 cohort <- cohort |>
   left_join(exposures) |>
   mutate(exposure_period_end_dt = first_treatment_dt + 90) # 91 day exposure period
 
-write_data(cohort, "msk_washout_continuous_enrollment_with_exposures_7_day_gap.fst", file.path(drv_root, "treatment"))
+write_data(cohort, "pain_washout_continuous_enrollment_with_exposures_7day_gap.fst", file.path(drv_root, "treatment"))

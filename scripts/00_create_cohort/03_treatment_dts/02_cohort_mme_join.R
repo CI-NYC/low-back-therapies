@@ -9,6 +9,7 @@
 
 library(tidyverse)
 library(fst)
+library(yaml)
 library(lubridate)
 library(data.table)
 library(arrow)
@@ -22,7 +23,7 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 # load cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
+cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
 
 mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
@@ -48,13 +49,13 @@ otl_opioids <- left_join(cohort, otl_opioids)
 
 rxl_opioids <- 
   rxl_opioids |> 
-  filter((RX_FILL_DT >= first_treatment_dt) & 
-           (RX_FILL_DT <= last_treatment_dt))
+  filter((RX_FILL_DT >= pain_diagnosis_dt) & 
+           (RX_FILL_DT <= exposure_end_dt))
 
 otl_opioids <- 
   otl_opioids |> 
-  filter((LINE_SRVC_BGN_DT >= first_treatment_dt) & 
-           (LINE_SRVC_BGN_DT <= last_treatment_dt))
+  filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
+           (LINE_SRVC_BGN_DT <= exposure_end_dt))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
 # no caps on number of pills, days supply, and pills per day
@@ -77,8 +78,8 @@ rxl_opioids <-
   rxl_opioids |>
   select(BENE_ID,
          # CLM_ID,
-         first_treatment_dt, 
-         last_treatment_dt,
+         pain_diagnosis_dt, 
+         # last_treatment_dt,
          exposure_end_dt,
          opioid,
          NDC,
@@ -106,8 +107,8 @@ otl_opioids <-
   otl_opioids |>
   select(BENE_ID,
          CLM_ID,
-         first_treatment_dt, 
-         last_treatment_dt,
+         pain_diagnosis_dt, 
+         # last_treatment_dt,
          exposure_end_dt,
          NDC,
          dose_form,
@@ -121,6 +122,7 @@ otl_opioids <-
 opioids <- rxl_opioids |>
   bind_rows(rxl_opioids, otl_opioids) |>
   unique() |> 
-  mutate(days_supply = replace_na(days_supply, 1))
+  mutate(days_supply = replace_na(days_supply, 1),
+         treatment_name = "Opioid")
 
-write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatments"))
+write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatment"))

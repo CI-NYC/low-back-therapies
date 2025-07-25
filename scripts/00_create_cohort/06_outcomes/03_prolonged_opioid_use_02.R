@@ -8,12 +8,12 @@ library(tidylog)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
+cohort_full <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, exposure_period_end_dt)
 
 opioid_fills <- load_data("opioid_dts_12mos.fst", file.path(drv_root,"treatment"))
 
-cohort <- cohort |>
+cohort <- cohort_full |>
   left_join(opioid_fills)
 
 # cohort <- cohort |>
@@ -73,7 +73,8 @@ wide <- matches |>
 
 wide$num_opioid_months <- rowSums(wide[,2:13], na.rm=T)
 
-prolonged_opioid_use <- wide |>
-  mutate(outcome_prolonged_opioid_use = as.numeric(num_opioid_months == 12))
+prolonged_opioid_use <- cohort |>
+  left_join(wide) |>
+  mutate(outcome_prolonged_opioid_use = replace_na(as.numeric(num_opioid_months == 12),0))
 
 write_data(prolonged_opioid_use, "outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome"))

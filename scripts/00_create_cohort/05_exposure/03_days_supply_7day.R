@@ -17,11 +17,11 @@ library(collapse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   left_join(cohort) |>
   filter(rx_start_dt <= last_treatment_dt)
-  
+
 
 days_supply <- function(data) {
   dur <- 0
@@ -103,6 +103,6 @@ plan(sequential)
 opioids <- 
   fselect(opioids, BENE_ID) |> 
   funique() |>
-  fmutate(exposure_days_supply = pmax(days, 1)) # sometimes, the only opioid is prescribed on the last day of the period. as.duration would return a days supply of 0, so I am manually converting these to 1.
+  fmutate(exposure_days_supply = days)
 
-write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "treatment"))
+write_data(opioids, "exposure_days_supply_7day_gap.fst", file.path(drv_root, "treatment"))

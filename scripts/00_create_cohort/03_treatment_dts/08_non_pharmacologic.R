@@ -51,7 +51,7 @@ treatments_df <- treatments_df  |>
   mutate(treatment = ifelse(treatment %in% c("Physical therapy",
                                              "Acupuncture",
                                              "Chiropractic",
-                                             "Blocks",
+                                             # "Blocks",
                                              "Spinal cord stimulation"
                                              ), treatment, "Intervention"))
 
@@ -82,6 +82,5 @@ treatments_dts <- claims |>
   select(BENE_ID, treatment_start_dt = LINE_SRVC_BGN_DT, treatment_end_dt = LINE_SRVC_BGN_DT, treatment_name = treatment) |>
   arrange(treatment_start_dt, desc(treatment_end_dt))
 
-write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
+# write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
 write_data(unique(treatments_dts), "nonpharma_dts_with_scs.fst", file.path(drv_root, "treatment"))
-# saveRDS(treatments_dts, file.path(drv_root, "exclusion/treatments_dts.rds"))

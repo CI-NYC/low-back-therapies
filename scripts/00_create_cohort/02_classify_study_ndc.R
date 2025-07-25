@@ -97,4 +97,4 @@ rxname <- foreach(code = unclassified[, rxcui]) %dofuture% {
 
 unclassified[, rxname := rxname]
 
-saveRDS(ndc, file.path(drv_root,"exclusion/ndc_to_atc_crosswalk.rds"))
+saveRDS(ndc, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")

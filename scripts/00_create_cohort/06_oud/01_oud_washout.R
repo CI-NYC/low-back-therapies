@@ -69,7 +69,7 @@ cohort <-
                           moud_bup_washout + 
                           moud_methadone_washout + 
                           moud_nal_washout) >= 1)) |> 
-  fselect(BENE_ID, exclusion_oud)
+  fselect(BENE_ID, exclusion_oud, exclusion_oud_hillary)
 
 # save --------------------------------------------------------------------
 

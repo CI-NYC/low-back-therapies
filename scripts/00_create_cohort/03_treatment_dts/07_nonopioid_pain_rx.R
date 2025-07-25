@@ -37,12 +37,16 @@ cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")
 
 nonopioid_names_df <- data.frame(code = c(names(codes$Benzodiazepines[["ATC"]]),
                                           names(codes$Gabapentin[["ATC"]]),
-                                          "M03", "M01", "N06AX"),
+                                          "M03", "M01", "N06AX",
+                                          names(codes$Steroids[["ATC"]]),
+                                          "N02BE"),
                                  nonopioid_name = c(rep("Benzodiazepine", 3),
                                                     "Gabapentin",
                                                     "Muscle relaxant",
                                                     "Anti-inflammatory",
-                                                    "Duloxetine"))
+                                                    "Duloxetine",
+                                                    "Glucocorticoid",
+                                                    "Acetaminophen"))
 
 rx_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
   any(sapply(nonopioid_names_df$code, \(x) grepl(x, code)), na.rm = TRUE)
@@ -63,18 +67,34 @@ ndc_duloxetine <- ndc_duloxetine |>
   filter(grepl("duloxetine",rx_name)) |>
   select(-rx_name)
 
+
+# subsetting antidepressants to just duloxetine prescriptions ------------------
+ndc_acetaminophen <- ndc_rx |>
+  filter(atc == "N02BE") 
+
+ndc_acetaminophen$rx_name <- sapply(ndc_acetaminophen$rxcui, get_rx)
+
+ndc_acetaminophen <- ndc_acetaminophen |>
+  filter(grepl("acetaminophen",rx_name)) |>
+  select(-rx_name)
+
+
 # combine duloxetine with other non-opioid pain prescriptions ------------------
 
-ndc_rx <- rbind(ndc_rx |> filter(!atc=="N06AX"),
-                ndc_duloxetine) |>
+ndc_rx <- rbind(ndc_rx |> filter(!atc=="N06AX", !atc=="N02BE"),
+                ndc_duloxetine,
+                ndc_acetaminophen) |>
   mutate(treatment_name = case_when(
     atc %in% names(codes$Benzodiazepines[["ATC"]]) ~ "Benzodiazepine",
     atc %in% names(codes$Gabapentin[["ATC"]]) ~ "Gabapentin",
     grepl("M03",atc) ~ "Muscle relaxant",
     grepl("M01",atc) ~ "Anti-inflammatory",
     atc == "N06AX" ~ "Duloxetine",
+    grepl("H02AB", atc) ~ "Steroid",
+    atc == "N02BE" ~ "Acetaminophen",
     TRUE ~ NA
-  ))
+  )) |>
+  filter(!is.na(treatment_name))
 
 
 
@@ -87,7 +107,7 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 # Find non-opioids in OTL following diagnosis
-otl <- 
+otl_opioids <- 
   select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
   inner_join(cohort, by = "BENE_ID") |> 
   mutate(LINE_SRVC_BGN_DT = ifelse(
@@ -101,10 +121,10 @@ otl <-
   select(BENE_ID, rx_start_dt = LINE_SRVC_BGN_DT, rx_end_dt = LINE_SRVC_BGN_DT, NDC) |>
   distinct()
 
-otl <- collect(otl) |> as.data.table()
+otl_opioids <- collect(otl_opioids) |> as.data.table()
 
 # Find non-opioids in RXL following diagnosis
-rxl <- 
+rxl_opioids <- 
   rxl |>
   inner_join(cohort, by = "BENE_ID") |> 
   filter((RX_FILL_DT >= pain_diagnosis_dt) & 
@@ -112,12 +132,12 @@ rxl <-
          NDC %in% ndc_rx$NDC) |>
   distinct()
 
-rxl <- collect(rxl) |> 
-  mutate(rx_end_dt = RX_FILL_DT + days(DAYS_SUPPLY - 1)) |>
+rxl_opioids <- collect(rxl_opioids) |> 
+  mutate(rx_end_dt = RX_FILL_DT + days(coalesce(DAYS_SUPPLY, 1) - 1)) |>
   select(BENE_ID, rx_start_dt = RX_FILL_DT, rx_end_dt, NDC) |>
   as.data.table()
 
-all <- unique(rbind(otl, rxl)) |>
+all <- unique(rbind(otl_opioids, rxl_opioids)) |>
   left_join(ndc_rx |> select(NDC, treatment_name)) |>
   select(-NDC)
 

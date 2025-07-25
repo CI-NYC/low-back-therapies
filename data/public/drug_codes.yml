@@ -27,3 +27,12 @@ Stimulants:
 Gabapentin:
     ATC:
         N02BF: Gabapentinoids
+        
+        
+Steroids:
+    ATC:
+        H02AB: Glucocorticoids
+        
+Anilides:
+    ATC:
+        N02BE: Anilides # Want to subset this to N02BE01: Paracetamol (Acetaminophen)

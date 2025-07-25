@@ -17,9 +17,9 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, first_treatment_dt, exposure_period_end_dt)
 
-cohort_7_day_gap <- load_data("pain_washout_continuous_enrollment_with_exposures_7_day_gap.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, first_treatment_dt, exposure_period_end_dt) |>
-  rename("exposure_period_end_dt_7_day_gap" = "exposure_period_end_dt")
+# cohort_7_day_gap <- load_data("pain_washout_continuous_enrollment_with_exposures_7_day_gap.fst", file.path(drv_root, "treatment")) |>
+#   select(BENE_ID, first_treatment_dt, exposure_period_end_dt) |>
+#   rename("exposure_period_end_dt_7_day_gap" = "exposure_period_end_dt")
 
 all_enrollment_dates <- load_data("all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_ALL.fst", file.path(drv_root, "outcome")) |>
   left_join(cohort) |>

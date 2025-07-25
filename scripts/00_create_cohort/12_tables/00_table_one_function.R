@@ -6,6 +6,8 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
+data_7day_gap <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
+
 table_one_function <- function(df){
   df <- df |>
     mutate(
@@ -54,7 +56,21 @@ table_one_function <- function(df){
       # other SSI categories
       ends_with("cal"),
       # treatments
-      starts_with("exposure"),
+      exposure_acetaminophen,
+      exposure_acupuncture,
+      `exposure_anti-inflammatory`,
+      exposure_benzodiazepine,
+      exposure_chiropractic,
+      exposure_duloxetine,
+      exposure_gabapentin,
+      exposure_intervention,
+      `exposure_muscle relaxant`,
+      exposure_opioid,
+      `exposure_physical therapy`,
+      `exposure_spinal cord stimulation`,
+      exposure_steroid,
+      exposure_max_daily_dose_mme,
+      exposure_days_supply,
       # outcomes
       oud_period_4,
       oud_hillary_period_4,
@@ -64,7 +80,8 @@ table_one_function <- function(df){
       cens_period_4,
       cens_hillary_period_4,
       cens_prolonged_opioid_period_4,
-      cens_chronic_pain_period_4
+      cens_chronic_pain_period_4,
+      -exposure_na
       # ed_visit_period_exposure,
       # ed_visit_period_1,
       # ed_visit_period_2,
@@ -82,7 +99,7 @@ table_one_function <- function(df){
     mutate(household_size = NA, .before = dem_household_size) |>
     mutate(ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional) |>
     mutate(psychiatric_conditions = NA, .before = adhd_washout_cal) |>
-    mutate(treatments = NA, .before = exposure_opioid) |>
+    mutate(treatments = NA, .before = exposure_acetaminophen) |>
     mutate(outcomes = NA, .before = oud_period_4) |>
     mutate(censoring = NA, .before = cens_period_4) |>
     # mutate(ed_visits = NA, .before = ed_visit_period_exposure) |>
@@ -128,24 +145,25 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}Depression",
                     "\\hspace{0.5cm}Other mental illness",
                     "\\textbf{Treatments (months 1-3)}",
-                    "Opioid",
-                    "Duloxetine",
+                    "Acetaminophen",
+                    "Acupuncture",
                     "Anti-inflammatory",
-                    "Muscle relaxant",
-                    "Physical therapy",
-                    "Intervention",
                     "Benzodiazepine",
                     "Chiropractic",
-                    "Acupuncture",
-                    "Blocks",
+                    "Duloxetine",
                     "Gabapentin",
+                    "Intervention",
+                    "Muscle relaxant",
+                    "Opioid",
+                    "Physical therapy",
                     "Spinal cord stimulation",
+                    "Steroid",
                     "Max MME",
                     "Days supply",
-                    "\\textbf{Outcomes (months 4-15)}",
+                    "\\textbf{Outcomes (months 3-15)}",
                     "OUD by 15 months",
                     "OUD (ICD only) by 15 months",
-                    "Prolonged opioid use from month 4-15",
+                    "Prolonged opioid use from month 3-15",
                     "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
                     "Uncensored (OUD) throughout entire study period",

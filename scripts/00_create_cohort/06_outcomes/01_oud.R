@@ -14,7 +14,7 @@ library(data.table)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, pain_diagnosis_dt, exposure_period_end_dt)
+  select(BENE_ID, first_treatment_dt, exposure_period_end_dt)
 
 # load component files ----------------------------------------------------
 
@@ -68,7 +68,7 @@ add_all_periods <- function(x, y, date_col, overlap, prefix) {
 oud_hillary <- 
   fselect(hillary, BENE_ID, oud_hillary_dt) |> 
   left_join(cohort) |> 
-  filter(oud_hillary_dt %within% interval(pain_diagnosis_dt, exposure_period_end_dt + days(455))) |> 
+  filter(oud_hillary_dt %within% interval(first_treatment_dt, exposure_period_end_dt + days(455))) |> 
   roworder(BENE_ID, oud_hillary_dt) |> 
   group_by(BENE_ID) |> 
   filter(row_number() == 1) |> 
@@ -76,14 +76,14 @@ oud_hillary <-
   fselect(BENE_ID, oud_hillary_dt) |> 
   add_all_periods(cohort, y = _, oud_hillary_dt, FALSE, "hillary") |> 
   fmutate(hillary_period_exposure = 
-            fifelse(oud_hillary_dt %within% interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
+            fifelse(oud_hillary_dt %within% interval(first_treatment_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
   select(BENE_ID, hillary_period_exposure, starts_with("hillary_period")) |> 
   fmutate(across(hillary_period_exposure:hillary_period_5, replace_na))
 
 oud_poison <- 
   fselect(poison, BENE_ID, oud_poison_dt) |> 
   left_join(cohort) |> 
-  filter(oud_poison_dt %within% interval(pain_diagnosis_dt, exposure_period_end_dt + days(455))) |> 
+  filter(oud_poison_dt %within% interval(first_treatment_dt, exposure_period_end_dt + days(455))) |> 
   roworder(BENE_ID, oud_poison_dt) |> 
   group_by(BENE_ID) |> 
   filter(row_number() == 1) |> 
@@ -91,7 +91,7 @@ oud_poison <-
   fselect(BENE_ID, oud_poison_dt) |> 
   add_all_periods(cohort, y = _, oud_poison_dt, FALSE, "poison") |> 
   fmutate(poison_period_exposure = 
-            fifelse(oud_poison_dt %within% interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
+            fifelse(oud_poison_dt %within% interval(first_treatment_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
   select(BENE_ID, poison_period_exposure, starts_with("poison_period")) |> 
   fmutate(across(poison_period_exposure:poison_period_5, replace_na))
 
@@ -99,7 +99,7 @@ oud_bup <-
   mutate(bup, moud_period = interval(moud_start_dt, moud_end_dt)) |> 
   fselect(BENE_ID, moud_period, moud_start_dt, moud_end_dt) |> 
   left_join(cohort) |> 
-  filter(int_overlaps(moud_period, interval(pain_diagnosis_dt, exposure_period_end_dt + days(455)))) |> 
+  filter(int_overlaps(moud_period, interval(first_treatment_dt, exposure_period_end_dt + days(455)))) |> 
   arrange(BENE_ID, moud_start_dt, moud_end_dt) |> 
   group_by(BENE_ID) |> 
   filter(row_number() == 1) |> 
@@ -107,7 +107,7 @@ oud_bup <-
   fselect(BENE_ID, moud_period) |> 
   add_all_periods(cohort, y = _, moud_period, TRUE, "bup") |> 
   fmutate(bup_period_exposure = 
-            fifelse(moud_period %within% interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
+            fifelse(moud_period %within% interval(first_treatment_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
   select(BENE_ID, bup_period_exposure, starts_with("bup_period")) |> 
   fmutate(across(bup_period_exposure:bup_period_5, replace_na))
 
@@ -115,7 +115,7 @@ oud_methadone <-
   mutate(methadone, moud_period = interval(moud_start_dt, moud_end_dt)) |> 
   fselect(BENE_ID, moud_period, moud_start_dt, moud_end_dt) |> 
   left_join(cohort) |> 
-  filter(int_overlaps(moud_period, interval(pain_diagnosis_dt, exposure_period_end_dt + days(455)))) |> 
+  filter(int_overlaps(moud_period, interval(first_treatment_dt, exposure_period_end_dt + days(455)))) |> 
   arrange(BENE_ID, moud_start_dt, moud_end_dt) |> 
   group_by(BENE_ID) |> 
   filter(row_number() == 1) |> 
@@ -123,7 +123,7 @@ oud_methadone <-
   fselect(BENE_ID, moud_period) |> 
   add_all_periods(cohort, y = _, moud_period, TRUE, "methadone") |> 
   fmutate(methadone_period_exposure = 
-            fifelse(moud_period %within% interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
+            fifelse(moud_period %within% interval(first_treatment_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
   select(BENE_ID, methadone_period_exposure, starts_with("methadone_period")) |> 
   fmutate(across(methadone_period_exposure:methadone_period_5, replace_na))
 
@@ -131,7 +131,7 @@ oud_nal <-
   mutate(nal, moud_period = interval(moud_start_dt, moud_end_dt)) |> 
   fselect(BENE_ID, moud_period, moud_start_dt, moud_end_dt) |> 
   left_join(cohort) |> 
-  filter(int_overlaps(moud_period, interval(pain_diagnosis_dt, exposure_period_end_dt + days(455)))) |> 
+  filter(int_overlaps(moud_period, interval(first_treatment_dt, exposure_period_end_dt + days(455)))) |> 
   arrange(BENE_ID, moud_start_dt, moud_end_dt) |> 
   group_by(BENE_ID) |> 
   filter(row_number() == 1) |> 
@@ -139,13 +139,13 @@ oud_nal <-
   fselect(BENE_ID, moud_period) |> 
   add_all_periods(cohort, y = _, moud_period, TRUE, "nal") |> 
   fmutate(nal_period_exposure = 
-            fifelse(moud_period %within% interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
+            fifelse(moud_period %within% interval(first_treatment_dt, exposure_period_end_dt - days(1)), 1, 0)) |> 
   select(BENE_ID, nal_period_exposure, starts_with("nal_period")) |> 
   fmutate(across(nal_period_exposure:nal_period_5, replace_na))
 
 in_period_misuse <- function(period) {
   fselect(opioids, BENE_ID, RX_FILL_DT, PRSCRBNG_PRVDR_NPI, DSPNSNG_PRVDR_NPI, DAYS_SUPPLY) |> 
-    left_join(select(cohort, BENE_ID, pain_diagnosis_dt, exposure_period_end_dt, {{ period }})) |> 
+    left_join(select(cohort, BENE_ID, first_treatment_dt, exposure_period_end_dt, {{ period }})) |> 
     filter(RX_FILL_DT %within% {{ period }}) |> 
     fgroup_by(BENE_ID) |> 
     fsummarise(distinct_providers = n_distinct(PRSCRBNG_PRVDR_NPI), 
@@ -173,7 +173,7 @@ in_period_misuse <- function(period) {
     select(BENE_ID, starts_with("misuse"))
 }
 
-cohort <- mutate(cohort, period_exposure = interval(pain_diagnosis_dt, exposure_period_end_dt - days(1)))
+cohort <- mutate(cohort, period_exposure = interval(first_treatment_dt, exposure_period_end_dt - days(1)))
 
 oud_misuse <- 
   list(in_period_misuse(period_exposure), 
@@ -186,15 +186,14 @@ oud_misuse <-
   right_join(select(cohort, BENE_ID)) |> 
   fmutate(across(misuse_period_exposure:misuse_period_5, replace_na))
 
-# only include hillary + poision in main outcome
 
 oud <- 
   list(
     oud_hillary, 
-    oud_poison#, 
-    #oud_bup, 
-    #oud_methadone, 
-    #oud_nal, 
+    oud_poison, 
+    oud_bup,
+    oud_methadone,
+    oud_nal#,
     #oud_misuse
   ) |> 
   reduce(left_join) |> 
