@@ -109,49 +109,49 @@ all_enrollment_dates_grouped <- all_enrollment_dates |>
 
 write_data(all_enrollment_dates_grouped, "all_possible_enrollment_dates/censoring_enrollment.fst", file.path(drv_root, "outcome"))
 
-rm(all_enrollment_dates_grouped)
-
-all_enrollment_dates_grouped_7_day_gap <- all_enrollment_dates |>
-  group_by(BENE_ID) |>
-  summarize(enrollment_cens_period_1 = any(enrolled_during_period_1_7_day_gap == 1),
-            enrollment_cens_period_2 = any(enrolled_during_period_2_7_day_gap == 1),
-            enrollment_cens_period_3 = any(enrolled_during_period_3_7_day_gap == 1),
-            enrollment_cens_period_4 = any(enrolled_during_period_4_7_day_gap == 1),
-            enrollment_cens_period_5 = any(enrolled_during_period_5_7_day_gap == 1),
-            enrollment_cens_study_end_dt = any(enrolled_during_study_end_dt == 1)
-  ) |>
-  mutate(enrollment_cens_period_1 = case_when(enrollment_cens_period_1 == FALSE ~ 1, # disenrolled prior to start of outcome period
-                                              enrollment_cens_period_2 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
-                                              TRUE ~ 0), 
-         enrollment_cens_period_2 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
-                                               enrollment_cens_period_3 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
-                                               TRUE ~ 0), 
-         enrollment_cens_period_3 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
-                                               enrollment_cens_period_2 == 1 ~ 1,
-                                               enrollment_cens_period_4 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
-                                               TRUE ~ 0),
-         enrollment_cens_period_4 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
-                                               enrollment_cens_period_2 == 1 ~ 1,
-                                               enrollment_cens_period_3 == 1 ~ 1,
-                                               enrollment_cens_period_5 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
-                                               TRUE ~ 0), 
-         enrollment_cens_period_5 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
-                                               enrollment_cens_period_2 == 1 ~ 1,
-                                               enrollment_cens_period_3 == 1 ~ 1,
-                                               enrollment_cens_period_4 == 1 ~ 1,
-                                               enrollment_cens_study_end_dt == FALSE ~ 1, # still enrolled during period 5 but not by end of study, then they are censored during this period
-                                               TRUE ~ 0), 
-         
-  ) |>
-  select(-enrollment_cens_study_end_dt)
-
-write_data(all_enrollment_dates_grouped_7_day_gap, "all_possible_enrollment_dates/censoring_enrollment_7_day_gap.fst", file.path(drv_root, "outcome"))
-
-
-
-
-
-
-
-
-
+# rm(all_enrollment_dates_grouped)
+# 
+# all_enrollment_dates_grouped_7_day_gap <- all_enrollment_dates |>
+#   group_by(BENE_ID) |>
+#   summarize(enrollment_cens_period_1 = any(enrolled_during_period_1_7_day_gap == 1),
+#             enrollment_cens_period_2 = any(enrolled_during_period_2_7_day_gap == 1),
+#             enrollment_cens_period_3 = any(enrolled_during_period_3_7_day_gap == 1),
+#             enrollment_cens_period_4 = any(enrolled_during_period_4_7_day_gap == 1),
+#             enrollment_cens_period_5 = any(enrolled_during_period_5_7_day_gap == 1),
+#             enrollment_cens_study_end_dt = any(enrolled_during_study_end_dt == 1)
+#   ) |>
+#   mutate(enrollment_cens_period_1 = case_when(enrollment_cens_period_1 == FALSE ~ 1, # disenrolled prior to start of outcome period
+#                                               enrollment_cens_period_2 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
+#                                               TRUE ~ 0), 
+#          enrollment_cens_period_2 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
+#                                                enrollment_cens_period_3 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
+#                                                TRUE ~ 0), 
+#          enrollment_cens_period_3 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
+#                                                enrollment_cens_period_2 == 1 ~ 1,
+#                                                enrollment_cens_period_4 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
+#                                                TRUE ~ 0),
+#          enrollment_cens_period_4 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
+#                                                enrollment_cens_period_2 == 1 ~ 1,
+#                                                enrollment_cens_period_3 == 1 ~ 1,
+#                                                enrollment_cens_period_5 == FALSE ~ 1, # not enrolled at all during next period, then they are censored during this period
+#                                                TRUE ~ 0), 
+#          enrollment_cens_period_5 =  case_when(enrollment_cens_period_1 == 1 ~ 1,
+#                                                enrollment_cens_period_2 == 1 ~ 1,
+#                                                enrollment_cens_period_3 == 1 ~ 1,
+#                                                enrollment_cens_period_4 == 1 ~ 1,
+#                                                enrollment_cens_study_end_dt == FALSE ~ 1, # still enrolled during period 5 but not by end of study, then they are censored during this period
+#                                                TRUE ~ 0), 
+#          
+#   ) |>
+#   select(-enrollment_cens_study_end_dt)
+# 
+# write_data(all_enrollment_dates_grouped_7_day_gap, "all_possible_enrollment_dates/censoring_enrollment_7_day_gap.fst", file.path(drv_root, "outcome"))
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 

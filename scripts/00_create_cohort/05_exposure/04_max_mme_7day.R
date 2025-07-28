@@ -50,13 +50,13 @@ calculate_max_daily_dose <- function(data) {
   ][, .(exposure_max_daily_dose_mme = max(total_mme_strength))]
 }
 
-plan(multisession, workers = 10)
+plan(multisession, workers = 5)
 
 # Apply function
 out <- foreach(data = opioids$data, 
                id = opioids$BENE_ID, 
                .combine = "rbind",
-               .options.future = list(chunk.size = 1e4)) %dofuture% {
+               .options.future = list(chunk.size = 4e4)) %dofuture% {
                  out <- calculate_max_daily_dose(data)
                  out$BENE_ID <- id
                  setcolorder(out, "BENE_ID")

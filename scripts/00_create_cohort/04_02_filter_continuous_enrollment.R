@@ -95,13 +95,13 @@ find_enrollment_periods <- function(data) {
 # find_enrollment_periods(tmp$`HHHHHH447AkdkHd`)
 # find_enrollment_periods(tmp[[100]])
 
-plan(multisession, workers = 20)
+plan(multisession, workers = 10)
 
 for (i in seq_along(files)) {
   tmp <- readRDS(files[i])
   
   valid_periods <- 
-    foreach(x = tmp, .combine = "rbind", .options.future = list(chunk.size = 5e3)) %dofuture% {
+    foreach(x = tmp, .combine = "rbind", .options.future = list(chunk.size = 1e3)) %dofuture% {
       find_enrollment_periods(x)
     }
   

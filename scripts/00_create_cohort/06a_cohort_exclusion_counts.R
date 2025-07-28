@@ -11,10 +11,11 @@ library(collapse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-# base cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+
 # opioid naive exclusion
 opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
+# base cohort
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> filter(BENE_ID %in% opioid_naive_exclusion$BENE_ID)
 # debse exclusions
 debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
 # iph exclusions

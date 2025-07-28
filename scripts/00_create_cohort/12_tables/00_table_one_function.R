@@ -80,8 +80,7 @@ table_one_function <- function(df){
       cens_period_4,
       cens_hillary_period_4,
       cens_prolonged_opioid_period_4,
-      cens_chronic_pain_period_4,
-      -exposure_na
+      cens_chronic_pain_period_4
       # ed_visit_period_exposure,
       # ed_visit_period_1,
       # ed_visit_period_2,
@@ -209,9 +208,9 @@ table_one_function <- function(df){
       # )
     }
     
-    return(paste0(round(median(data[[variable]]),2)," (",
-                  round(quantile(data[[variable]], 0.25),2),", ",
-                  round(quantile(data[[variable]], 0.75),2),")"))
+    return(paste0(round(median(data[[variable]], na.rm=T),2)," (",
+                  round(quantile(data[[variable]], 0.25, na.rm=T),2),", ",
+                  round(quantile(data[[variable]], 0.75, na.rm=T),2),")"))
   }
   
   continuous_values <- as.vector(sapply(continuous_vars, function(variable) summarise_continuous_variable(df, variable)))

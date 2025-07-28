@@ -67,7 +67,7 @@ rm(cohort)
 rm(mme)
 rm(days_supply)
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 mme <- load_data("exposure_max_daily_dose_mme_7day_gap.fst", file.path(drv_root, "treatment"))
 days_supply <- load_data("exposure_days_supply_7day_gap.fst", file.path(drv_root, "treatment"))
 

@@ -40,7 +40,7 @@ cohort <- cohort |>
   as.data.table()
 
 # cohort <- cohort |>
-#   slice(5000000:5100000)
+#   slice(5000000:5200000)
 
 # Nesting dates grouped by BENE_ID --------------------------------------------
 cohort <- cohort[, list(data = list(data.table(.SD))), by = BENE_ID]
@@ -88,31 +88,30 @@ get_duration <- function(data, gap = 30) {
 
 # Looping using a gap of 30 days --------------------------------------------
 
-# plan(multisession, workers = 20)
-# # Apply function
-# out <- foreach(data = cohort$data,
-#                id = cohort$BENE_ID,
-#                .combine = "rbind",
-#                .options.future = list(chunk.size = 1e5)) %dofuture% {
-#                  out <- get_duration(data, gap = 30)
-#                  out$BENE_ID <- id
-#                  setcolorder(out, "BENE_ID")
-#                  out
-#                }
-# 
-# plan(sequential)
-# write_data(out, "exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
+plan(multisession, workers = 10)
+# Apply function
+out <- foreach(data = cohort$data,
+               id = cohort$BENE_ID,
+               .combine = "rbind",
+               .options.future = list(chunk.size = 1e3)) %dofuture% {
+                 out <- get_duration(data, gap = 30)
+                 out$BENE_ID <- id
+                 setcolorder(out, "BENE_ID")
+                 out
+               }
+
+plan(sequential)
+write_data(out, "exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
 
 
 # Looping using a gap of 7 days --------------------------------------------
-
-plan(multisession, workers = 20)
+plan(multisession, workers = 10)
 
 # Apply function
 out_seven <- foreach(data = cohort$data,
                      id = cohort$BENE_ID,
                      .combine = "rbind",
-                     .options.future = list(chunk.size = 1e5)) %dofuture% {
+                     .options.future = list(chunk.size = 1e3)) %dofuture% {
                        out <- get_duration(data, gap = 7)
                        out$BENE_ID <- id
                        setcolorder(out, "BENE_ID")
@@ -120,5 +119,4 @@ out_seven <- foreach(data = cohort$data,
                      }
 
 plan(sequential)
-
 write_data(out_seven, "exposure_end_dt_7_days.fst", file.path(drv_root, "treatment"))
