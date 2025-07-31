@@ -27,6 +27,7 @@ cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")
 cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
 
 mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
+bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
 
 rxl_opioids <-
   rxl |>
@@ -77,7 +78,7 @@ rxl_opioids <-
 rxl_opioids <-
   rxl_opioids |>
   select(BENE_ID,
-         # CLM_ID,
+         CLM_ID,
          pain_diagnosis_dt, 
          # last_treatment_dt,
          exposure_end_dt,
@@ -125,4 +126,8 @@ opioids <- rxl_opioids |>
   mutate(days_supply = replace_na(days_supply, 1),
          treatment_name = "Opioid")
 
-write_data(opioids, "exposure_period_opioids.fst", file.path(drv_root, "treatment"))
+# remove opioids (buprenorphine) if they belong to our list of buprenorphine codes that are specifically used to treat MOUD
+opioids_wo_moud_bup <- opioids |>
+  filter(!NDC %in% bup_list$ndc)
+
+write_data(opioids_wo_moud_bup, "exposure_period_opioids.fst", file.path(drv_root, "treatment"))

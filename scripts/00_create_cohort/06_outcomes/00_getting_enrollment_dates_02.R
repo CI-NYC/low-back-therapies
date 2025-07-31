@@ -88,7 +88,7 @@ getdates <- function(df) {
 }
 
 # applying function to each chunk
-for (i in 16:19) {
+for (i in 1:19) {
   tmp <- readRDS(files[i])
   
   # only keep those in the cohort

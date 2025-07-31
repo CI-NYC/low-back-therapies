@@ -8,6 +8,7 @@
 library(collapse)
 library(tidyverse)
 library(fst)
+library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
