@@ -39,6 +39,7 @@ for (i in c("", "_7day_gap")){
   hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst", file.path(drv_root, "outcome"))
   chronic_pain <- load_data("outcome_chronic_pain.fst", file.path(drv_root, "outcome"))
   prolonged_opioid_use <- load_data("outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome")) |> select(BENE_ID, outcome_prolonged_opioid_use)
+  chronic_opioid_therapy <- load_data("outcome_chronic_opioid_therapy.fst", file.path(drv_root, "outcome"))
   
   ### if OUD is observed in the exposure period, then flag those beneficiaries as having OUD in period 1
   # OUD (Composite)
@@ -73,15 +74,16 @@ for (i in c("", "_7day_gap")){
     join(cens, how = "left") |>
     join(chronic_pain, how = "left") |>
     join(prolonged_opioid_use, how = "left") |>
-    mutate(across(
-        c(
-          outcome_chronic_pain_period_2,
-          outcome_chronic_pain_period_4,
-          outcome_prolonged_opioid_use
-        ),
-        ~ replace_na(.x, 0)
-      )
-    ) |> # TEMPORARY. proper solution would be to fix scripts so vectors are saved with this step already completed
+    join(chronic_opioid_therapy, how = "left") |>
+    # mutate(across(
+    #     c(
+    #       outcome_chronic_pain_period_2,
+    #       outcome_chronic_pain_period_4,
+    #       outcome_prolonged_opioid_use
+    #     ),
+    #     ~ replace_na(.x, 0)
+    #   )
+    # ) |> # TEMPORARY. proper solution would be to fix scripts so vectors are saved with this step already completed
     mutate(cens_hillary_period_1 = cens_period_1,
            cens_hillary_period_2 = cens_period_2,
            cens_hillary_period_3 = cens_period_3,
@@ -90,6 +92,7 @@ for (i in c("", "_7day_gap")){
            cens_chronic_pain_period_2 = cens_period_2,
            cens_chronic_pain_period_4 = cens_period_4,
            cens_prolonged_opioid_period_4 = cens_period_4,
+           cens_chronic_opioid_period_4 = cens_period_4,
     )
   
   convert_cens_to_na <- function (data, outcomes, cens) {
@@ -163,6 +166,8 @@ for (i in c("", "_7day_gap")){
                                             TRUE ~ outcome_chronic_pain_period_4),
            outcome_prolonged_opioid_use = case_when(cens_prolonged_opioid_period_4 == 0 ~ as.numeric(NA),
                                                   TRUE ~ outcome_prolonged_opioid_use),
+           outcome_chronic_opioid_therapy = case_when(cens_chronic_opioid_period_4 == 0 ~ as.numeric(NA),
+                                                    TRUE ~ outcome_chronic_opioid_therapy),
            )
   
   write_data(cohort, paste0("inclusion_exclusion_cohort_with_exposure_outcomes",i,".fst"), file.path(drv_root, "exclusion"))

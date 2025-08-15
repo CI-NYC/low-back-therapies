@@ -75,6 +75,7 @@ wide$num_opioid_months <- rowSums(wide[,2:13], na.rm=T)
 
 prolonged_opioid_use <- cohort |>
   left_join(wide) |>
-  mutate(outcome_prolonged_opioid_use = replace_na(as.numeric(num_opioid_months == 12),0))
+  mutate(outcome_prolonged_opioid_use = replace_na(as.numeric(num_opioid_months == 12),0)) |> 
+  distinct()
 
 write_data(prolonged_opioid_use, "outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome"))

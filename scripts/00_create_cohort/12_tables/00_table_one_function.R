@@ -1,6 +1,6 @@
 
-library(dplyr)
 library(data.table)
+library(tidyverse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -8,8 +8,41 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
 data_7day_gap <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 
+opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
+  select(BENE_ID, rx_start_dt, opioid, dose_form)
+
 table_one_function <- function(df){
+  
+  df_opioids <- df |>
+    left_join(opioids) |>
+    filter(rx_start_dt <= last_treatment_dt)
+  
+  selected_opioids <- c(
+    "hydrocodone", "tramadol",      "oxycodone"#,
+    # "codeine",
+    # "morphine",      "hydromorphone", 
+    # "fentanyl",    "buprenorphine", "methadone"
+  )
+  
+  df_opioids_wide <- df_opioids %>%
+    select(BENE_ID, opioid) %>%
+    mutate(opioid = ifelse(!opioid %in% selected_opioids, "other_opioid", opioid)) |>
+    distinct() %>%
+    mutate(present = 1) %>%
+    pivot_wider(
+      id_cols       = BENE_ID,
+      names_from    = opioid,
+      values_from   = present,
+      values_fill   = list(present = 0),
+      names_prefix  = "exposure_"
+    ) %>%
+    select(
+      BENE_ID,
+      all_of(paste0("exposure_", c(selected_opioids, "other_opioid")))
+    )
+  
   df <- df |>
+    left_join(df_opioids_wide) |>
     mutate(
       dem_race_aian = ifelse(missing_dem_race==0, dem_race_aian, NA),
       dem_race_asian = ifelse(missing_dem_race==0, dem_race_asian, NA),
@@ -65,21 +98,24 @@ table_one_function <- function(df){
       exposure_gabapentin,
       exposure_intervention,
       `exposure_muscle relaxant`,
-      exposure_opioid,
       `exposure_physical therapy`,
       `exposure_spinal cord stimulation`,
       exposure_steroid,
+      exposure_opioid,
+      all_of(paste0("exposure_", c(selected_opioids, "other_opioid"))),
       exposure_max_daily_dose_mme,
       exposure_days_supply,
       # outcomes
       oud_period_4,
       oud_hillary_period_4,
       outcome_prolonged_opioid_use,
+      outcome_chronic_opioid_therapy,
       outcome_chronic_pain_period_4,
       # censoring
       cens_period_4,
       cens_hillary_period_4,
       cens_prolonged_opioid_period_4,
+      cens_chronic_opioid_period_4,
       cens_chronic_pain_period_4
       # ed_visit_period_exposure,
       # ed_visit_period_1,
@@ -153,21 +189,24 @@ table_one_function <- function(df){
                     "Gabapentin",
                     "Intervention",
                     "Muscle relaxant",
-                    "Opioid",
                     "Physical therapy",
                     "Spinal cord stimulation",
                     "Steroid",
+                    "Opioid",
+                    paste0("\\hspace{0.5cm}", c(selected_opioids, "other_opioid")),
                     "Max MME",
                     "Days supply",
                     "\\textbf{Outcomes (months 3-15)}",
                     "OUD by 15 months",
                     "OUD (ICD only) by 15 months",
                     "Prolonged opioid use from month 3-15",
+                    "Chronic opioid therapy by 15 months",
                     "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
                     "Uncensored (OUD) throughout entire study period",
                     "Uncensored (OUD ICD-only) throughout entire study period",
                     "Uncensored (POU) throughout entire study period",
+                    "Uncensored (COT) throughout entire study period",
                     "Uncensored (Chronic LBP) throughout entire study period"
                     # "\\textbf{At least 1 ED visit at:}",
                     # "\\hspace{0.5cm}Exposure",

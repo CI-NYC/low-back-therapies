@@ -8,13 +8,13 @@ overall_1 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[1:38,]
 oud_no_1 <- table_one_function(data |> filter(subset_oud == 0))[1:38,2]
 oud_yes_1 <- table_one_function(data |> filter(subset_oud == 1))[1:38,2]
 
-overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[39:64,]
-oud_no_2 <- table_one_function(data |> filter(subset_oud == 0))[39:64,2]
-oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[39:64,2]
+overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[39:76,]
+oud_no_2 <- table_one_function(data |> filter(subset_oud == 0))[39:76,2]
+oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[39:76,2]
 
-overall_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud %in% c(0,1)))[39:64,]
-oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0))[39:64,2]
-oud_yes_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 1))[39:64,2]
+overall_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud %in% c(0,1)))[39:76,]
+oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0))[39:76,2]
+oud_yes_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 1))[39:76,2]
 
 part1 <- cbind(overall_1, oud_no_1, oud_yes_1)
 part2 <- cbind(overall_2, oud_no_2, oud_yes_2)

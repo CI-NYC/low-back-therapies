@@ -9,7 +9,6 @@
 
 library(tidyverse)
 library(fst)
-library(yaml)
 library(lubridate)
 library(data.table)
 library(arrow)

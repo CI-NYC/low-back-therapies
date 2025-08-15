@@ -1,75 +1,133 @@
 # -------------------------------------
-# Script: 04_filter_opioid_ndc.R
+# Script: 02_cohort_mme_join.R
 # Author: Nick Williams
-# Purpose: find opioid fills for 1 year after follow-up
-# Notes:
+# Purpose: Calculate MME/strength per day for opioids in exposure period
+# Notes: Modified from: 
+#   - https://github.com/CI-NYC/medicaid-treatments-oud-risk/blob/main/scripts/01_create_treatments/01_00_treatment_dose_mme.R
+#   - https://github.com/CI-NYC/medicaid-treatments-oud-risk/blob/main/scripts/01_create_treatments/01_01_treatment_dose_mme.R
 # -------------------------------------
-# 
 
-library(data.table)
 library(tidyverse)
-library(yaml)
-library(foreach)
 library(fst)
+library(yaml)
+library(lubridate)
+library(data.table)
 library(arrow)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
-
-# load initial continuous enrollment cohort
-cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
-  mutate(followup_start_dt = exposure_period_end_dt + days(1), # start of follow-up
-         followup_12mos_dt = exposure_period_end_dt + days(366)) |> # 1 year follow-up
-  select(BENE_ID, followup_start_dt, followup_12mos_dt)
-
-# filter rxl and otl files ------------------------------------------------
-
-ndc_opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
-
 # Read in RXL (pharmacy line)
 rxl <- open_rxl()
 
-# Read in OTL (Other services line) 
+#  Read in OTL (Other services line) 
 otl <- open_otl()
 
-# Find opioids in OTL following diagnosis
-otl <- 
-  select(otl, BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, NDC) |> 
-  inner_join(cohort, by = "BENE_ID") |> 
-  mutate(LINE_SRVC_BGN_DT = ifelse(
-    is.na(LINE_SRVC_BGN_DT), 
-    LINE_SRVC_END_DT, 
-    LINE_SRVC_BGN_DT)
-  ) |> 
-  filter((LINE_SRVC_BGN_DT >= followup_start_dt) & 
-           (LINE_SRVC_BGN_DT <= followup_12mos_dt), 
-         NDC %in% ndc_opioids$NDC,
-         !(NDC %in% c("27505005036", "27505005096"))) |> # lucemyra -- not an opioid
-  select(BENE_ID, rx_start_dt = LINE_SRVC_BGN_DT, rx_end_dt = LINE_SRVC_BGN_DT) |>
-  distinct()
+# load cohort
+cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment")) |>
+  mutate(followup_start_dt = exposure_period_end_dt + days(1),
+         study_end_dt = exposure_period_end_dt + days(366)) |>
+  select(BENE_ID, followup_start_dt, study_end_dt)
 
-otl <- collect(otl) |> as.data.table()
+mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
+bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
 
-# Find opioids in RXL following diagnosis
-rxl <- 
+rxl_opioids <-
   rxl |>
-  inner_join(cohort, by = "BENE_ID") |> 
+  filter(NDC %in% mme$NDC) |>
+  select(BENE_ID, CLM_ID, RX_FILL_DT, contains("ndc"), DAYS_SUPPLY) |>
+  collect() |>
+  left_join(mme)
+
+rxl_opioids <- left_join(cohort, rxl_opioids)
+
+otl_opioids <- 
+  otl |>
+  filter(NDC %in% mme$NDC) |>
+  mutate(LINE_SRVC_BGN_DT = ifelse(is.na(LINE_SRVC_BGN_DT), LINE_SRVC_END_DT, LINE_SRVC_BGN_DT)) |>
+  select(BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, contains("NDC")) |>
+  collect() |>
+  left_join(mme)
+
+otl_opioids <- left_join(cohort, otl_opioids)
+
+rxl_opioids <- 
+  rxl_opioids |> 
   filter((RX_FILL_DT >= followup_start_dt) & 
-           (RX_FILL_DT <= followup_12mos_dt),
-         NDC %in% ndc_opioids$NDC,
-         !(NDC %in% c("27505005036", "27505005096"))) |> # lucemyra -- not an opioid
-  distinct()
+           (RX_FILL_DT <= study_end_dt))
 
-rxl <- collect(rxl) |> 
-  mutate(rx_end_dt = RX_FILL_DT + days(DAYS_SUPPLY - 1)) |>
-  select(BENE_ID, rx_start_dt = RX_FILL_DT, rx_end_dt) |>
-  as.data.table()
+otl_opioids <- 
+  otl_opioids |> 
+  filter((LINE_SRVC_BGN_DT >= followup_start_dt) & 
+           (LINE_SRVC_BGN_DT <= study_end_dt))
 
+# calculate strength per day in Milligram Morphine Equivalent (MME) units
+# no caps on number of pills, days supply, and pills per day
+rxl_opioids <-
+  rxl_opioids |>
+  drop_na(BENE_ID) |>
+  mutate(number_pills = case_when(!is.na(NDC_QTY) ~ abs(NDC_QTY),
+                                  TRUE ~ 1),
+         days_supply = case_when(!is.na(DAYS_SUPPLY) ~ DAYS_SUPPLY,
+                                 TRUE ~ 1), # best assumption we can make if missing a days supply var
+         pills_per_day = number_pills / days_supply,
+         strength = parse_number(numeratorValue),
+         strength_per_day = strength * pills_per_day,
+         mme_strength_per_day = strength_per_day * conversion#, 
+         # mme_strength_per_day = pmin(mme_strength_per_day, quantile(mme_strength_per_day, 0.99))
+  )
 
-opioid_claims <- unique(rbind(otl, rxl)) |>
-  mutate(treatment_name = "opioid")
+# keep only relevant vars for RXL opioids
+rxl_opioids <-
+  rxl_opioids |>
+  select(BENE_ID,
+         CLM_ID,
+         followup_start_dt, 
+         study_end_dt,
+         opioid,
+         NDC,
+         dose_form,
+         days_supply,
+         pills_per_day,
+         strength,
+         strength_per_day,
+         mme_strength_per_day,
+         days_supply,
+         rx_start_dt = RX_FILL_DT) |>
+  mutate(rx_end_dt = rx_start_dt + days_supply - 1) |>
+  arrange(BENE_ID, rx_start_dt, opioid)
 
+# filter to opioids for pain, calculate strength per day in Milligram Morphine Equivalent (MME) units
+otl_opioids <-
+  otl_opioids |>
+  drop_na(BENE_ID) |>
+  mutate(strength = parse_number(numeratorValue),
+         # we assume all OTL opioids are one day supply (outpatient)
+         mme_strength_per_day = strength * conversion) 
 
-write_data(opioid_claims, "opioid_dts_12mos.fst", file.path(drv_root,"treatment"))
+# keep only relevant vars for OTL opioids
+otl_opioids <-
+  otl_opioids |>
+  select(BENE_ID,
+         CLM_ID,
+         followup_start_dt, 
+         study_end_dt,
+         NDC,
+         dose_form,
+         opioid,
+         strength,
+         mme_strength_per_day,
+         rx_start_dt = LINE_SRVC_BGN_DT) |>
+  mutate(rx_end_dt = rx_start_dt) |> # 1 day supply assumption
+  arrange(BENE_ID, rx_start_dt, opioid)
+
+opioids <- rxl_opioids |>
+  bind_rows(rxl_opioids, otl_opioids) |>
+  unique() |> 
+  mutate(days_supply = replace_na(days_supply, 1),
+         treatment_name = "Opioid")
+
+# remove opioids (buprenorphine) if they belong to our list of buprenorphine codes that are specifically used to treat MOUD
+opioids_wo_moud_bup <- opioids |>
+  filter(!NDC %in% bup_list$ndc)
+
+write_data(opioids_wo_moud_bup, "opioid_dts_12mos.fst", file.path(drv_root, "treatment"))

@@ -21,7 +21,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
-  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(90))
+  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(30))
 
 opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt, treatment_name) |>
@@ -38,7 +38,7 @@ treatment_end_dt_7day_gap <- load_data("exposure_end_dt_7_days.fst", file.path(d
          BENE_ID %in% treatment_end_dt$BENE_ID)
 
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> 
-  left_join(treatment_end_dt) |>
+  right_join(treatment_end_dt) |>
   filter(treatment_start_dt <= last_treatment_dt) |>
   as.data.table()
 

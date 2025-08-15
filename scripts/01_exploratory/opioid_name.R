@@ -50,11 +50,11 @@ table(cohort_opioids_wide$hydrocodone)
 table(cohort_opioids_wide$tramadol)
 table(cohort_opioids_wide$methadone)
 
-(table(cohort_opioids_wide$buprenorphine)[2])/nrow(cohort_OUD)*100
-(table(cohort_opioids_wide$oxycodone)[2])/nrow(cohort_OUD)*100
-(table(cohort_opioids_wide$hydrocodone)[2])/nrow(cohort_OUD)*100
-(table(cohort_opioids_wide$tramadol)[2])/nrow(cohort_OUD)*100
-(table(cohort_opioids_wide$methadone)[2])/nrow(cohort_OUD)*100
+(table(cohort_opioids_wide$buprenorphine)[2])/nrow(cohort_opioids_wide)*100
+(table(cohort_opioids_wide$oxycodone)[2])/nrow(cohort_opioids_wide)*100
+(table(cohort_opioids_wide$hydrocodone)[2])/nrow(cohort_opioids_wide)*100
+(table(cohort_opioids_wide$tramadol)[2])/nrow(cohort_opioids_wide)*100
+(table(cohort_opioids_wide$methadone)[2])/nrow(cohort_opioids_wide)*100
 
 cohort_opioids_no_bup_or_met <- cohort_opioids |>
   filter(!opioid %in% c("buprenorphine", "methadone"))
