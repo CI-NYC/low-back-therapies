@@ -23,7 +23,7 @@ otl <- open_otl()
 
 # load cohort
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
-cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
+cohort[, let(exposure_end_dt_possible_latest = pain_diagnosis_dt + days(121))] # first treatment must be within 3 months, then looking within 3 months from the first treatment date. Also collecting treatments within 6 months of first treatment for exploratory analysis.
 
 mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
 bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
@@ -50,12 +50,12 @@ otl_opioids <- left_join(cohort, otl_opioids)
 rxl_opioids <- 
   rxl_opioids |> 
   filter((RX_FILL_DT >= pain_diagnosis_dt) & 
-           (RX_FILL_DT <= exposure_end_dt))
+           (RX_FILL_DT <= exposure_end_dt_possible_latest))
 
 otl_opioids <- 
   otl_opioids |> 
   filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
-           (LINE_SRVC_BGN_DT <= exposure_end_dt))
+           (LINE_SRVC_BGN_DT <= exposure_end_dt_possible_latest))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
 # no caps on number of pills, days supply, and pills per day
@@ -80,7 +80,7 @@ rxl_opioids <-
          CLM_ID,
          pain_diagnosis_dt, 
          # last_treatment_dt,
-         exposure_end_dt,
+         exposure_end_dt_possible_latest,
          opioid,
          NDC,
          dose_form,
@@ -90,9 +90,9 @@ rxl_opioids <-
          strength_per_day,
          mme_strength_per_day,
          days_supply,
-         rx_start_dt = RX_FILL_DT) |>
-  mutate(rx_end_dt = rx_start_dt + days_supply - 1) |>
-  arrange(BENE_ID, rx_start_dt, opioid)
+         treatment_start_dt = RX_FILL_DT) |>
+  mutate(treatment_end_dt = treatment_start_dt + days_supply - 1) |>
+  arrange(BENE_ID, treatment_start_dt, opioid)
 
 # filter to opioids for pain, calculate strength per day in Milligram Morphine Equivalent (MME) units
 otl_opioids <-
@@ -109,15 +109,15 @@ otl_opioids <-
          CLM_ID,
          pain_diagnosis_dt, 
          # last_treatment_dt,
-         exposure_end_dt,
+         exposure_end_dt_possible_latest,
          NDC,
          dose_form,
          opioid,
          strength,
          mme_strength_per_day,
-         rx_start_dt = LINE_SRVC_BGN_DT) |>
-  mutate(rx_end_dt = rx_start_dt) |> # 1 day supply assumption
-  arrange(BENE_ID, rx_start_dt, opioid)
+         treatment_start_dt = LINE_SRVC_BGN_DT) |>
+  mutate(treatment_end_dt = treatment_start_dt) |> # 1 day supply assumption
+  arrange(BENE_ID, treatment_start_dt, opioid)
 
 opioids <- rxl_opioids |>
   bind_rows(rxl_opioids, otl_opioids) |>

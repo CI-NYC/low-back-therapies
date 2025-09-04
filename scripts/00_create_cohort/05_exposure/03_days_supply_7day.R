@@ -20,7 +20,12 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   left_join(cohort) |>
-  filter(rx_start_dt <= last_treatment_dt)
+  filter(treatment_start_dt <= last_treatment_dt) |>
+  mutate(exposure_period_end_dt = first_treatment_dt + days(90)) |>
+  arrange(BENE_ID, treatment_start_dt) |> 
+  mutate(treatment_end_dt = pmin(treatment_end_dt + 1, exposure_period_end_dt)) |>
+  select(BENE_ID, rx_start=treatment_start_dt, rx_end=treatment_end_dt)
+
 
 
 days_supply <- function(data) {
@@ -41,53 +46,6 @@ days_supply <- function(data) {
   time_length(dur, "days")
 }
 
-opioids <- 
-  opioids |> 
-  mutate(rx_int = interval(rx_start_dt, pmin(rx_end_dt+1, exposure_end_dt))) |> # +1 because "as.duration", a function used below, counts the time elapsed between two dates. A prescription that starts and ends on the same day should have 1 day supply, but as.duration will return 0.
-  select(BENE_ID, NDC, opioid, rx_int) |> 
-  as_tibble() |> 
-  mutate(interval_days_supply = as.numeric(as.duration(rx_int), "days")) |> 
-  group_by(BENE_ID) |> 
-  arrange(BENE_ID, int_start(rx_int)) |> 
-  ungroup()
-
-opioids <- 
-  mutate(opioids, 
-         rx_start = int_start(rx_int), 
-         rx_end = int_end(rx_int)) |> 
-  select(-rx_int)
-
-# testthat::test_that(
-#   "Test days_supply function works as expected",
-#   testthat::expect_equal({
-#     fsubset(opioids, BENE_ID %==% "HHHHHH447777ddB") |> 
-#       days_supply()
-#   }, 76)
-# )
-# 
-# testthat::test_that(
-#   "Test days_supply function works as expected",
-#   testthat::expect_equal({
-#     fsubset(opioids, BENE_ID %==% "HHHHHH447AddkCB") |> 
-#       days_supply()
-#   }, 25)
-# )
-# 
-# testthat::test_that(
-#   "Test days_supply function works as expected",
-#   testthat::expect_equal({
-#     fsubset(opioids, BENE_ID %==% "HHHHHH44Ak7AnnH") |> 
-#       days_supply()
-#   }, 28)
-# )
-# 
-# testthat::test_that(
-#   "Test days_supply function works as expected",
-#   testthat::expect_equal({
-#     fsubset(opioids, BENE_ID %==% "HHHHHH4477d4Bnd") |> 
-#       days_supply()
-#   }, 30)
-# )
 
 plan(multisession, workers = 10)
 

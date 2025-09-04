@@ -12,6 +12,7 @@ library(lubridate)
 library(data.table)
 library(foreach)
 library(doFuture)
+library(tictoc)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -20,15 +21,16 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   left_join(cohort) |>
-  filter(rx_start_dt <= last_treatment_dt) |>
-  mutate(rx_end_dt = as.Date(pmin(rx_end_dt, exposure_end_dt)))
+  filter(treatment_start_dt <= last_treatment_dt) |>
+  mutate(exposure_period_end_dt = first_treatment_dt + days(90)) |>
+  mutate(treatment_end_dt = as.Date(pmin(treatment_end_dt, exposure_period_end_dt)))
 
 setDT(opioids)
 setkey(opioids, BENE_ID)
 
 opioids <- opioids[, .(BENE_ID, first_treatment_dt, last_treatment_dt, 
-                       rx_start_dt, rx_end_dt, NDC, opioid, mme_strength_per_day)]
-  
+                       treatment_start_dt, treatment_end_dt, NDC, opioid, mme_strength_per_day)]
+
 
 num_opioids <- opioids |>
   group_by(BENE_ID) |>
@@ -39,24 +41,25 @@ saveRDS(num_opioids, file.path(drv_root, "treatment/num_opioids.rds"))
 # Calculate max daily dose -----------------------------------------------------
 
 opioids <- opioids[, list(data = list(data.table(.SD))), by = BENE_ID]
+# opioids <- opioids[1:100000,]
 
 calculate_max_daily_dose <- function(data) {
   to_modify <- copy(data)
   
-  to_modify[, .(date = seq(rx_start_dt, rx_end_dt, by = "1 day"), NDC, opioid, mme_strength_per_day), 
+  to_modify[, .(date = seq(treatment_start_dt, treatment_end_dt, by = "1 day"), NDC, opioid, mme_strength_per_day), 
             by = .(seq_len(nrow(data)))
   ][, .(total_mme_strength = sum(mme_strength_per_day, na.rm = TRUE)), 
     by = .(date)
   ][, .(exposure_max_daily_dose_mme = max(total_mme_strength))]
 }
-
-plan(multisession, workers = 5)
+tic()
+plan(multisession, workers = 8)
 
 # Apply function
 out <- foreach(data = opioids$data, 
                id = opioids$BENE_ID, 
                .combine = "rbind",
-               .options.future = list(chunk.size = 4e4)) %dofuture% {
+               .options.future = list(chunk.size = 5e4)) %dofuture% {
                  out <- calculate_max_daily_dose(data)
                  out$BENE_ID <- id
                  setcolorder(out, "BENE_ID")
@@ -64,7 +67,7 @@ out <- foreach(data = opioids$data,
                }
 
 plan(sequential)
-
+toc()
 testthat::test_that(
   "All observations have a max daily MME",
   testthat::expect_false(any(is.na(out$exposure_max_daily_dose_mme)))

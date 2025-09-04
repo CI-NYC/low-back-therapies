@@ -38,5 +38,5 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
              used    (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells   56534631  3019.3   86256517  4606.6   86256517  4606.6
-Vcells 4140650497 31590.7 6874807216 52450.7 4191880362 31981.6
+Ncells   56535611  3019.4   86257671  4606.7   86257671  4606.7
+Vcells 4140723703 31591.3 6874921265 52451.5 4191955149 31982.1

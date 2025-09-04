@@ -24,6 +24,13 @@
 ✖ lubridate::year()    masks data.table::year()
 ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
+Attaching package: ‘foreach’
+
+The following objects are masked from ‘package:purrr’:
+
+    accumulate, when
+
+
 Attaching package: ‘arrow’
 
 The following object is masked from ‘package:lubridate’:
@@ -34,24 +41,7 @@ The following object is masked from ‘package:utils’:
 
     timestamp
 
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-[1] 602368     78
-[1] 573924     78
-[1] 28444    78
+Warning message:
+In readLines(file, warn = readLines.warn) :
+  incomplete final line found on '~/medicaid/low-back-therapies/data/public/drug_codes.yml'
+Joining with `by = join_by(NDC)`

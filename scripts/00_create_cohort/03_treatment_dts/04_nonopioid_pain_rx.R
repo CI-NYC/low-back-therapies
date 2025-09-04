@@ -21,7 +21,7 @@ codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 # load initial continuous enrollment cohort
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
-  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(90))
+  mutate(exposure_end_dt_possible_latest = pain_diagnosis_dt + days(121)) # 30 days from diagnosis + 90 day exposure period
 
 
 
@@ -116,9 +116,9 @@ otl_opioids <-
     LINE_SRVC_BGN_DT
   )) |> 
   filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
-           (LINE_SRVC_BGN_DT <= treatment_start_dt_possible_latest), 
+           (LINE_SRVC_BGN_DT <= exposure_end_dt_possible_latest), 
          NDC %in% ndc_rx$NDC) |>
-  select(BENE_ID, rx_start_dt = LINE_SRVC_BGN_DT, rx_end_dt = LINE_SRVC_BGN_DT, NDC) |>
+  select(BENE_ID, treatment_start_dt = LINE_SRVC_BGN_DT, treatment_end_dt = LINE_SRVC_BGN_DT, NDC) |>
   distinct()
 
 otl_opioids <- collect(otl_opioids) |> as.data.table()
@@ -128,13 +128,13 @@ rxl_opioids <-
   rxl |>
   inner_join(cohort, by = "BENE_ID") |> 
   filter((RX_FILL_DT >= pain_diagnosis_dt) & 
-           (RX_FILL_DT <= treatment_start_dt_possible_latest), 
+           (RX_FILL_DT <= exposure_end_dt_possible_latest), 
          NDC %in% ndc_rx$NDC) |>
   distinct()
 
 rxl_opioids <- collect(rxl_opioids) |> 
-  mutate(rx_end_dt = RX_FILL_DT + days(coalesce(DAYS_SUPPLY, 1) - 1)) |>
-  select(BENE_ID, rx_start_dt = RX_FILL_DT, rx_end_dt, NDC) |>
+  mutate(treatment_end_dt = RX_FILL_DT + days(coalesce(DAYS_SUPPLY, 1) - 1)) |>
+  select(BENE_ID, treatment_start_dt = RX_FILL_DT, treatment_end_dt, NDC) |>
   as.data.table()
 
 all <- unique(rbind(otl_opioids, rxl_opioids)) |>

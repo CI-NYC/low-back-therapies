@@ -19,7 +19,7 @@ otl <- open_otl()
 # Read in cohort and dates
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
-  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(90))
+  mutate(exposure_end_dt_possible_latest = pain_diagnosis_dt + days(121))
 
 # Read in CPT, HCPC, and Modifier codes for mediator claims
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/mediator_codes.yml")
@@ -73,8 +73,8 @@ claims <- unique(merge(claims, cohort, by = "BENE_ID"))
 
 # Filter to claims within mediator time-frame
 claims <- claims[LINE_SRVC_BGN_DT %within% interval(pain_diagnosis_dt, 
-                                                    treatment_start_dt_possible_latest), 
-                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, pain_diagnosis_dt, treatment_start_dt_possible_latest, LINE_PRCDR_CD)]
+                                                    exposure_end_dt_possible_latest), 
+                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, pain_diagnosis_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
 
 treatments_dts <- claims |>
   left_join(treatments_df |> distinct(cd, .keep_all=T), 
@@ -83,4 +83,4 @@ treatments_dts <- claims |>
   arrange(treatment_start_dt, desc(treatment_end_dt))
 
 # write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
-write_data(unique(treatments_dts), "nonpharma_dts_with_scs.fst", file.path(drv_root, "treatment"))
+write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))

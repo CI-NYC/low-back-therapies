@@ -63,7 +63,4 @@ The following object is masked from ‘package:utils’:
 
     timestamp
 
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
-Joining with `by = join_by(BENE_ID)`
+Joining with `by = join_by(BENE_ID, pain_diagnosis_dt)`

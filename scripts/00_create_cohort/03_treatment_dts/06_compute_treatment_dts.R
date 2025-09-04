@@ -24,19 +24,30 @@ cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")
   mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(30))
 
 opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt, treatment_name) |>
-  distinct()
-nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment")) |>
-  rename(treatment_start_dt = rx_start_dt, treatment_end_dt = rx_end_dt)
+  select(BENE_ID, treatment_start_dt, treatment_end_dt, treatment_name) |> distinct()
+nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment"))
 nonpharma_dts <- load_data("nonpharma_dts.fst", file.path(drv_root, "treatment"))
 
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_name) |> as.data.table()
 
-# Collect all treatments
+# Keep those with at least 1 treatment within the first 3 months
 cohort <- cohort |>
   right_join(treatments) |>
-  select(BENE_ID, treatment_start_dt_possible_latest, treatment_start_dt, treatment_end_dt) |>
-  filter(treatment_start_dt <= treatment_start_dt_possible_latest) |>
+  group_by(BENE_ID) |>
+  summarise(first_treatment_dt = min(treatment_start_dt),
+            has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>
+  filter(has_treatment == 1)
+
+
+# Keep treatments within 3 months of the first treatment 
+# (so, the max time between diagnosis and 1st treatment is 3 months,
+# and the max time between diagnosis and end of exposure period is 6 months).
+# The exposure period is 3 months long
+cohort <- cohort |>
+  right_join(treatments) |>
+  select(BENE_ID, first_treatment_dt, treatment_start_dt, treatment_end_dt) |>
+  filter(treatment_start_dt <= (first_treatment_dt + days(90))) |>
+  mutate(treatment_end_dt = pmin(treatment_end_dt, first_treatment_dt + days(90))) |>
   arrange(BENE_ID, treatment_start_dt, treatment_end_dt) |>
   as.data.table()
 
@@ -59,7 +70,7 @@ get_duration <- function(data, gap = 30) {
   
   observation_start_dt <- data$treatment_start_dt
   observation_end_dt   <- data$treatment_end_dt
-
+  
   # next_observation_start <- c(observation_start_dt[-1], NA)
   prev_observation_end <- as.Date(c(NA, observation_end_dt[1:length(observation_end_dt)-1]))
   
@@ -89,7 +100,7 @@ get_duration <- function(data, gap = 30) {
 
 # Looping using a gap of 30 days --------------------------------------------
 
-plan(multisession, workers = 10)
+plan(multisession, workers = 5)
 # Apply function
 out <- foreach(data = cohort$data,
                id = cohort$BENE_ID,
@@ -101,23 +112,22 @@ out <- foreach(data = cohort$data,
                  out
                }
 
+
 plan(sequential)
 write_data(out, "exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
 
 
-# Looping using a gap of 7 days --------------------------------------------
-plan(multisession, workers = 10)
-
-# Apply function
-out_seven <- foreach(data = cohort$data,
-                     id = cohort$BENE_ID,
-                     .combine = "rbind",
-                     .options.future = list(chunk.size = 1e3)) %dofuture% {
-                       out <- get_duration(data, gap = 7)
-                       out$BENE_ID <- id
-                       setcolorder(out, "BENE_ID")
-                       out
-                     }
-
-plan(sequential)
-write_data(out_seven, "exposure_end_dt_7_days.fst", file.path(drv_root, "treatment"))
+# # Looping using a gap of 7 days --------------------------------------------
+# plan(multisession, workers = 10)
+# 
+# # Apply function
+# out_seven <- foreach(id = unique(cohort$BENE_ID), 
+#                .combine = "rbind",
+#                .options.future = list(chunk.size = 1e3)) %dofuture% {
+#                  fsubset(cohort, BENE_ID %==% id) |> 
+#                    get_duration(gap = 7)
+#                }
+# 
+# 
+# plan(sequential)
+# write_data(out_seven, "exposure_end_dt_7_days.fst", file.path(drv_root, "treatment"))

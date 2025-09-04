@@ -18,8 +18,8 @@ for (i in c("", "_7day_gap")){
   # opioid naive exclusion
   opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
   # base cohort
-  cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts",i,".fst"), file.path(drv_root, "exclusion")) #|>
-    # filter(BENE_ID %in% opioid_naive_exclusion$BENE_ID)
+  cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts",i,".fst"), file.path(drv_root, "exclusion")) |>
+    filter(BENE_ID %in% opioid_naive_exclusion$BENE_ID)
   # washout pain exclusion
   washout_pain <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
   # debse exclusions
@@ -31,7 +31,7 @@ for (i in c("", "_7day_gap")){
   # oud exclusions
   oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
   # exposures
-  exposures <- load_data(paste0("exposures_with_scs",i,".fst"), file.path(drv_root, "treatment"))
+  exposures <- load_data(paste0("exposures",i,".fst"), file.path(drv_root, "treatment"))
   # censoring
   cens <- load_data("pain_washout_continuous_enrollment_censoring.fst", file.path(drv_root, "outcome"))
   # outcomes

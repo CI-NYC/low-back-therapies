@@ -9,13 +9,13 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 data_7day_gap <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, rx_start_dt, opioid, dose_form)
+  select(BENE_ID, treatment_start_dt, opioid, dose_form)
 
 table_one_function <- function(df){
   
   df_opioids <- df |>
     left_join(opioids) |>
-    filter(rx_start_dt <= last_treatment_dt)
+    filter(treatment_start_dt <= last_treatment_dt)
   
   selected_opioids <- c(
     "hydrocodone", "tramadol",      "oxycodone"#,
@@ -199,8 +199,8 @@ table_one_function <- function(df){
                     "\\textbf{Outcomes (months 3-15)}",
                     "OUD by 15 months",
                     "OUD (ICD only) by 15 months",
-                    "Prolonged opioid use from month 3-15",
-                    "Chronic opioid therapy by 15 months",
+                    "At least monthly opioid prescribing",
+                    "$\\ge$ 90 days supply for opioids",
                     "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
                     "Uncensored (OUD) throughout entire study period",
