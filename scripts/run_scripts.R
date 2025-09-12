@@ -13,14 +13,27 @@ job_groups <- list(
   # group5 = "04_02_filter_continuous_enrollment.R",
   # group6 = paste0("05_exposure/", c("03_days_supply.R", "03_days_supply_7day.R")),
   # group6 = "05_exposure/04_max_mme.R",
-  group7 = "05_exposure/04_max_mme_7day.R",
-  group8 = "05_exposure/09_combine_exposures.R",
-  # group9 = paste0("06_outcomes/", c("03_prolonged_opioid_use_01.R","04_chronic_opioid_therapy.R")),
-  group10 = c("07_combine_exclusions_exposure_outcome.R"),
-  group11 = c("08_baseline_covariates.R"),
-  group12 = c("10_combine_cohort.R"),
-  group13 = c("11_clean_impute_analysis_data.R", "11_clean_impute_analysis_data_7day_gap.R"),
-  group14 = "12_tables/01_finalize_table_one.R"
+  # group7 = "05_exposure/04_max_mme_7day.R",
+  # group8 = "05_exposure/09_combine_exposures.R",
+  # group9 = c("05_opioid_naive_exclusions.R","05_other_pain_exclusions.R"),
+  # group10 = paste0("06_oud/", c("00_bup.R", "00_hillary.R", "00_methadone.R")),
+  # group11 = paste0("06_oud/", c("00_naltrexone.R", "00_poison.R", "00_misuse/00_study_pain_opioids.R")),
+  # group12 = "06_oud/00_misuse/01_washout_misuse.R",
+  # group13 = "06_oud/01_oud_washout.R",
+  # group14 = paste0("06_outcomes/", c("00_getting_enrollment_dates_01.R", "01_oud.R", "02_chronic_pain_01.R")),
+  # group15 = paste0("06_outcomes/", c("00_getting_enrollment_dates_02.R", "00_getting_enrollment_dates_03.R", "00_getting_enrollment_dates_04.R")),
+  # group16 = paste0("06_outcomes/", c("00_getting_enrollment_dates_05.R", "02_chronic_pain_02.R", "03_prolonged_opioid_use_01.R")),
+  # group17 = paste0("06_outcomes/", c("04_chronic_opioid_therapy.R", "05_censoring_enrollment.R", "03_prolonged_opioid_use_02.R")),
+  # group18 = "06_outcomes/06_censoring_combined.R",
+  # group19 = paste0("06_outcomes/", c("03_prolonged_opioid_use_01.R","04_chronic_opioid_therapy.R")),
+  # group20 = c("06_tafdebse_exclusions.R", "06_tafiph_exclusions.R", "06_tafoth_exclusions.R"),
+  group21 = c("07_combine_exclusions_exposure_outcome.R"),
+  group22 = c("08_baseline_covariates.R"),
+  # group23 = paste0("10_comorbidity/", c("01_adhd.R", "02_anxiety.R", "03_bipolar.R")),
+  # group24 = paste0("10_comorbidity/", c("04_depression.R", "05_mental_illness.R")),
+  group25 = c("10_combine_cohort.R"),
+  group26 = c("11_clean_impute_analysis_data.R", "11_clean_impute_analysis_data_7day_gap.R")
+  # group27 = "12_tables/01_finalize_table_one.R"
 )
 
 
@@ -70,7 +83,7 @@ run_jobs_future <- function(groups, log_dir = "../logs") {
 }
 
 
-plan(multisession, workers = 2)
+plan(multisession, workers = 3)
 
 tryCatch(
   run_jobs_future(job_groups),

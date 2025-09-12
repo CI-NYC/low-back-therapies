@@ -38,7 +38,7 @@ for (i in c("", "_7day_gap")){
   outcomes <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_outcomes.fst", file.path(drv_root, "outcome"))
   hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst", file.path(drv_root, "outcome"))
   chronic_pain <- load_data("outcome_chronic_pain.fst", file.path(drv_root, "outcome"))
-  prolonged_opioid_use <- load_data("outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome")) |> select(BENE_ID, outcome_prolonged_opioid_use)
+  prolonged_opioid_use <- load_data("outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome")) |> select(BENE_ID, outcome_prolonged_opioid_use) |> distinct()
   chronic_opioid_therapy <- load_data("outcome_chronic_opioid_therapy.fst", file.path(drv_root, "outcome"))
   
   ### if OUD is observed in the exposure period, then flag those beneficiaries as having OUD in period 1

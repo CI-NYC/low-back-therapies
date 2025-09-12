@@ -88,7 +88,7 @@ getdates <- function(df) {
 }
 
 # applying function to each chunk
-for (i in 1:6) {
+for (i in 7:12) {
   tmp <- readRDS(files[i])
   
   # only keep those in the cohort
@@ -122,7 +122,7 @@ for (i in 1:6) {
 #   # left_join(washout) |>
 #   # filter(date >= first_treatment_dt) |> # only need dates from post-exposure start
 #   # select(BENE_ID, ENRLMT_START_DT, ENRLMT_END_DT)
-# 
+#   
 #   results_list[[i]] <- final_df
 # }
 # #

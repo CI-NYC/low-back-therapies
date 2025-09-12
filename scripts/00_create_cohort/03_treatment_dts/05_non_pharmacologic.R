@@ -25,7 +25,7 @@ cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/mediator_codes.yml")
 mediators <- c("Physical therapy",
                # "Counseling",
-               # "Massage therapy",
+               "Massage therapy",
                "Chiropractic",
                "Acupuncture",
                "Blocks",
@@ -49,6 +49,7 @@ for (mediator in mediators) {
 }
 treatments_df <- treatments_df  |>
   mutate(treatment = ifelse(treatment %in% c("Physical therapy",
+                                             "Massage therapy",
                                              "Acupuncture",
                                              "Chiropractic",
                                              # "Blocks",
@@ -77,10 +78,10 @@ claims <- claims[LINE_SRVC_BGN_DT %within% interval(pain_diagnosis_dt,
                  .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, pain_diagnosis_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
 
 treatments_dts <- claims |>
-  left_join(treatments_df |> distinct(cd, .keep_all=T), 
-            by = c("LINE_PRCDR_CD" = "cd")) |>
+  left_join(treatments_df, by = c("LINE_PRCDR_CD" = "cd")) |>
   select(BENE_ID, treatment_start_dt = LINE_SRVC_BGN_DT, treatment_end_dt = LINE_SRVC_BGN_DT, treatment_name = treatment) |>
-  arrange(treatment_start_dt, desc(treatment_end_dt))
+  arrange(treatment_start_dt, desc(treatment_end_dt)) |>
+  distinct()
 
 # write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
-write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
+write_data(treatments_dts, "nonpharma_dts.fst", file.path(drv_root, "treatment"))
