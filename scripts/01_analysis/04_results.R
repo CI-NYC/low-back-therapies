@@ -64,10 +64,10 @@ read_relr <- function(Y, subset1, subset2) {
       readRDS() |> 
       lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{subset2}_{Y}_outcome_fix_no_cens.rds"))), 
                     type = "rr")
-    mutate(diff$vals, treatment = treatment, .before = "theta") |> 
-      mutate(theta = theta - 1, 
-             conf.low = conf.low - 1, 
-             conf.high = conf.high - 1)
+    mutate(diff$estimates, treatment = treatment, .before = "shift") #|> 
+      # mutate(theta = theta - 1, 
+      #        conf.low = conf.low - 1, 
+      #        conf.high = conf.high - 1)
   })
 }
 
@@ -225,7 +225,7 @@ ragg::agg_png(
 read_diff(Y, 0, 0) |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = T)) |> 
+  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
   plot_diff()
 
 dev.off()
@@ -238,7 +238,7 @@ ragg::agg_png(
 read_relr(Y, 0, 0) |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = T)) |> 
+  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
   plot_relr()
 
 dev.off()
@@ -251,7 +251,7 @@ ragg::agg_png(
 read_diff(Y, 1, 1) |> 
   relabel() |> 
   filter(extract_count(cl_y_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = T)) |> 
+  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
   plot_diff()
 
 dev.off()
@@ -264,7 +264,7 @@ ragg::agg_png(
 read_relr(Y, 1, 1) |> 
   relabel() |> 
   filter(extract_count(cl_y_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = T)) |> 
+  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
   plot_relr()
 
 dev.off()
