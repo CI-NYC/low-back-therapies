@@ -14,65 +14,26 @@ library(dplyr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
-
 # data <- data[1:5000,]
-  
-args <- commandArgs(TRUE)
 
-# options: [1, 2]
-subset <- args[[1]]
-# options: [1:12]
-treatment <- as.numeric(args[[2]])
-# options: see 01_run_main.R
-body <- args[[3]]
-eval(parse(text = paste('f <- function(x) ', body, sep='')))
-# options: ["oud_period", "oud_hillary_period", "outcome_prolonged_opioid_use", "outcome_chronic_opioid_therapy", "outcome_chronic_pain"]
-Y <- args[[4]]
-cens <- args[[5]]
-# options: [2, 5]
-folds <- as.numeric(args[[6]])
+args <- commandArgs(TRUE)
 
 # paramaters to modify
 # learners
 version <- "6_learners"
-sl <- c("SL.glm", "SL.xgboost", 
+sl <- c("SL.glm", "SL.xgboost",
         "SL.ranger",
         "SL.nnet",
         "SL.mean", "SL.earth")
 
 SL_folds <- 2
-print(paste0("CF_folds: ", folds, ", Version: ", version, ", ", paste(Y)))
+Y <- args[[1]]
+cens <- args[[2]]
+print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
-use <- data |> filter(subset_oud == subset)
+data_n_oud <- data |> filter(subset_oud == 0)
+data_y_oud <- data |> filter(subset_oud == 1)
 
-# Shift function function factory 
-factory <- function(treatment, func) {
-  fs <- lapply(1:15, function(x) function(x) x)
-  fs[[treatment]] <- func
-  
-  function(data, m) {
-    out <- list(
-      fs[[1]](data[[m[1]]]),  # "exposure_acetaminophen"
-      fs[[2]](data[[m[2]]]),  # "exposure_acupuncture"
-      fs[[3]](data[[m[3]]]),  # "exposure_anti-inflammatory"
-      fs[[4]](data[[m[4]]]),  # "exposure_benzodiazepine"
-      fs[[5]](data[[m[5]]]),  # "exposure_chiropractic"
-      fs[[6]](data[[m[6]]]),  # "exposure_duloxetine"
-      fs[[7]](data[[m[7]]]),  # "exposure_gabapentin"
-      fs[[8]](data[[m[8]]]),  # "exposure_intervention"
-      fs[[9]](data[[m[9]]]),  # "exposure_muscle relaxant"
-      fs[[10]](data[[m[10]]]),  # "exposure_massage therapy"
-      fs[[11]](data[[m[11]]]),   # "exposure_physical therapy"
-      fs[[12]](data[[m[12]]]),   # "exposure_steroid"
-      fs[[13]](data[[m[13]]]),   # "exposure_opioid"
-      fs[[14]](data[[m[14]]]),   # "exposure_max_daily_dose_mme"
-      fs[[15]](data[[m[15]]])   # "exposure_days_supply"
-    )
-    setNames(out, m)
-  }
-}
-
-d <- factory(treatment, f)
 
 W <- c(
   "dem_age",
@@ -123,14 +84,10 @@ A <- list(c("exposure_acetaminophen",
             "exposure_days_supply"
 ))
 
-# data$exposure_max_daily_dose_mme <- 
-#   replace_na(data$exposure_max_daily_dose_mme, 0)
-# 
-# data$exposure_days_supply <- 
-#   replace_na(data$exposure_days_supply, 0)
+
 
 fit <- lmtp_tmle(
-  use,
+  data_n_oud,
   trt = A,
   outcome = Y,
   baseline = W,
@@ -138,14 +95,34 @@ fit <- lmtp_tmle(
   mtp = T,
   learners_outcome = sl,
   learners_trt = sl,
-  shift = d,
-  folds = folds, 
+  shift = NULL,
+  folds = 2, 
   control = lmtp_control(.learners_outcome_folds = SL_folds,
                          .learners_trt_folds = SL_folds,
                          .discrete = F)
 )
 
-print("worked")
+saveRDS(fit, file.path(drv_root, "analysis", version,
+                       glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
 
-saveRDS(fit, file.path(drv_root, "analysis", version,  
-                       glue("fit_{gsub(' ', '_', subset)}_{Y}_outcome_fix_treatment_{A[[1]][treatment]}.rds")))
+
+
+fit <- lmtp_tmle(
+  data_y_oud,
+  trt = A,
+  outcome = Y,
+  baseline = W,
+  cens = cens,
+  mtp = T,
+  learners_outcome = sl,
+  learners_trt = sl,
+  shift = NULL,
+  folds = 5, 
+  control = lmtp_control(.learners_outcome_folds = SL_folds,
+                         .learners_trt_folds = SL_folds,
+                         .discrete = F)
+)
+
+saveRDS(fit, file.path(drv_root, "analysis", version,
+                       glue("fit_1_{Y}_outcome_fix_no_cens.rds")))
+

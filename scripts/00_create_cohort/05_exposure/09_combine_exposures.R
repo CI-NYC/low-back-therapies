@@ -47,7 +47,12 @@ combinations_wide <- cohort %>%
 
 exposures <- combinations_wide |>
   left_join(mme) |>
-  left_join(days_supply)
+  left_join(days_supply) |>
+  mutate(exposure_max_daily_dose_mme = replace_na(exposure_max_daily_dose_mme, 0),
+         exposure_days_supply = replace_na(exposure_days_supply, 0))
+
+# replace spaces and dashes with underscore, because in the analysis, ranger has an issue with these characters.
+names(exposures) <- gsub("[ -]", "_", names(exposures))
 
 write_data(exposures, "exposures.fst", file.path(drv_root, "treatment"))
 
@@ -92,9 +97,13 @@ combinations_wide <- cohort %>%
 
 exposures <- combinations_wide |>
   left_join(mme) |>
-  left_join(days_supply)
+  left_join(days_supply) |>
+  mutate(exposure_max_daily_dose_mme = replace_na(exposure_max_daily_dose_mme, 0),
+         exposure_days_supply = replace_na(exposure_days_supply, 0))
 
 write_data(exposures, "exposures_7day_gap.fst", file.path(drv_root, "treatment"))
+
+names(exposures) <- gsub("[ -]", "_", names(exposures))
 
 cohort <- cohort |>
   left_join(exposures) |>

@@ -8,7 +8,9 @@
 library(callr)
 library(tibble)
 
-script <- "~/medicaid/low-back-therapies/scripts/01_analysis/01_lmtp.R"
+script <- "/home/amh2389/medicaid/low-back-therapies/scripts/01_analysis/01_lmtp.R"
+
+# args <- commandArgs(TRUE)
 
 # subset 1 is non-OUD group. subset 2 is OUD group
 n_oud_param <- tribble(~subset, ~mediator, ~func, 
@@ -32,34 +34,72 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-y <- "oud_period"
+Y <- "oud_period_2"
+cens <- "cens_period_2"
+# "oud_period_2", "cens_period_2", # 1
+# "oud_period_4", "cens_period_4", # 2 
+# "oud_hillary_period_2", "cens_hillary_period_2", # 3
+# "oud_hillary_period_4", "cens_hillary_period_4", # 4
+# "outcome_chronic_pain_period_2", "cens_chronic_pain_period_2", # 5
+# "outcome_chronic_pain_period_4", "cens_chronic_pain_period_4", # 6
+# "outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4",
+# "outcome_chronic_opioid_therapy", "cens_chronic_opioid_period_4"
 
-# Execute for chronic pain and disability ---------------------------------
+# Execute for non-OUD subgroup ---------------------------------
+
+log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
+
+is <- 1:10
+processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds
-for (i in 1:nrow(n_oud_param)) {
-  # if (i == 4) next
-  
-  Rprocess <- rscript_process$new(
+# launch all processes without waiting
+for (i in is) {
+  processes[[i]] <- rscript_process$new(
     rscript_process_options(
-      script = script, 
-      cmdargs = c(n_oud_param$subset[i], n_oud_param$mediator[i], n_oud_param$func[i], y, 2)
+      script  = script,
+      cmdargs = c(n_oud_param$subset[i], n_oud_param$mediator[i], n_oud_param$func[i], Y, cens, 2)
     )
   )
-  Rprocess$wait()
+  # processes[[i]]$wait()
 }
 
-# Execute for chronic pain only -------------------------------------------
+# wait on each process, then capture and write its stderr
+for (i in is) {
+  proc <- processes[[i]]
+  proc$wait()
+  log_error <- proc$read_error()
+  writeLines(
+    log_error,
+    file.path(log_dir, Y, paste0("error_n_oud", i, ".log"))
+  )
+}
+
+
+
+# Execute for OUD subgroup -------------------------------------------
+
+processes <- vector("list", nrow(y_oud_param))
 
 # Crossfit with 5-folds
-for (i in 1:nrow(y_oud_param)) {
-  # if (i == 4) next
-  
-  Rprocess <- rscript_process$new(
+# launch all processes without waiting
+for (i in is) {
+  processes[[i]] <- rscript_process$new(
     rscript_process_options(
       script = script, 
-      cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], y, 5)
+      cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], Y, cens, 5)
     )
   )
-  Rprocess$wait()
+  # processes[[i]]$wait()
+}
+
+# wait on each process, then capture and write its stderr
+for (i in is) {
+  proc <- processes[[i]]
+  proc$wait()
+  log_error <- proc$read_error()
+  writeLines(
+    log_error,
+    file.path(log_dir, Y, paste0("error_y_oud", i, ".log"))
+  )
 }

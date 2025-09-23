@@ -162,5 +162,6 @@ for (i in c("")){
   # flip censoring indicators (in lmtp, 1 indicates still observed)
   cens <- mutate(cens, across(starts_with("cens"), \(x) ifelse(x == 0, 1, 0)))
   
+  cens[is.na(cens)] <- 0
   write_data(cens, paste0("pain_washout_continuous_enrollment_censoring", i, ".fst"), file.path(drv_root, "outcome"))
 }
