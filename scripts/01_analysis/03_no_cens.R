@@ -27,8 +27,8 @@ sl <- c("SL.glm", "SL.xgboost",
         "SL.mean", "SL.earth")
 
 SL_folds <- 2
-Y <- args[[1]]
-cens <- args[[2]]
+Y <- "outcome_chronic_opioid_therapy"
+cens <- "cens_chronic_opioid_period_4"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)

@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "6_learners"
-Y <- "oud_period_4"
+Y <- "outcome_chronic_pain_period_4"
 
 A <- (c("exposure_acetaminophen",
             "exposure_acupuncture",
@@ -64,10 +64,10 @@ read_relr <- function(Y, subset1, subset2) {
       readRDS() |> 
       lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{subset2}_{Y}_outcome_fix_no_cens.rds"))), 
                     type = "rr")
-    mutate(diff$estimates, treatment = treatment, .before = "shift") #|> 
-      # mutate(theta = theta - 1, 
-      #        conf.low = conf.low - 1, 
-      #        conf.high = conf.high - 1)
+    mutate(diff$estimates, treatment = treatment, .before = "shift") |> 
+      mutate(estimate = estimate - 1,
+             conf.low = conf.low - 1,
+             conf.high = conf.high - 1)
   })
 }
 

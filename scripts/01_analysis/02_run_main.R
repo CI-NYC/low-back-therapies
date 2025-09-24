@@ -34,8 +34,8 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "oud_period_2"
-cens <- "cens_period_2"
+Y <- "outcome_chronic_opioid_therapy"
+cens <- "cens_chronic_opioid_period_4"
 # "oud_period_2", "cens_period_2", # 1
 # "oud_period_4", "cens_period_4", # 2 
 # "oud_hillary_period_2", "cens_hillary_period_2", # 3
@@ -49,7 +49,7 @@ cens <- "cens_period_2"
 
 log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
 
-is <- 1:10
+is <- 1:8
 processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds

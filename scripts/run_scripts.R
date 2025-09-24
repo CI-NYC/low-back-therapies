@@ -14,7 +14,7 @@ job_groups <- list(
   # group6 = paste0("05_exposure/", c("03_days_supply.R", "03_days_supply_7day.R")),
   # group6 = "05_exposure/04_max_mme.R",
   # group7 = "05_exposure/04_max_mme_7day.R",
-  # group8 = "05_exposure/09_combine_exposures.R",
+  group8 = "05_exposure/09_combine_exposures.R",
   # group9 = c("05_opioid_naive_exclusions.R","05_other_pain_exclusions.R"),
   # group10 = paste0("06_oud/", c("00_bup.R", "00_hillary.R", "00_methadone.R")),
   # group11 = paste0("06_oud/", c("00_naltrexone.R", "00_poison.R", "00_misuse/00_study_pain_opioids.R")),
