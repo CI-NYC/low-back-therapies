@@ -110,8 +110,6 @@ for (i in c("", "_7day_gap")){
         outcome_j_1 <- outcomes[j-1]
         DT[get(outcome_j_1) == 1, `:=`((modify), lapply(.SD, function(x) 1)), .SDcols = modify]
       }
-      
-      
     }
     DT[]
     DT

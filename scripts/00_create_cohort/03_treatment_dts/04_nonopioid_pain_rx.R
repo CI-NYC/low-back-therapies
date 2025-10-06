@@ -132,11 +132,14 @@ rxl_opioids <-
          NDC %in% ndc_rx$NDC) |>
   distinct()
 
+# setting treatment end dt to the last day of supply, assuming medication starts on the fill date
+# replace NAs with 1 day supply
 rxl_opioids <- collect(rxl_opioids) |> 
   mutate(treatment_end_dt = RX_FILL_DT + days(coalesce(DAYS_SUPPLY, 1) - 1)) |>
   select(BENE_ID, treatment_start_dt = RX_FILL_DT, treatment_end_dt, NDC) |>
   as.data.table()
 
+# re-joining the specific name of the non-opioid pharmacalogic (benzo, gaba, anti-inflammatory, etc.)
 all <- unique(rbind(otl_opioids, rxl_opioids)) |>
   left_join(ndc_rx |> select(NDC, treatment_name)) |>
   select(-NDC)

@@ -14,9 +14,9 @@ library(dplyr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
-# data <- data[1:5000,]
+# data <- data[1:50000,]
 
-args <- commandArgs(TRUE)
+# args <- commandArgs(TRUE)
 
 # paramaters to modify
 # learners
@@ -68,7 +68,7 @@ W <- c(
 )
 
 A <- list(c("exposure_acetaminophen",
-            "exposure_acupuncture",
+            # "exposure_acupuncture",
             "exposure_anti_inflammatory",
             "exposure_benzodiazepine",
             "exposure_chiropractic",
@@ -85,25 +85,26 @@ A <- list(c("exposure_acetaminophen",
 ))
 
 
-
-fit <- lmtp_tmle(
-  data_n_oud,
-  trt = A,
-  outcome = Y,
-  baseline = W,
-  cens = cens,
-  mtp = T,
-  learners_outcome = sl,
-  learners_trt = sl,
-  shift = NULL,
-  folds = 2, 
-  control = lmtp_control(.learners_outcome_folds = SL_folds,
-                         .learners_trt_folds = SL_folds,
-                         .discrete = F)
-)
-
-saveRDS(fit, file.path(drv_root, "analysis", version,
-                       glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
+# 
+# fit <- lmtp_tmle(
+#   data_n_oud,
+#   trt = A,
+#   outcome = Y,
+#   baseline = W,
+#   cens = cens,
+#   mtp = T,
+#   outcome_type = "binomial",
+#   learners_outcome = sl,
+#   learners_trt = sl,
+#   shift = NULL,
+#   folds = 2, 
+#   control = lmtp_control(.learners_outcome_folds = SL_folds,
+#                          .learners_trt_folds = SL_folds,
+#                          .discrete = F)
+# )
+# 
+# saveRDS(fit, file.path(drv_root, "analysis", version,
+#                        glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
 
 
 
@@ -114,10 +115,11 @@ fit <- lmtp_tmle(
   baseline = W,
   cens = cens,
   mtp = T,
+  outcome_type = "binomial",
   learners_outcome = sl,
   learners_trt = sl,
   shift = NULL,
-  folds = 5, 
+  folds = 5,
   control = lmtp_control(.learners_outcome_folds = SL_folds,
                          .learners_trt_folds = SL_folds,
                          .discrete = F)

@@ -15,7 +15,7 @@ library(dplyr)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
-# data <- data[1:5000,]
+# data <- data[1:50000,]
   
 args <- commandArgs(TRUE)
 
@@ -47,26 +47,26 @@ use <- data |> filter(subset_oud == subset)
 
 # Shift function function factory 
 factory <- function(treatment, func) {
-  fs <- lapply(1:15, function(x) function(x) x)
+  fs <- lapply(1:14, function(x) function(x) x)
   fs[[treatment]] <- func
   
   function(data, m) {
     out <- list(
       fs[[1]](data[[m[1]]]),  # "exposure_acetaminophen"
-      fs[[2]](data[[m[2]]]),  # "exposure_acupuncture"
-      fs[[3]](data[[m[3]]]),  # "exposure_anti-inflammatory"
-      fs[[4]](data[[m[4]]]),  # "exposure_benzodiazepine"
-      fs[[5]](data[[m[5]]]),  # "exposure_chiropractic"
-      fs[[6]](data[[m[6]]]),  # "exposure_duloxetine"
-      fs[[7]](data[[m[7]]]),  # "exposure_gabapentin"
-      fs[[8]](data[[m[8]]]),  # "exposure_intervention"
-      fs[[9]](data[[m[9]]]),  # "exposure_muscle relaxant"
-      fs[[10]](data[[m[10]]]),  # "exposure_massage therapy"
-      fs[[11]](data[[m[11]]]),   # "exposure_physical therapy"
-      fs[[12]](data[[m[12]]]),   # "exposure_steroid"
-      fs[[13]](data[[m[13]]]),   # "exposure_opioid"
-      fs[[14]](data[[m[14]]]),   # "exposure_max_daily_dose_mme"
-      fs[[15]](data[[m[15]]])   # "exposure_days_supply"
+      # fs[[2]](data[[m[2]]]),  # "exposure_acupuncture"
+      fs[[2]](data[[m[2]]]),  # "exposure_anti-inflammatory"
+      fs[[3]](data[[m[3]]]),  # "exposure_benzodiazepine"
+      fs[[4]](data[[m[4]]]),  # "exposure_chiropractic"
+      fs[[5]](data[[m[5]]]),  # "exposure_duloxetine"
+      fs[[6]](data[[m[6]]]),  # "exposure_gabapentin"
+      fs[[7]](data[[m[7]]]),  # "exposure_intervention"
+      fs[[8]](data[[m[8]]]),  # "exposure_muscle relaxant"
+      fs[[9]](data[[m[9]]]),  # "exposure_massage therapy"
+      fs[[10]](data[[m[10]]]),   # "exposure_physical therapy"
+      fs[[11]](data[[m[11]]]),   # "exposure_steroid"
+      fs[[12]](data[[m[12]]]),   # "exposure_opioid"
+      fs[[13]](data[[m[13]]]),   # "exposure_max_daily_dose_mme"
+      fs[[14]](data[[m[14]]])   # "exposure_days_supply"
     )
     setNames(out, m)
   }
@@ -107,7 +107,7 @@ W <- c(
 )
 
 A <- list(c("exposure_acetaminophen",
-            "exposure_acupuncture",
+            # "exposure_acupuncture",
             "exposure_anti_inflammatory",
             "exposure_benzodiazepine",
             "exposure_chiropractic",
@@ -123,11 +123,6 @@ A <- list(c("exposure_acetaminophen",
             "exposure_days_supply"
 ))
 
-# data$exposure_max_daily_dose_mme <- 
-#   replace_na(data$exposure_max_daily_dose_mme, 0)
-# 
-# data$exposure_days_supply <- 
-#   replace_na(data$exposure_days_supply, 0)
 
 fit <- lmtp_tmle(
   use,
@@ -136,6 +131,7 @@ fit <- lmtp_tmle(
   baseline = W,
   cens = cens,
   mtp = T,
+  outcome_type = "binomial",
   learners_outcome = sl,
   learners_trt = sl,
   shift = d,

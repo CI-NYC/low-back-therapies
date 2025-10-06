@@ -84,7 +84,8 @@ opioids <- load_data("outcome_days_supply.dst", file.path(drv_root, "outcome"))
 
 opioids <- cohort_full |>
   left_join(opioids) |>
-  mutate(outcome_chronic_opioid_therapy = ifelse(outcome_days_supply >= 90, 1, 0)) |>
+  mutate(outcome_chronic_opioid_therapy = ifelse(outcome_days_supply >= 90, 1, 0),
+         outcome_chronic_opioid_therapy = replace_na(outcome_chronic_opioid_therapy, 0)) |>
   select(BENE_ID, outcome_chronic_opioid_therapy)
 
 write_data(opioids, "outcome_chronic_opioid_therapy.fst", file.path(drv_root, "outcome"))

@@ -20,9 +20,9 @@ The following object is masked from ‘package:utils’:
 
     timestamp
 
-Loading required package: nnls
-Loading required namespace: nnet
-Loading required namespace: earth
-Loading required namespace: xgboost
-Loading required namespace: ranger
+Warning message:
+NAs introduced by coercion 
+Error in fs[[treatment]] <- func : [[ ]] subscript out of bounds
+Calls: factory
+Execution halted
 

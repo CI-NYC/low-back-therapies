@@ -94,7 +94,7 @@ df[, `:=`(dem_sex_m = fifelse(dem_sex == "M", 1, 0), # Sex (reference category s
 
 
 # truncating max MME exposure due to low coverage (99th percentile as discussed)
-df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.99, na.rm=T)))]
+df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.995, na.rm=T)))]
 # 240 MME
 
 # Save in the mediation folder

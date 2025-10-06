@@ -17,10 +17,10 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "6_learners"
-Y <- "outcome_chronic_pain_period_4"
+Y <- "oud_period_4"
 
 A <- (c("exposure_acetaminophen",
-            "exposure_acupuncture",
+            # "exposure_acupuncture",
             "exposure_anti_inflammatory",
             "exposure_benzodiazepine",
             "exposure_chiropractic",
@@ -104,7 +104,7 @@ theme_update(
 
 label_counts <- function(data, subset, m) {
   subsetted <- data[subset_oud == subset]
-  has_mediator <- subsetted[subsetted[[m]] == 1]
+  has_mediator <- subsetted[subsetted[[m]] > 0]
   vals <- table(has_mediator[[Y]])
   glue("Outcome count: {vals['1']}")
 }
@@ -132,7 +132,7 @@ relabel <- function(data) {
            treatment == "exposure_steroid" ~ "Steroid", 
            treatment == "exposure_opioid" ~ "Opioid", 
            treatment == "exposure_max_daily_dose_mme" ~ "Maximum daily dose (MME)", 
-           treatment == "exposure_days_supply" ~ "Proportion of opioid days", 
+           treatment == "exposure_days_supply" ~ "Opioid days supply", 
            TRUE ~ treatment
          ))
 }
@@ -212,13 +212,13 @@ plot_res <- function(data, limits) {
 
 extract_count <- function(x) {
   map_dbl(x, function(i) {
-    if (!stringr::str_detect(i, "\\d+")) return(15)
+    if (!stringr::str_detect(i, "\\d+")) return(14)
     as.numeric(unlist(stringr::str_extract_all(i, "\\d+")))
   })
 }
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
@@ -231,7 +231,7 @@ read_diff(Y, 0, 0) |>
 dev.off()
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
@@ -244,7 +244,7 @@ read_relr(Y, 0, 0) |>
 dev.off()
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/mtp_{Y}_outcome_fix_y_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_riskdiff.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
@@ -257,7 +257,7 @@ read_diff(Y, 1, 1) |>
 dev.off()
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/mtp_{Y}_outcome_fix_y_oud_relrisk.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 

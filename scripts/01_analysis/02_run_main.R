@@ -26,16 +26,15 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
                        0, "10" , "(x*0) + 1",
                        0, "11" , "(x*0) + 1",
                        0, "12" , "(x*0) + 1",
-                       0, "13" , "(x*0) + 1",
-                       0, "14" , "((x*1.2) > 1)*x + ((x*1.2) <= 1)*(x*1.2)",
-                       0, "15" , "((x*1.2) > 1)*x + ((x*1.2) <= 1)*(x*1.2)"
+                       0, "13" , "((x*1.2) > 115)*x + ((x*1.2) <= 115)*(x*1.2)", # 115 max MME is the highest in the cohort
+                       0, "14" , "((x*1.2) > 90)*x + ((x*1.2) <= 90)*(x*1.2)" # 90 days is the highest in the cohort
                        )
 
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "outcome_chronic_opioid_therapy"
-cens <- "cens_chronic_opioid_period_4"
+Y <- "oud_period_4"
+cens <- "cens_period_4"
 # "oud_period_2", "cens_period_2", # 1
 # "oud_period_4", "cens_period_4", # 2 
 # "oud_hillary_period_2", "cens_hillary_period_2", # 3
@@ -49,7 +48,7 @@ cens <- "cens_chronic_opioid_period_4"
 
 log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
 
-is <- 1:8
+is <- c(8:14)
 processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds
@@ -77,29 +76,29 @@ for (i in is) {
 
 
 
-# Execute for OUD subgroup -------------------------------------------
-
-processes <- vector("list", nrow(y_oud_param))
-
-# Crossfit with 5-folds
-# launch all processes without waiting
-for (i in is) {
-  processes[[i]] <- rscript_process$new(
-    rscript_process_options(
-      script = script, 
-      cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], Y, cens, 5)
-    )
-  )
-  # processes[[i]]$wait()
-}
-
-# wait on each process, then capture and write its stderr
-for (i in is) {
-  proc <- processes[[i]]
-  proc$wait()
-  log_error <- proc$read_error()
-  writeLines(
-    log_error,
-    file.path(log_dir, Y, paste0("error_y_oud", i, ".log"))
-  )
-}
+# # Execute for OUD subgroup -------------------------------------------
+# 
+# processes <- vector("list", nrow(y_oud_param))
+# 
+# # Crossfit with 5-folds
+# # launch all processes without waiting
+# for (i in is) {
+#   processes[[i]] <- rscript_process$new(
+#     rscript_process_options(
+#       script = script,
+#       cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], Y, cens, 5)
+#     )
+#   )
+#   # processes[[i]]$wait()
+# }
+# 
+# # wait on each process, then capture and write its stderr
+# for (i in is) {
+#   proc <- processes[[i]]
+#   proc$wait()
+#   log_error <- proc$read_error()
+#   writeLines(
+#     log_error,
+#     file.path(log_dir, Y, paste0("error_y_oud", i, ".log"))
+#   )
+# }
