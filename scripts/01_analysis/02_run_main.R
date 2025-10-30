@@ -33,8 +33,8 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "oud_period_4"
-cens <- "cens_period_4"
+Y <- "outcome_chronic_pain_period_2"
+cens <- "cens_chronic_pain_period_2"
 # "oud_period_2", "cens_period_2", # 1
 # "oud_period_4", "cens_period_4", # 2 
 # "oud_hillary_period_2", "cens_hillary_period_2", # 3
@@ -48,7 +48,7 @@ cens <- "cens_period_4"
 
 log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
 
-is <- c(8:14)
+is <- c(1:14)
 processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds
@@ -76,29 +76,29 @@ for (i in is) {
 
 
 
-# # Execute for OUD subgroup -------------------------------------------
-# 
-# processes <- vector("list", nrow(y_oud_param))
-# 
-# # Crossfit with 5-folds
-# # launch all processes without waiting
-# for (i in is) {
-#   processes[[i]] <- rscript_process$new(
-#     rscript_process_options(
-#       script = script,
-#       cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], Y, cens, 5)
-#     )
-#   )
-#   # processes[[i]]$wait()
-# }
-# 
-# # wait on each process, then capture and write its stderr
-# for (i in is) {
-#   proc <- processes[[i]]
-#   proc$wait()
-#   log_error <- proc$read_error()
-#   writeLines(
-#     log_error,
-#     file.path(log_dir, Y, paste0("error_y_oud", i, ".log"))
-#   )
-# }
+# Execute for OUD subgroup -------------------------------------------
+
+processes <- vector("list", nrow(y_oud_param))
+
+# Crossfit with 5-folds
+# launch all processes without waiting
+for (i in is) {
+  processes[[i]] <- rscript_process$new(
+    rscript_process_options(
+      script = script,
+      cmdargs = c(y_oud_param$subset[i], y_oud_param$mediator[i], y_oud_param$func[i], Y, cens, 5)
+    )
+  )
+  # processes[[i]]$wait()
+}
+
+# wait on each process, then capture and write its stderr
+for (i in is) {
+  proc <- processes[[i]]
+  proc$wait()
+  log_error <- proc$read_error()
+  writeLines(
+    log_error,
+    file.path(log_dir, Y, paste0("error_y_oud", i, ".log"))
+  )
+}

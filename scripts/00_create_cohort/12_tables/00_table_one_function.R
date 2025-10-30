@@ -128,16 +128,17 @@ table_one_function <- function(df){
   # mutate(mediator_opioid_days_covered = mediator_opioid_days_covered*182)
   
   df <- df |>
-    mutate(baseline_covariates = NA, .before = dem_age) |>
-    mutate(sex = NA, .before = dem_sex_m) |>
-    mutate(dem_sex_f = 1 - dem_sex_m, .after=dem_sex_m) |>
-    mutate(race = NA, .before = dem_race) |>
-    mutate(household_size = NA, .before = dem_household_size) |>
-    mutate(ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional) |>
-    mutate(psychiatric_conditions = NA, .before = adhd_washout_cal) |>
-    mutate(treatments = NA, .before = exposure_acetaminophen) |>
-    mutate(outcomes = NA, .before = oud_period_4) |>
-    mutate(censoring = NA, .before = cens_period_4) |>
+    mutate(baseline_covariates = NA, .before = dem_age,
+           sex = NA, .before = dem_sex_m,
+           dem_sex_f = 1 - dem_sex_m, .after=dem_sex_m,
+           race = NA, .before = dem_race,
+           household_size = NA, .before = dem_household_size,
+           ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional,
+           psychiatric_conditions = NA, .before = adhd_washout_cal,
+           healthcare_utilization = NA, .before = num_iph_washout_cal,
+           treatments = NA, .before = exposure_acetaminophen,
+           outcomes = NA, .before = oud_period_4,
+           censoring = NA, .before = cens_period_4) |>
     # mutate(ed_visits = NA, .before = ed_visit_period_exposure) |>
     as.data.table()
   
@@ -174,12 +175,17 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}Mandatory or optional",
                     "\\hspace{0.5cm}Not applicable",
                     "\\hspace{0.5cm}Unknown",
-                    "Psychiatric conditions \\& counseling (months -6 to 0):",
+                    "Psychiatric conditions \\& counseling:",
                     "\\hspace{0.5cm}ADHD",
                     "\\hspace{0.5cm}Anxiety",
                     "\\hspace{0.5cm}Bipolar",
                     "\\hspace{0.5cm}Depression",
                     "\\hspace{0.5cm}Other mental illness",
+                    "\\hspace{0.5cm}Mental health counseling",
+                    "Healthcare Utilization",
+                    "\\hspace{0.5cm}Inpatient",
+                    "\\hspace{0.5cm}Outpatient",
+                    "\\hspace{0.5cm}Emergency department",
                     "\\textbf{Treatments (months 1-3)}",
                     "Acetaminophen",
                     "Acupuncture",
@@ -222,7 +228,10 @@ table_one_function <- function(df){
   ############# Preparing continuous variables
   continuous_vars <- c("dem_age",
                        "exposure_max_daily_dose_mme",
-                       "exposure_days_supply"
+                       "exposure_days_supply",
+                       "num_iph_washout_cal",
+                       "num_oth_washout_cal",
+                       "n_ED_visits_washout_cal"
                        # "ed_visit_period_exposure", 
                        # "ed_visit_period_1", 
                        # "ed_visit_period_2", 
@@ -232,7 +241,10 @@ table_one_function <- function(df){
   )
   continuous_names <- c("Age",
                         "Max MME",
-                        "Days supply"
+                        "Days supply",
+                        "\\hspace{0.5cm}Inpatient",
+                        "\\hspace{0.5cm}Outpatient",
+                        "\\hspace{0.5cm}Emergency department"
                         # "\\hspace{0.5cm}Exposure",
                         # "\\hspace{0.5cm}0-3 months",
                         # "\\hspace{0.5cm}3-6 months",
@@ -242,7 +254,7 @@ table_one_function <- function(df){
   )
   
   summarise_continuous_variable <- function(data, variable){
-    if (variable != "dem_age"){
+    if (variable %in% c("exposure_max_daily_dose_mme", "exposure_days_supply")){
       data <- data[exposure_days_supply > 0,]
       # return(paste0(sum(data[[variable]]>1),
       #               " (", round(mean(data[[variable]]>1)*100,2), "\\%)")

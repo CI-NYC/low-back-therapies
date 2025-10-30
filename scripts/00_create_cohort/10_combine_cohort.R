@@ -13,6 +13,9 @@ anxiety <- load_data("anxiety.rds", file.path(drv_root, "baseline_covariates"))
 bipolar <- load_data("bipolar.rds", file.path(drv_root, "baseline_covariates"))
 depression <- load_data("depression.rds", file.path(drv_root, "baseline_covariates"))
 mental_ill <- load_data("mental_ill.rds", file.path(drv_root, "baseline_covariates"))
+baseline_counseling <- load_data("counseling.fst", file.path(drv_root, "baseline_covariates"))
+num_inpatient_outpatient <- load_data("baseline_ip_op.fst", file.path(drv_root, "baseline_covariates"))
+num_ed_visits <- load_data("cohort_num_ED_visits.fst", file.path(drv_root, "baseline_covariates"))
 
 cohort_MH_joined <- cohort |>
   left_join(adhd |> select(BENE_ID, adhd_washout_cal)) |> 
@@ -20,6 +23,9 @@ cohort_MH_joined <- cohort |>
   left_join(bipolar |> select(BENE_ID, bipolar_washout_cal)) |> 
   left_join(depression |> select(BENE_ID, depression_washout_cal)) |>
   left_join(mental_ill |> select(BENE_ID, mental_ill_washout_cal)) |>
+  left_join(baseline_counseling |> select(BENE_ID, counseling_washout_cal)) |>
+  left_join(num_inpatient_outpatient) |>
+  left_join(num_ed_visits) |>
   select(BENE_ID, 
          ends_with("dt", ignore.case = FALSE), 
          starts_with("dem"),
@@ -50,6 +56,9 @@ cohort_MH_joined <- cohort |>
   left_join(bipolar |> select(BENE_ID, bipolar_washout_cal)) |> 
   left_join(depression |> select(BENE_ID, depression_washout_cal)) |>
   left_join(mental_ill |> select(BENE_ID, mental_ill_washout_cal)) |>
+  left_join(baseline_counseling |> select(BENE_ID, counseling_washout_cal)) |>
+  left_join(num_inpatient_outpatient) |>
+  left_join(num_ed_visits) |>
   select(BENE_ID, 
          ends_with("dt", ignore.case = FALSE), 
          starts_with("dem"),

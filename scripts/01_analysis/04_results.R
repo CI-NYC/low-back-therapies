@@ -5,6 +5,7 @@
 # Notes:
 # -------------------------------------
 
+.libPaths(c("~/libs", .libPaths()))
 library(lmtp)
 library(glue)
 library(purrr)
@@ -16,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
-version <- "6_learners"
+version <- "mlr3superlearner"
 Y <- "oud_period_4"
 
 A <- (c("exposure_acetaminophen",

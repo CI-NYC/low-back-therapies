@@ -8,10 +8,12 @@
 .libPaths(c("~/libs", .libPaths()))
 library(data.table)
 library(lmtp)
+library(mlr3superlearner)
 library(mlr3extralearners)
 library(glue)
 library(dplyr)
 
+set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
@@ -34,11 +36,12 @@ folds <- as.numeric(args[[6]])
 
 # paramaters to modify
 # learners
-version <- "6_learners"
-sl <- c("SL.glm", "SL.xgboost", 
-        "SL.ranger",
-        "SL.nnet",
-        "SL.mean", "SL.earth")
+version <- "mlr3superlearner"
+sl <- list("glm", "lightgbm",
+        # "ranger",
+        # "nnet",
+        "mean", "earth",
+        list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
 print(paste0("CF_folds: ", folds, ", Version: ", version, ", ", paste(Y)))
@@ -96,7 +99,10 @@ W <- c(
   "adhd_washout_cal",
   "depression_washout_cal",
   "mental_ill_washout_cal",
-  # "baseline_has_counseling",
+  "counseling_washout_cal",
+  "num_iph_washout_cal",
+  "num_oth_washout_cal",
+  "n_ED_visits_washout_cal",
   "missing_dem_race",
   "missing_dem_primary_language_english",
   "missing_dem_married_or_partnered",

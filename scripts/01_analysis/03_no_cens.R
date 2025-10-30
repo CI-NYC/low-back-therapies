@@ -8,10 +8,12 @@
 .libPaths(c("~/libs", .libPaths()))
 library(data.table)
 library(lmtp)
+library(mlr3superlearner)
 library(mlr3extralearners)
 library(glue)
 library(dplyr)
 
+set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 # data <- data[1:50000,]
@@ -20,15 +22,16 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
 # paramaters to modify
 # learners
-version <- "6_learners"
-sl <- c("SL.glm", "SL.xgboost",
-        "SL.ranger",
-        "SL.nnet",
-        "SL.mean", "SL.earth")
+version <- "mlr3superlearner"
+sl <- list("glm", "lightgbm",
+        # "ranger",
+        # "nnet",
+        "mean", "earth",
+        list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "outcome_chronic_opioid_therapy"
-cens <- "cens_chronic_opioid_period_4"
+Y <- "outcome_prolonged_opioid_use"
+cens <- "cens_prolonged_opioid_period_4"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)
@@ -44,20 +47,23 @@ W <- c(
   "dem_race_hawaiian",
   "dem_race_hispanic",
   "dem_race_multiracial",
-  "dem_primary_language_english", 
+  "dem_primary_language_english",
   "dem_married_or_partnered",
   "dem_household_size_2",
   "dem_household_size_2plus",
-  "dem_veteran", 
+  "dem_veteran",
   "dem_probable_high_income",
-  "dem_tanf_benefits", 
+  "dem_tanf_benefits",
   "dem_ssi_benefits_mandatory_optional",
   "bipolar_washout_cal",
   "anxiety_washout_cal",
   "adhd_washout_cal",
   "depression_washout_cal",
   "mental_ill_washout_cal",
-  # "baseline_has_counseling",
+  "counseling_washout_cal",
+  "num_iph_washout_cal",
+  "num_oth_washout_cal",
+  "n_ED_visits_washout_cal",
   "missing_dem_race",
   "missing_dem_primary_language_english",
   "missing_dem_married_or_partnered",
@@ -85,26 +91,25 @@ A <- list(c("exposure_acetaminophen",
 ))
 
 
-# 
-# fit <- lmtp_tmle(
-#   data_n_oud,
-#   trt = A,
-#   outcome = Y,
-#   baseline = W,
-#   cens = cens,
-#   mtp = T,
-#   outcome_type = "binomial",
-#   learners_outcome = sl,
-#   learners_trt = sl,
-#   shift = NULL,
-#   folds = 2, 
-#   control = lmtp_control(.learners_outcome_folds = SL_folds,
-#                          .learners_trt_folds = SL_folds,
-#                          .discrete = F)
-# )
-# 
-# saveRDS(fit, file.path(drv_root, "analysis", version,
-#                        glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
+
+fit <- lmtp_tmle(
+  data_n_oud,
+  trt = A,
+  outcome = Y,
+  baseline = W,
+  cens = cens,
+  outcome_type = "binomial",
+  learners_outcome = sl,
+  learners_trt = sl,
+  shift = NULL,
+  folds = 2,
+  control = lmtp_control(.learners_outcome_folds = SL_folds,
+                         .learners_trt_folds = SL_folds,
+                         .discrete = F)
+)
+
+saveRDS(fit, file.path(drv_root, "analysis", version,
+                       glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
 
 
 
@@ -114,7 +119,6 @@ fit <- lmtp_tmle(
   outcome = Y,
   baseline = W,
   cens = cens,
-  mtp = T,
   outcome_type = "binomial",
   learners_outcome = sl,
   learners_trt = sl,

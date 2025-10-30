@@ -37,6 +37,14 @@ open_iph <- function(path = "/mnt/processed-data/disability") {
     open_dataset()
 }
 
+open_ipl <- function(path = "/mnt/processed-data/disability") {
+  list.files(path, 
+             pattern = "*inpatient_line.*\\.parquet$", 
+             recursive = TRUE) |> 
+    (\(files) file.path(path, files))() |> 
+    open_dataset()
+}
+
 #' Open an arrow dataset for the other services files
 open_oth <- function(path = "/mnt/processed-data/disability") {
   list.files(path, 

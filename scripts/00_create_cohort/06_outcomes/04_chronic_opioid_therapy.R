@@ -77,10 +77,10 @@ opioids <-
   funique() |>
   fmutate(outcome_days_supply = pmax(days, 1)) # sometimes, the only opioid is prescribed on the last day of the period. as.duration would return a days supply of 0, so I am manually converting these to 1.
 
-write_data(opioids, "outcome_days_supply.dst", file.path(drv_root, "outcome"))
+write_data(opioids, "outcome_days_supply.fst", file.path(drv_root, "outcome"))
 
 
-opioids <- load_data("outcome_days_supply.dst", file.path(drv_root, "outcome"))
+opioids <- load_data("outcome_days_supply.fst", file.path(drv_root, "outcome"))
 
 opioids <- cohort_full |>
   left_join(opioids) |>
