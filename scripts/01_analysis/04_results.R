@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "mlr3superlearner"
-Y <- "oud_period_4"
+Y <- "outcome_prolonged_opioid_use"
 
 A <- (c("exposure_acetaminophen",
             # "exposure_acupuncture",
