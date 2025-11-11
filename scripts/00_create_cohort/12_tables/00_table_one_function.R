@@ -62,7 +62,25 @@ table_one_function <- function(df){
       dem_tanf_benefits = ifelse(missing_dem_tanf_benefits==0, dem_tanf_benefits, NA),
       dem_ssi_benefits_mandatory_optional = ifelse(missing_dem_ssi_benefits==0, dem_ssi_benefits_mandatory_optional, NA),
       dem_ssi_benefits = ifelse(dem_ssi_benefits=="Not Applicable", 1, 0),
-      dem_ssi_benefits = ifelse(missing_dem_ssi_benefits==0, dem_ssi_benefits, NA)
+      dem_ssi_benefits = ifelse(missing_dem_ssi_benefits==0, dem_ssi_benefits, NA),
+      iph_0_washout_cal_bin = as.numeric(num_iph_washout_cal == 0),
+      iph_1_washout_cal_bin = as.numeric(num_iph_washout_cal %in% c(1,2)),
+      iph_2_washout_cal_bin = as.numeric(num_iph_washout_cal %in% c(3,4)),
+      iph_3_washout_cal_bin = as.numeric(num_iph_washout_cal >= 5),
+      oth_0_washout_cal_bin = as.numeric(num_oth_washout_cal == 0),
+      oth_20_washout_cal_bin = as.numeric(num_oth_washout_cal > 0 & num_oth_washout_cal <= 25),
+      oth_40_washout_cal_bin = as.numeric(num_oth_washout_cal > 25 & num_oth_washout_cal <= 50),
+      oth_60_washout_cal_bin = as.numeric(num_oth_washout_cal > 50 & num_oth_washout_cal <= 75),
+      oth_80_washout_cal_bin = as.numeric(num_oth_washout_cal > 75),
+      rxl_0_washout_cal_bin = as.numeric(num_rxl_washout_cal == 0),
+      rxl_10_washout_cal_bin = as.numeric(num_rxl_washout_cal > 0 & num_rxl_washout_cal <= 10),
+      rxl_20_washout_cal_bin = as.numeric(num_rxl_washout_cal > 10 & num_rxl_washout_cal <= 20),
+      rxl_30_washout_cal_bin = as.numeric(num_rxl_washout_cal > 20 & num_rxl_washout_cal <= 30),
+      rxl_40_washout_cal_bin = as.numeric(num_rxl_washout_cal > 30),
+      ed_0_washout_cal_bin = as.numeric(n_ED_visits_washout_cal == 0),
+      ed_2_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(1,2)),
+      ed_4_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(3,4)),
+      ed_6_washout_cal_bin = as.numeric(n_ED_visits_washout_cal >= 5)
     ) |>
     select(# baseline covariates
       dem_age, # CONTINUOUS
@@ -88,6 +106,8 @@ table_one_function <- function(df){
       missing_dem_ssi_benefits,
       # other SSI categories
       ends_with("cal"),
+      -"num_iph_washout_cal", -"num_oth_washout_cal", -"num_rxl_washout_cal", -"n_ED_visits_washout_cal",
+      ends_with("cal_bin"),
       # treatments
       exposure_acetaminophen,
       exposure_acupuncture,
@@ -107,17 +127,21 @@ table_one_function <- function(df){
       exposure_max_daily_dose_mme,
       exposure_days_supply,
       # outcomes
+      oud_period_2,
       oud_period_4,
+      oud_hillary_period_2,
       oud_hillary_period_4,
       outcome_prolonged_opioid_use,
       outcome_chronic_opioid_therapy,
+      outcome_chronic_pain_period_2,
       outcome_chronic_pain_period_4,
       # censoring
-      cens_period_4,
-      cens_hillary_period_4,
-      cens_prolonged_opioid_period_4,
-      cens_chronic_opioid_period_4,
-      cens_chronic_pain_period_4
+      cens_period_2,
+      cens_period_4
+      # cens_hillary_period_4,
+      # cens_prolonged_opioid_period_4,
+      # cens_chronic_opioid_period_4,
+      # cens_chronic_pain_period_4
       # ed_visit_period_exposure,
       # ed_visit_period_1,
       # ed_visit_period_2,
@@ -128,17 +152,21 @@ table_one_function <- function(df){
   # mutate(mediator_opioid_days_covered = mediator_opioid_days_covered*182)
   
   df <- df |>
-    mutate(baseline_covariates = NA, .before = dem_age,
-           sex = NA, .before = dem_sex_m,
-           dem_sex_f = 1 - dem_sex_m, .after=dem_sex_m,
-           race = NA, .before = dem_race,
-           household_size = NA, .before = dem_household_size,
-           ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional,
-           psychiatric_conditions = NA, .before = adhd_washout_cal,
-           healthcare_utilization = NA, .before = num_iph_washout_cal,
-           treatments = NA, .before = exposure_acetaminophen,
-           outcomes = NA, .before = oud_period_4,
-           censoring = NA, .before = cens_period_4) |>
+    mutate(baseline_covariates = NA, .before = dem_age) |>
+    mutate(sex = NA, .before = dem_sex_m) |>
+    mutate(dem_sex_f = 1 - dem_sex_m, .after = dem_sex_m) |>
+    mutate(race = NA, .before = dem_race) |>
+    mutate(household_size = NA, .before = dem_household_size) |>
+    mutate(ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional) |>
+    mutate(psychiatric_conditions = NA, .before = adhd_washout_cal) |>
+    mutate(healthcare_utilization = NA, .before = iph_0_washout_cal_bin) |>
+    mutate(inpatient = NA, .before = iph_0_washout_cal_bin) |>
+    mutate(outpatient = NA, .before = oth_0_washout_cal_bin) |>
+    mutate(prescription = NA, .before = rxl_0_washout_cal_bin) |>
+    mutate(emergency = NA, .before = ed_0_washout_cal_bin) |>
+    mutate(treatments = NA, .before = exposure_acetaminophen) |>
+    mutate(outcomes = NA, .before = oud_period_2) |>
+    mutate(censoring = NA, .before = cens_period_2) |>
     # mutate(ed_visits = NA, .before = ed_visit_period_exposure) |>
     as.data.table()
   
@@ -182,10 +210,15 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}Depression",
                     "\\hspace{0.5cm}Other mental illness",
                     "\\hspace{0.5cm}Mental health counseling",
-                    "Healthcare Utilization",
-                    "\\hspace{0.5cm}Inpatient",
-                    "\\hspace{0.5cm}Outpatient",
-                    "\\hspace{0.5cm}Emergency department",
+                    "\\textbf{Healthcare Utilization}",
+                    "Inpatient hospitalizations",
+                    paste0("\\hspace{0.5cm}", c("0", "1-2", "3-4", "5+")),
+                    "Outpatient visits",
+                    paste0("\\hspace{0.5cm}", c("0", "1-25", "26-50", "51-75", "76+")),
+                    "Prescriptions",
+                    paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
+                    "Emergency department",
+                    paste0("\\hspace{0.5cm}", c("0", "1-2", "3-4", "5+")),
                     "\\textbf{Treatments (months 1-3)}",
                     "Acetaminophen",
                     "Acupuncture",
@@ -205,17 +238,21 @@ table_one_function <- function(df){
                     "Max MME",
                     "Days supply",
                     "\\textbf{Outcomes (months 3-15)}",
+                    "OUD by 9 months",
                     "OUD by 15 months",
+                    "OUD (ICD only) by 9 months",
                     "OUD (ICD only) by 15 months",
                     "At least monthly opioid prescribing",
                     "$\\ge$ 90 days supply for opioids",
+                    "Chronic LBP by 9 months",
                     "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
-                    "Uncensored (OUD) throughout entire study period",
-                    "Uncensored (OUD ICD-only) throughout entire study period",
-                    "Uncensored (POU) throughout entire study period",
-                    "Uncensored (COT) throughout entire study period",
-                    "Uncensored (Chronic LBP) throughout entire study period"
+                    "Uncensored through 9 months",
+                    "Uncensored through 15 months"
+                    # "Uncensored (OUD ICD-only) throughout entire study period",
+                    # "Uncensored (POU) throughout entire study period",
+                    # "Uncensored (COT) throughout entire study period",
+                    # "Uncensored (Chronic LBP) throughout entire study period"
                     # "\\textbf{At least 1 ED visit at:}",
                     # "\\hspace{0.5cm}Exposure",
                     # "\\hspace{0.5cm}0-3 months",
@@ -227,11 +264,12 @@ table_one_function <- function(df){
   
   ############# Preparing continuous variables
   continuous_vars <- c("dem_age",
+                       # "num_iph_washout_cal",
+                       # "num_oth_washout_cal",
+                       # "num_rxl_washout_cal",
+                       # "n_ED_visits_washout_cal",
                        "exposure_max_daily_dose_mme",
-                       "exposure_days_supply",
-                       "num_iph_washout_cal",
-                       "num_oth_washout_cal",
-                       "n_ED_visits_washout_cal"
+                       "exposure_days_supply"
                        # "ed_visit_period_exposure", 
                        # "ed_visit_period_1", 
                        # "ed_visit_period_2", 
@@ -240,11 +278,12 @@ table_one_function <- function(df){
                        # "ed_visit_period_5"
   )
   continuous_names <- c("Age",
+                        # "\\hspace{0.5cm}Inpatient",
+                        # "\\hspace{0.5cm}Outpatient",
+                        # "\\hspace{0.5cm}Prescriptions",
+                        # "\\hspace{0.5cm}Emergency department",
                         "Max MME",
-                        "Days supply",
-                        "\\hspace{0.5cm}Inpatient",
-                        "\\hspace{0.5cm}Outpatient",
-                        "\\hspace{0.5cm}Emergency department"
+                        "Days supply"
                         # "\\hspace{0.5cm}Exposure",
                         # "\\hspace{0.5cm}0-3 months",
                         # "\\hspace{0.5cm}3-6 months",
@@ -254,13 +293,7 @@ table_one_function <- function(df){
   )
   
   summarise_continuous_variable <- function(data, variable){
-    if (variable %in% c("exposure_max_daily_dose_mme", "exposure_days_supply")){
-      data <- data[exposure_days_supply > 0,]
-      # return(paste0(sum(data[[variable]]>1),
-      #               " (", round(mean(data[[variable]]>1)*100,2), "\\%)")
-      # )
-    }
-    
+    data <- data[data[[variable]] > 0, ]
     return(paste0(round(median(data[[variable]], na.rm=T),2)," (",
                   round(quantile(data[[variable]], 0.25, na.rm=T),2),", ",
                   round(quantile(data[[variable]], 0.75, na.rm=T),2),")"))

@@ -25,4 +25,7 @@ cohort <- cohort |>
     left_join(ED_visits) |>
     mutate(n_ED_visits_washout_cal = replace_na(n_ED_visits_washout_cal, 0))
 
+cohort <- cohort |>
+    mutate(n_ED_visits_washout_cal = ifelse(n_ED_visits_washout_cal > 5, 5, n_ED_visits_washout_cal))
+
 write_data(cohort, "cohort_num_ED_visits.fst", file.path(drv_root, "baseline_covariates"))

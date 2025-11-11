@@ -30,8 +30,8 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "outcome_prolonged_opioid_use"
-cens <- "cens_prolonged_opioid_period_4"
+Y <- "oud_hillary_period_2"
+cens <- "cens_period_2"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)
@@ -63,7 +63,10 @@ W <- c(
   "counseling_washout_cal",
   "num_iph_washout_cal",
   "num_oth_washout_cal",
-  "n_ED_visits_washout_cal",
+  "num_rxl_washout_cal",
+  "n_ED_visits_0_washout_cal",
+  "n_ED_visits_1_washout_cal",
+  "n_ED_visits_3_washout_cal",
   "missing_dem_race",
   "missing_dem_primary_language_english",
   "missing_dem_married_or_partnered",
@@ -108,6 +111,7 @@ fit <- lmtp_tmle(
                          .discrete = F)
 )
 
+
 saveRDS(fit, file.path(drv_root, "analysis", version,
                        glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
 
@@ -128,6 +132,7 @@ fit <- lmtp_tmle(
                          .learners_trt_folds = SL_folds,
                          .discrete = F)
 )
+
 
 saveRDS(fit, file.path(drv_root, "analysis", version,
                        glue("fit_1_{Y}_outcome_fix_no_cens.rds")))

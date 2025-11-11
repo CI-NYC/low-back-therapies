@@ -13,7 +13,7 @@ A <- (c("exposure_acetaminophen",
         "exposure_anti_inflammatory",
         "exposure_benzodiazepine",
         "exposure_chiropractic",
-        "exposure_duloxetine",
+        # "exposure_duloxetine",
         "exposure_gabapentin",
         "exposure_intervention",
         "exposure_muscle_relaxant",
@@ -55,7 +55,7 @@ plot_function <- function(name, Y, subset) {
         x = "Treatment") +
     theme_minimal()
 
-  ggsave(filename = paste0("/home/amh2389/medicaid/low-back-therapies/figures/exploratory/",Y,".png"), plot = p, width = 8, height = 6)
+  ggsave(filename = glue("/home/amh2389/medicaid/low-back-therapies/figures/exploratory/{Y}_{subset}.png"), plot = p, width = 8, height = 6)
 }
 
 plot_function(">=90 opioid days supply", "outcome_chronic_opioid_therapy", 0)
@@ -67,3 +67,11 @@ plot_function("Chronic pain 12mos", "outcome_chronic_pain_period_4", 0)
 plot_function("Chronic pain 6mos", "outcome_chronic_pain_period_2", 0)
 plot_function("At least 1 opioid monthly", "outcome_prolonged_opioid_use", 0)
 
+plot_function(">=90 opioid days supply", "outcome_chronic_opioid_therapy", 1)
+plot_function("OUD 12mos", "oud_period_4", 1)
+plot_function("OUD 6mos", "oud_period_2", 1)
+plot_function("OUD (ICD) 12mos", "oud_hillary_period_4", 1)
+plot_function("OUD (ICD) 6mos", "oud_hillary_period_2", 1)
+plot_function("Chronic pain 12mos", "outcome_chronic_pain_period_4", 1)
+plot_function("Chronic pain 6mos", "outcome_chronic_pain_period_2", 1)
+plot_function("At least 1 opioid monthly", "outcome_prolonged_opioid_use", 1)

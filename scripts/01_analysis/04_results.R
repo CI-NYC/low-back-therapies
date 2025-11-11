@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "mlr3superlearner"
-Y <- "outcome_chronic_pain_period_2"
+Y <- "oud_hillary_period_4"
 
 A <- (c("exposure_acetaminophen",
             # "exposure_acupuncture",
@@ -79,12 +79,12 @@ res_n_oud <- file.path(drv_root, "analysis", version, glue("fit_0_{Y}_outcome_fi
   mutate(treatment = "No censoring", .before = "estimate") |> 
   bind_rows(read_res(Y, subset=0))
 
-# Results for OUD group
-res_y_oud <- file.path(drv_root, "analysis", version, glue("fit_1_{Y}_outcome_fix_no_cens.rds")) |> 
-  readRDS() |> 
-  tidy() |> 
-  mutate(treatment = "No censoring", .before = "estimate") |> 
-  bind_rows(read_res(Y, subset=1))
+# # Results for OUD group
+# res_y_oud <- file.path(drv_root, "analysis", version, glue("fit_1_{Y}_outcome_fix_no_cens.rds")) |> 
+#   readRDS() |> 
+#   tidy() |> 
+#   mutate(treatment = "No censoring", .before = "estimate") |> 
+#   bind_rows(read_res(Y, subset=1))
 
 # Plot results ------------------------------------------------------------
 
@@ -112,8 +112,8 @@ label_counts <- function(data, subset, m) {
 
 cl_n_oud <-setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 0, m)),
                   A[1:length(A)])
-cl_y_oud <- setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 1, m)), 
-                  A[1:length(A)])
+# cl_y_oud <- setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 1, m)), 
+#                   A[1:length(A)])
 
 
 relabel <- function(data) {
@@ -244,28 +244,28 @@ read_relr(Y, 0, 0) |>
 
 dev.off()
 
-ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_riskdiff.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
-
-read_diff(Y, 1, 1) |> 
-  relabel() |> 
-  filter(extract_count(cl_y_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_diff()
-
-dev.off()
-
-ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_relrisk.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
-
-read_relr(Y, 1, 1) |> 
-  relabel() |> 
-  filter(extract_count(cl_y_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_relr()
-
-dev.off()
+# ragg::agg_png(
+#   glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_riskdiff.png"), 
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+# 
+# read_diff(Y, 1, 1) |> 
+#   relabel() |> 
+#   filter(extract_count(cl_y_oud) > 10) |> 
+#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
+#   plot_diff()
+# 
+# dev.off()
+# 
+# ragg::agg_png(
+#   glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_y_oud_relrisk.png"), 
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+# 
+# read_relr(Y, 1, 1) |> 
+#   relabel() |> 
+#   filter(extract_count(cl_y_oud) > 10) |> 
+#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
+#   plot_relr()
+# 
+# dev.off()

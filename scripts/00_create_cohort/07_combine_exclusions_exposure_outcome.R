@@ -74,17 +74,17 @@ for (i in c("", "_7day_gap")){
     join(cens, how = "left") |>
     join(chronic_pain, how = "left") |>
     join(prolonged_opioid_use, how = "left") |>
-    join(chronic_opioid_therapy, how = "left") |>
-    mutate(cens_hillary_period_1 = cens_period_1,
-           cens_hillary_period_2 = cens_period_2,
-           cens_hillary_period_3 = cens_period_3,
-           cens_hillary_period_4 = cens_period_4,
-           # cens_hillary_period_5 = cens_period_5,
-           cens_chronic_pain_period_2 = cens_period_2,
-           cens_chronic_pain_period_4 = cens_period_4,
-           cens_prolonged_opioid_period_4 = cens_period_4,
-           cens_chronic_opioid_period_4 = cens_period_4,
-    )
+    join(chronic_opioid_therapy, how = "left") #|>
+    # mutate(cens_hillary_period_1 = cens_period_1,
+    #        cens_hillary_period_2 = cens_period_2,
+    #        cens_hillary_period_3 = cens_period_3,
+    #        cens_hillary_period_4 = cens_period_4,
+    #        # cens_hillary_period_5 = cens_period_5,
+    #        cens_chronic_pain_period_2 = cens_period_2,
+    #        cens_chronic_pain_period_4 = cens_period_4,
+    #        cens_prolonged_opioid_period_4 = cens_period_4,
+    #        cens_chronic_opioid_period_4 = cens_period_4,
+    #)
   
   convert_cens_to_na <- function (data, outcomes, cens) {
     DT <- as.data.table(data)
@@ -125,37 +125,43 @@ for (i in c("", "_7day_gap")){
   cohort <- cohort |>
     convert_outcome_to_na(paste0("oud_period_", 1:4), paste0("cens_period_", 1:4)) |>
     # convert_cens_to_na(paste0("oud_period_", 1:4), paste0("cens_period_", 1:4)) |>
-    convert_outcome_to_na(paste0("oud_hillary_period_", 1:4), paste0("cens_hillary_period_", 1:4)) |>
+    convert_outcome_to_na(paste0("oud_hillary_period_", 1:4), paste0("cens_period_", 1:4)) |>
     # convert_cens_to_na(paste0("oud_hillary_period_", 1:4), paste0("cens_hillary_period_", 1:4)) |>
-    convert_outcome_to_na(paste0("outcome_chronic_pain_period_", c(2,4)), paste0("cens_chronic_pain_period_", c(2,4))) |>
+    convert_outcome_to_na(paste0("outcome_chronic_pain_period_", c(2,4)), paste0("cens_period_", c(2,4))) |>
     # convert_cens_to_na(paste0("outcome_chronic_pain_period_", c(2,4)), paste0("cens_chronic_pain_period_", c(2,4))) |>
     # convert_outcome_to_na("outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4") |>
     # convert_cens_to_na("outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4") |>
     mutate(oud_period_4 = case_when(oud_period_3 == 1 ~ 1,
-                                    # cens_period_4 == 0 ~ as.numeric(NA),
+                                    cens_period_4 == 0 ~ as.numeric(NA),
                                     TRUE ~ oud_period_4),
            oud_hillary_period_4 = case_when(oud_hillary_period_3 == 1 ~ 1,
-                                    # cens_hillary_period_4 == 0 ~ as.numeric(NA),
+                                    cens_period_4 == 0 ~ as.numeric(NA),
                                     TRUE ~ oud_hillary_period_4),
            outcome_chronic_pain_period_4 = case_when(outcome_chronic_pain_period_2 == 1 ~ 1,
-                                            # cens_chronic_pain_period_4 == 0 ~ as.numeric(NA),
+                                            cens_period_4 == 0 ~ as.numeric(NA),
                                             TRUE ~ outcome_chronic_pain_period_4),
-           # outcome_prolonged_opioid_use = case_when(cens_prolonged_opioid_period_4 == 0 ~ as.numeric(NA),
-           #                                        TRUE ~ outcome_prolonged_opioid_use),
-           # outcome_chronic_opioid_therapy = case_when(cens_chronic_opioid_period_4 == 0 ~ as.numeric(NA),
-           #                                          TRUE ~ outcome_chronic_opioid_therapy),
+           oud_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
+                                    TRUE ~ oud_period_2),
+           oud_hillary_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
+                                            TRUE ~ oud_hillary_period_2),
+           outcome_chronic_pain_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
+                                                     TRUE ~ outcome_chronic_pain_period_2),
+           outcome_prolonged_opioid_use = case_when(cens_period_4 == 0 ~ as.numeric(NA),
+                                                  TRUE ~ outcome_prolonged_opioid_use),
+           outcome_chronic_opioid_therapy = case_when(cens_period_4 == 0 ~ as.numeric(NA),
+                                                    TRUE ~ outcome_chronic_opioid_therapy),
            ) |> 
     select(BENE_ID, 
-                   ends_with("dt"),
-                   starts_with("exposure"),
-                   starts_with("subset"),
-                   starts_with("cens"),
-                   starts_with("oud"),
-                   starts_with("outcome"),
-                   -paste0("cens_period_", c(1,3,5)),
-                   -paste0("cens_hillary_period_", c(1,3)),
-                   -paste0("oud_period_", c("exposure",1,3,5)),
-                   -paste0("oud_hillary_period_", c("exposure",1,3,5))
+            ends_with("dt"),
+            starts_with("exposure"),
+            starts_with("subset"),
+            starts_with("cens"),
+            starts_with("oud"),
+            starts_with("outcome"),
+            -paste0("cens_period_", c(1,3,5)),
+          #  -paste0("cens_hillary_period_", c(1,3)),
+            -paste0("oud_period_", c("exposure",1,3,5)),
+            -paste0("oud_hillary_period_", c("exposure",1,3,5))
            )
   
   write_data(cohort, paste0("inclusion_exclusion_cohort_with_exposure_outcomes",i,".fst"), file.path(drv_root, "exclusion"))

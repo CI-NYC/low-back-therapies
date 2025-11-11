@@ -20,8 +20,6 @@ library(arrow)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-source("~/medicaid/low-back-therapies/R/helpers.R")
-
 ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 
@@ -52,4 +50,4 @@ opioids[, dose_form := future_map_chr(opioids$rxcui, get_dose_form, local_host =
 
 plan(sequential)
 
-saveRDS(opioids, file.path(drv_root, "exclusion/ndc_to_atc_opioids_with_strength.rds"))
+saveRDS(opioids, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids_with_strength.rds")

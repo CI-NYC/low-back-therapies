@@ -40,8 +40,9 @@ version <- "mlr3superlearner"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
-        "mean", "earth",
-        list("cv_glmnet", alpha = 1))
+        "mean","earth",
+        list("cv_glmnet", alpha = 1)
+        )
 
 SL_folds <- 2
 print(paste0("CF_folds: ", folds, ", Version: ", version, ", ", paste(Y)))
@@ -102,7 +103,10 @@ W <- c(
   "counseling_washout_cal",
   "num_iph_washout_cal",
   "num_oth_washout_cal",
-  "n_ED_visits_washout_cal",
+  "num_rxl_washout_cal",
+  "n_ED_visits_0_washout_cal",
+  "n_ED_visits_1_washout_cal",
+  "n_ED_visits_3_washout_cal",
   "missing_dem_race",
   "missing_dem_primary_language_english",
   "missing_dem_married_or_partnered",
