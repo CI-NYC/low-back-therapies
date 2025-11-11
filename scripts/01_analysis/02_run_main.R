@@ -48,7 +48,7 @@ cens <- "cens_period_2"
 
 log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
 
-is <- c(12:14)
+is <- c(1:5)
 processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds
