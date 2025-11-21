@@ -22,7 +22,7 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
 # paramaters to modify
 # learners
-version <- "mlr3superlearner"
+version <- "opioid_categorized"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -30,8 +30,8 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "oud_hillary_period_2"
-cens <- "cens_period_2"
+Y <- "oud_hillary_period_4"
+cens <- "cens_period_4"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)
@@ -88,9 +88,12 @@ A <- list(c("exposure_acetaminophen",
             "exposure_massage_therapy",
             "exposure_physical_therapy",
             "exposure_steroid",
-            "exposure_opioid",
-            "exposure_max_daily_dose_mme",
-            "exposure_days_supply"
+            # "exposure_opioid",
+            # "exposure_max_daily_dose_mme",
+            # "exposure_days_supply"
+            "exposure_opioid_le7days_le50mme",
+            "exposure_opioid_g7days_le50mme",
+            "exposure_opioid_g50mme"
 ))
 
 
@@ -108,7 +111,8 @@ fit <- lmtp_tmle(
   folds = 2,
   control = lmtp_control(.learners_outcome_folds = SL_folds,
                          .learners_trt_folds = SL_folds,
-                         .discrete = F)
+                         .discrete = F,
+                         .trim=0.995)
 )
 
 
@@ -117,23 +121,24 @@ saveRDS(fit, file.path(drv_root, "analysis", version,
 
 
 
-fit <- lmtp_tmle(
-  data_y_oud,
-  trt = A,
-  outcome = Y,
-  baseline = W,
-  cens = cens,
-  outcome_type = "binomial",
-  learners_outcome = sl,
-  learners_trt = sl,
-  shift = NULL,
-  folds = 5,
-  control = lmtp_control(.learners_outcome_folds = SL_folds,
-                         .learners_trt_folds = SL_folds,
-                         .discrete = F)
-)
-
-
-saveRDS(fit, file.path(drv_root, "analysis", version,
-                       glue("fit_1_{Y}_outcome_fix_no_cens.rds")))
+# fit <- lmtp_tmle(
+#   data_y_oud,
+#   trt = A,
+#   outcome = Y,
+#   baseline = W,
+#   cens = cens,
+#   outcome_type = "binomial",
+#   learners_outcome = sl,
+#   learners_trt = sl,
+#   shift = NULL,
+#   folds = 5,
+#   control = lmtp_control(.learners_outcome_folds = SL_folds,
+#                          .learners_trt_folds = SL_folds,
+#                          .discrete = F,
+#                          .trim=0.995)
+# )
+# 
+# 
+# saveRDS(fit, file.path(drv_root, "analysis", version,
+#                        glue("fit_1_{Y}_outcome_fix_no_cens.rds")))
 

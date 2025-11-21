@@ -4,25 +4,29 @@ path <- "~/medicaid/low-back-therapies/scripts/00_create_cohort/12_tables"
 
 source(file.path(path, "00_table_one_function.R"))
 
-overall_1 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[1:62,]
-oud_no_1 <- table_one_function(data |> filter(subset_oud == 0))[1:62,2]
-oud_yes_1 <- table_one_function(data |> filter(subset_oud == 1))[1:62,2]
+overall_1 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[1:59,]
+oud_no_1 <- table_one_function(data |> filter(subset_oud == 0))[1:59,]
+oud_yes_1 <- table_one_function(data |> filter(subset_oud == 1))[1:59,2]
 
-overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[63:95,]
-oud_no_2 <- table_one_function(data |> filter(subset_oud == 0))[63:95,2]
-oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[63:95,2]
+overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[60:91,]
+oud_no_2 <- table_one_function(data |> filter(subset_oud == 0))[60:91,]
+oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[60:91,2]
 
-overall_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud %in% c(0,1)))[63:83,]
-oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0))[63:83,2]
-oud_yes_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 1))[63:83,2]
+overall_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud %in% c(0,1)))[60:79,]
+oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0))[60:79,]
+oud_yes_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 1))[60:79,2]
 
-part1 <- cbind(overall_1, oud_no_1, oud_yes_1)
-part2 <- cbind(overall_2, oud_no_2, oud_yes_2)
-part2_7day_gap <- cbind(overall_2_7day_gap, oud_no_2_7day_gap, oud_yes_2_7day_gap)
+# part1 <- cbind(overall_1, oud_no_1, oud_yes_1)
+# part2 <- cbind(overall_2, oud_no_2, oud_yes_2)
+# part2_7day_gap <- cbind(overall_2_7day_gap, oud_no_2_7day_gap, oud_yes_2_7day_gap)
 
 write.csv(part1, file.path(path, "table_one_part1_all.csv"), row.names=F)
 write.csv(part2, file.path(path, "table_one_part2_all.csv"), row.names=F)
 write.csv(part2_7day_gap, file.path(path, "table_one_part2_7_day_gap.csv"), row.names=F)
+
+part1 <- cbind(oud_no_1)
+part2 <- cbind(oud_no_2)
+part2_7day_gap <- cbind(oud_no_2_7day_gap)
 
 dim(data |> filter(subset_oud %in% c(0,1)))
 dim(data |> filter(subset_oud == 0))

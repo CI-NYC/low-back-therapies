@@ -16,7 +16,10 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_
 
 mme <- load_data("exposure_max_daily_dose_mme.fst", file.path(drv_root, "treatment"))
 days_supply <- load_data("exposure_days_supply.fst", file.path(drv_root, "treatment"))
-# distinct_prescribers <- load_data("exposure_distinct_prescribers.fst", file.path(drv_root, "treatment"))
+days_supply$treatment_name <- ifelse(mme$exposure_max_daily_dose_mme <= 50, 
+                              ifelse(days_supply$exposure_days_supply <= 7, "Opioid_le7days_le50mme", 
+                                     "Opioid_g7days_le50mme"),
+                              "Opioid_g50mme")
 
 opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, treatment_start_dt, treatment_end_dt, treatment_name) |> distinct()
@@ -34,6 +37,7 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |>
 combinations_wide <- cohort %>%
   left_join(treatments) %>%
   select(BENE_ID, treatment_name) %>%
+  rbind(days_supply |> select(BENE_ID, treatment_name)) |>
   distinct() %>%    
   mutate(present = 1) %>%
   pivot_wider(
@@ -47,7 +51,7 @@ combinations_wide <- cohort %>%
 
 exposures <- combinations_wide |>
   left_join(mme) |>
-  left_join(days_supply) |>
+  left_join(days_supply |> select(-treatment_name)) |>
   mutate(exposure_max_daily_dose_mme = replace_na(exposure_max_daily_dose_mme, 0),
          exposure_days_supply = replace_na(exposure_days_supply, 0))
 
@@ -72,6 +76,11 @@ rm(days_supply)
 cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 mme <- load_data("exposure_max_daily_dose_mme_7day_gap.fst", file.path(drv_root, "treatment"))
 days_supply <- load_data("exposure_days_supply_7day_gap.fst", file.path(drv_root, "treatment"))
+days_supply$treatment_name <- ifelse(mme$exposure_max_daily_dose_mme <= 50, 
+                                     ifelse(days_supply$exposure_days_supply <= 7, "Opioid_le7days_le50mme", 
+                                            "Opioid_g7days_le50mme"),
+                                     "Opioid_g50mme")
+
 
 # Exposure: Which treatments were present during the exposure period? -----------
 
@@ -83,6 +92,7 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |>
 combinations_wide <- cohort %>%
   left_join(treatments) %>%
   select(BENE_ID, treatment_name) %>%
+  rbind(days_supply |> select(BENE_ID, treatment_name)) |>
   distinct() %>%    
   mutate(present = 1) %>%
   pivot_wider(
@@ -97,7 +107,7 @@ combinations_wide <- cohort %>%
 
 exposures <- combinations_wide |>
   left_join(mme) |>
-  left_join(days_supply) |>
+  left_join(days_supply |> select(-treatment_name)) |>
   mutate(exposure_max_daily_dose_mme = replace_na(exposure_max_daily_dose_mme, 0),
          exposure_days_supply = replace_na(exposure_days_supply, 0))
 

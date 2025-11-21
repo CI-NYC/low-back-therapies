@@ -14,6 +14,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 for (i in c("", "_7day_gap")){
+  print(i)
     
   # opioid naive exclusion
   opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))

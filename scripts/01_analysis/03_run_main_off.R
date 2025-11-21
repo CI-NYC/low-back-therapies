@@ -14,26 +14,28 @@ script <- "/home/amh2389/medicaid/low-back-therapies/scripts/01_analysis/01_lmtp
 
 # subset 1 is non-OUD group. subset 2 is OUD group
 n_oud_param <- tribble(~subset, ~mediator, ~func, 
-                       0, "1",  "(x*0) + 1",
-                       0, "2", "(x*0) + 1",
-                       0, "3" , "(x*0) + 1",
-                       0, "4" , "(x*0) + 1",
-                       0, "5" , "(x*0) + 1",
-                       0, "6" , "(x*0) + 1",
-                       0, "7" , "(x*0) + 1",
-                       0, "8" , "(x*0) + 1",
-                       0, "9" , "(x*0) + 1",
-                       0, "10" , "(x*0) + 1",
-                       0, "11" , "(x*0) + 1",
-                       0, "12" , "(x*0) + 1",
-                       0, "13" , "((x*1.2) > 115)*x + ((x*1.2) <= 115)*(x*1.2)", # 115 max MME is the highest in the cohort
-                       0, "14" , "((x*1.2) > 90)*x + ((x*1.2) <= 90)*(x*1.2)" # 90 days is the highest in the cohort
-                       )
+                       0, "1",  "(x*0)", # "exposure_acetaminophen"
+                       0, "2", "(x*0)", # "exposure_anti-inflammatory"
+                       0, "3" , "(x*0)", # "exposure_benzodiazepine"
+                       0, "4" , "(x*0)", # "exposure_chiropractic"
+                       0, "5" , "(x*0)", # "exposure_duloxetine"
+                       0, "6" , "(x*0)", # "exposure_gabapentin"
+                       0, "7" , "(x*0)", # "exposure_intervention"
+                       0, "8" , "(x*0)", # "exposure_muscle relaxant"
+                       0, "9" , "(x*0)", # "exposure_massage therapy"
+                       0, "10" , "(x*0)", # "exposure_physical therapy"
+                       0, "11" , "(x*0)", # "exposure_steroid"
+                       0, "12" , "(x*0)", # "exposure_opioid_le7days_le50mme"
+                       0, "13" , "(x*0)", # "exposure_opioid_g7days_le50mme"
+                       0, "14" , "(x*0)", # "exposure_opioid_g50mme"
+                       # 0, "13" , "((x*1.2) > 115)*x + ((x*1.2) <= 115)*(x*1.2)", # 115 max MME is the highest in the cohort
+                       # 0, "14" , "((x*1.2) > 90)*x + ((x*1.2) <= 90)*(x*1.2)" # 90 days is the highest in the cohort
+)
 
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "oud_hillary_period_2"
+Y <- "oud_period_2"
 cens <- "cens_period_2"
 # "oud_period_2", "cens_period_2", # 1
 # "oud_period_4", "cens_period_4", # 2 
@@ -48,7 +50,7 @@ cens <- "cens_period_2"
 
 log_dir <- "~/medicaid/low-back-therapies/scripts/lmtp_logs"
 
-is <- c(1:5)
+is <- c(1:14)
 processes <- vector("list", nrow(n_oud_param))
 
 # Crossfit with 2-folds
@@ -57,7 +59,7 @@ for (i in is) {
   processes[[i]] <- rscript_process$new(
     rscript_process_options(
       script  = script,
-      cmdargs = c(n_oud_param$subset[i], n_oud_param$mediator[i], n_oud_param$func[i], Y, cens, 2)
+      cmdargs = c(n_oud_param$subset[i], n_oud_param$mediator[i], n_oud_param$func[i], Y, cens, 2, "off")
     )
   )
   # processes[[i]]$wait()

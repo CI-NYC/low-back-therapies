@@ -8,41 +8,41 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 
 data_7day_gap <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 
-opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, treatment_start_dt, opioid, dose_form)
+# opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
+#   select(BENE_ID, treatment_start_dt, opioid, dose_form)
 
 table_one_function <- function(df){
   
-  df_opioids <- df |>
-    left_join(opioids) |>
-    filter(treatment_start_dt <= last_treatment_dt)
+  # df_opioids <- df |>
+  #   left_join(opioids) |>
+  #   filter(treatment_start_dt <= last_treatment_dt)
   
-  selected_opioids <- c(
-    "hydrocodone", "tramadol",      "oxycodone"#,
-    # "codeine",
-    # "morphine",      "hydromorphone", 
-    # "fentanyl",    "buprenorphine", "methadone"
-  )
+  # selected_opioids <- c(
+  #   "hydrocodone", "tramadol",      "oxycodone"#,
+  #   # "codeine",
+  #   # "morphine",      "hydromorphone", 
+  #   # "fentanyl",    "buprenorphine", "methadone"
+  # )
   
-  df_opioids_wide <- df_opioids %>%
-    select(BENE_ID, opioid) %>%
-    mutate(opioid = ifelse(!opioid %in% selected_opioids, "other_opioid", opioid)) |>
-    distinct() %>%
-    mutate(present = 1) %>%
-    pivot_wider(
-      id_cols       = BENE_ID,
-      names_from    = opioid,
-      values_from   = present,
-      values_fill   = list(present = 0),
-      names_prefix  = "exposure_"
-    ) %>%
-    select(
-      BENE_ID,
-      all_of(paste0("exposure_", c(selected_opioids, "other_opioid")))
-    )
+  # df_opioids_wide <- df_opioids %>%
+  #   select(BENE_ID, opioid) %>%
+  #   mutate(opioid = ifelse(!opioid %in% selected_opioids, "other_opioid", opioid)) |>
+  #   distinct() %>%
+  #   mutate(present = 1) %>%
+  #   pivot_wider(
+  #     id_cols       = BENE_ID,
+  #     names_from    = opioid,
+  #     values_from   = present,
+  #     values_fill   = list(present = 0),
+  #     names_prefix  = "exposure_"
+  #   ) %>%
+  #   select(
+  #     BENE_ID,
+  #     all_of(paste0("exposure_", c(selected_opioids, "other_opioid")))
+  #   )
   
   df <- df |>
-    left_join(df_opioids_wide) |>
+    # left_join(df_opioids_wide) |>
     mutate(
       dem_race_aian = ifelse(missing_dem_race==0, dem_race_aian, NA),
       dem_race_asian = ifelse(missing_dem_race==0, dem_race_asian, NA),
@@ -64,9 +64,9 @@ table_one_function <- function(df){
       dem_ssi_benefits = ifelse(dem_ssi_benefits=="Not Applicable", 1, 0),
       dem_ssi_benefits = ifelse(missing_dem_ssi_benefits==0, dem_ssi_benefits, NA),
       iph_0_washout_cal_bin = as.numeric(num_iph_washout_cal == 0),
-      iph_1_washout_cal_bin = as.numeric(num_iph_washout_cal %in% c(1,2)),
-      iph_2_washout_cal_bin = as.numeric(num_iph_washout_cal %in% c(3,4)),
-      iph_3_washout_cal_bin = as.numeric(num_iph_washout_cal >= 5),
+      iph_1_washout_cal_bin = as.numeric(num_iph_washout_cal == 1),
+      # iph_2_washout_cal_bin = as.numeric(num_iph_washout_cal %in% c(3,4)),
+      # iph_3_washout_cal_bin = as.numeric(num_iph_washout_cal >= 5),
       oth_0_washout_cal_bin = as.numeric(num_oth_washout_cal == 0),
       oth_20_washout_cal_bin = as.numeric(num_oth_washout_cal > 0 & num_oth_washout_cal <= 25),
       oth_40_washout_cal_bin = as.numeric(num_oth_washout_cal > 25 & num_oth_washout_cal <= 50),
@@ -76,11 +76,11 @@ table_one_function <- function(df){
       rxl_10_washout_cal_bin = as.numeric(num_rxl_washout_cal > 0 & num_rxl_washout_cal <= 10),
       rxl_20_washout_cal_bin = as.numeric(num_rxl_washout_cal > 10 & num_rxl_washout_cal <= 20),
       rxl_30_washout_cal_bin = as.numeric(num_rxl_washout_cal > 20 & num_rxl_washout_cal <= 30),
-      rxl_40_washout_cal_bin = as.numeric(num_rxl_washout_cal > 30),
-      ed_0_washout_cal_bin = as.numeric(n_ED_visits_washout_cal == 0),
-      ed_2_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(1,2)),
-      ed_4_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(3,4)),
-      ed_6_washout_cal_bin = as.numeric(n_ED_visits_washout_cal >= 5)
+      rxl_40_washout_cal_bin = as.numeric(num_rxl_washout_cal > 30)
+      # ed_0_washout_cal_bin = as.numeric(n_ED_visits_washout_cal == 0),
+      # ed_2_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(1,2)),
+      # ed_4_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(3,4)),
+      # ed_6_washout_cal_bin = as.numeric(n_ED_visits_washout_cal >= 5)
     ) |>
     select(# baseline covariates
       dem_age, # CONTINUOUS
@@ -106,7 +106,7 @@ table_one_function <- function(df){
       missing_dem_ssi_benefits,
       # other SSI categories
       ends_with("cal"),
-      -"num_iph_washout_cal", -"num_oth_washout_cal", -"num_rxl_washout_cal", -"n_ED_visits_washout_cal",
+      -"num_iph_washout_cal", -"num_oth_washout_cal", -"num_rxl_washout_cal",
       ends_with("cal_bin"),
       # treatments
       exposure_acetaminophen,
@@ -122,8 +122,9 @@ table_one_function <- function(df){
       `exposure_physical_therapy`,
       `exposure_spinal_cord_stimulation`,
       exposure_steroid,
-      exposure_opioid,
-      all_of(paste0("exposure_", c(selected_opioids, "other_opioid"))),
+      # exposure_opioid,
+      # all_of(paste0("exposure_", c(selected_opioids, "other_opioid"))),
+      starts_with("exposure_opioid"),
       exposure_max_daily_dose_mme,
       exposure_days_supply,
       # outcomes
@@ -159,11 +160,11 @@ table_one_function <- function(df){
     mutate(household_size = NA, .before = dem_household_size) |>
     mutate(ssi_benefits = NA, .before = dem_ssi_benefits_mandatory_optional) |>
     mutate(psychiatric_conditions = NA, .before = adhd_washout_cal) |>
-    mutate(healthcare_utilization = NA, .before = iph_0_washout_cal_bin) |>
+    mutate(healthcare_utilization = NA, .before = n_ED_visits_0_washout_cal) |>
+    mutate(emergency = NA, .before = n_ED_visits_0_washout_cal) |>
     mutate(inpatient = NA, .before = iph_0_washout_cal_bin) |>
     mutate(outpatient = NA, .before = oth_0_washout_cal_bin) |>
     mutate(prescription = NA, .before = rxl_0_washout_cal_bin) |>
-    mutate(emergency = NA, .before = ed_0_washout_cal_bin) |>
     mutate(treatments = NA, .before = exposure_acetaminophen) |>
     mutate(outcomes = NA, .before = oud_period_2) |>
     mutate(censoring = NA, .before = cens_period_2) |>
@@ -211,14 +212,14 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}Other mental illness",
                     "\\hspace{0.5cm}Mental health counseling",
                     "\\textbf{Healthcare Utilization}",
+                    "Emergency department",
+                    paste0("\\hspace{0.5cm}", c("0", "1-2", "3+")),
                     "Inpatient hospitalizations",
-                    paste0("\\hspace{0.5cm}", c("0", "1-2", "3-4", "5+")),
+                    paste0("\\hspace{0.5cm}", c("0", "1+")),
                     "Outpatient visits",
                     paste0("\\hspace{0.5cm}", c("0", "1-25", "26-50", "51-75", "76+")),
                     "Prescriptions",
                     paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
-                    "Emergency department",
-                    paste0("\\hspace{0.5cm}", c("0", "1-2", "3-4", "5+")),
                     "\\textbf{Treatments (months 1-3)}",
                     "Acetaminophen",
                     "Acupuncture",
@@ -234,16 +235,19 @@ table_one_function <- function(df){
                     "Spinal cord stimulation",
                     "Steroid",
                     "Opioid",
-                    paste0("\\hspace{0.5cm}", c(selected_opioids, "other opioid"), "†"),
-                    "Max MME",
-                    "Days supply",
+                    # paste0("\\hspace{0.5cm}", c(selected_opioids, "other opioid"), "†"),
+                    "\\hspace{0.5cm}$>50$ MME",
+                    "\\hspace{0.5cm}$>7$ days, $\\le50$ MME",
+                    "\\hspace{0.5cm}$\\le7$ days, $\\le50$ MME",
+                    "\\hspace{0.5cm}Max daily MME",
+                    "\\hspace{0.5cm}Days supply",
                     "\\textbf{Outcomes (months 3-15)}",
                     "OUD by 9 months",
                     "OUD by 15 months",
                     "OUD (ICD only) by 9 months",
                     "OUD (ICD only) by 15 months",
                     "At least monthly opioid prescribing",
-                    "$\\ge$ 90 days supply for opioids",
+                    "$\\ge$90 days supply for opioids",
                     "Chronic LBP by 9 months",
                     "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
@@ -282,8 +286,8 @@ table_one_function <- function(df){
                         # "\\hspace{0.5cm}Outpatient",
                         # "\\hspace{0.5cm}Prescriptions",
                         # "\\hspace{0.5cm}Emergency department",
-                        "Max MME",
-                        "Days supply"
+                        "\\hspace{0.5cm}Max daily MME",
+                        "\\hspace{0.5cm}Days supply"
                         # "\\hspace{0.5cm}Exposure",
                         # "\\hspace{0.5cm}0-3 months",
                         # "\\hspace{0.5cm}3-6 months",

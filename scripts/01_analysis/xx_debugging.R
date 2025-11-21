@@ -6,14 +6,14 @@ library(glue)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
-version <- "mlr3superlearner"
+version <- "trim"
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
         "exposure_anti_inflammatory",
         "exposure_benzodiazepine",
         "exposure_chiropractic",
-        # "exposure_duloxetine",
+        "exposure_duloxetine",
         "exposure_gabapentin",
         "exposure_intervention",
         "exposure_muscle_relaxant",

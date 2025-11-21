@@ -17,8 +17,8 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
-version <- "mlr3superlearner"
-Y <- "oud_hillary_period_2"
+version <- "opioid_categorized"
+Y <- "oud_period_2"
 
 A <- (c("exposure_acetaminophen",
             # "exposure_acupuncture",
@@ -32,38 +32,41 @@ A <- (c("exposure_acetaminophen",
             "exposure_massage_therapy",
             "exposure_physical_therapy",
             "exposure_steroid",
-            "exposure_opioid",
-            "exposure_max_daily_dose_mme",
-            "exposure_days_supply"
+            # "exposure_opioid",
+            # "exposure_max_daily_dose_mme",
+            # "exposure_days_supply"
+            "exposure_opioid_le7days_le50mme",
+            "exposure_opioid_g7days_le50mme",
+            "exposure_opioid_g50mme"
 ))
 
-read_res <- function(Y, subset) {
+read_res <- function(Y, intervention) {
   map_dfr(A, function(treatment) {
     file.path(drv_root, "analysis", version,
-              glue("fit_{gsub(' ', '_', subset)}_{Y}_outcome_fix_treatment_{treatment}.rds")) |> 
+              glue("fit_{intervention}_outcome_{Y}_treatment_{treatment}.rds")) |> 
       readRDS() |> 
       tidy() |> 
       mutate(treatment = treatment, .before = "estimate")
   })
 }
 
-read_diff <- function(Y, subset1, subset2) {
+read_diff <- function(Y, intervention1, intervention2) {
   map_dfr(A, function(treatment) {
     diff <- file.path(drv_root, "analysis", version,
-                      glue("fit_{gsub(' ', '_', subset1)}_{Y}_outcome_fix_treatment_{treatment}.rds")) |> 
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
       readRDS() |> 
-      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{subset2}_{Y}_outcome_fix_no_cens.rds"))))
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{intervention2}_outcome_{Y}_treatment_{treatment}.rds"))))
     mutate(diff$estimates, treatment = treatment, .before = "shift") #|>
       # mutate(estimate = shift - ref)
   })
 }
 
-read_relr <- function(Y, subset1, subset2) {
+read_relr <- function(Y, intervention1, intervention2) {
   map_dfr(A, function(treatment) {
     diff <- file.path(drv_root, "analysis", version,
-                      glue("fit_{gsub(' ', '_', subset1)}_{Y}_outcome_fix_treatment_{treatment}.rds")) |> 
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
       readRDS() |> 
-      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{subset2}_{Y}_outcome_fix_no_cens.rds"))), 
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{intervention2}_outcome_{Y}_treatment_{treatment}.rds"))), 
                     type = "rr")
     mutate(diff$estimates, treatment = treatment, .before = "shift") |> 
       mutate(estimate = estimate - 1,
@@ -72,12 +75,12 @@ read_relr <- function(Y, subset1, subset2) {
   })
 }
 
-# Results for non-OUD group
-res_n_oud <- file.path(drv_root, "analysis", version, glue("fit_0_{Y}_outcome_fix_no_cens.rds")) |> 
-  readRDS() |> 
-  tidy() |> 
-  mutate(treatment = "No censoring", .before = "estimate") |> 
-  bind_rows(read_res(Y, subset=0))
+# # Results for non-OUD group
+# res_n_oud <- file.path(drv_root, "analysis", version, glue("fit_off_outcome_{Y}_treatment_{treatment}.rds")) |> 
+#   readRDS() |> 
+#   tidy() |> 
+#   mutate(treatment = "No censoring", .before = "estimate") |> 
+#   bind_rows(read_res(Y, subset=0))
 
 # # Results for OUD group
 # res_y_oud <- file.path(drv_root, "analysis", version, glue("fit_1_{Y}_outcome_fix_no_cens.rds")) |> 
@@ -120,7 +123,7 @@ relabel <- function(data) {
   mutate(data, 
          treatment = case_when(
            treatment == "exposure_acetaminophen" ~ "Acetaminophen", 
-           treatment == "exposure_acupuncture" ~ "Acupuncture",
+           # treatment == "exposure_acupuncture" ~ "Acupuncture",
            treatment == "exposure_anti_inflammatory" ~ "Anti-inflammatory", 
            treatment == "exposure_benzodiazepine" ~ "Benzodiazepine", 
            treatment == "exposure_chiropractic" ~ "Chiropractic", 
@@ -131,9 +134,9 @@ relabel <- function(data) {
            treatment == "exposure_massage_therapy" ~ "Massage therapy", 
            treatment == "exposure_physical_therapy" ~ "Physical therapy",
            treatment == "exposure_steroid" ~ "Steroid", 
-           treatment == "exposure_opioid" ~ "Opioid", 
-           treatment == "exposure_max_daily_dose_mme" ~ "Maximum daily dose (MME)", 
-           treatment == "exposure_days_supply" ~ "Opioid days supply", 
+           treatment == "exposure_opioid_le7days_le50mme" ~ "Opioid, \u2264 7 days and \u2264 50 MME", 
+           treatment == "exposure_opioid_g7days_le50mme" ~ "Opioid, > 7 days and \u2264 50 MME", 
+           treatment == "exposure_opioid_g50mme" ~ "Opioid, > 50 MME", 
            TRUE ~ treatment
          ))
 }
@@ -223,7 +226,7 @@ ragg::agg_png(
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
-read_diff(Y, 0, 0) |> 
+read_diff(Y, "on", "off") |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
@@ -236,7 +239,7 @@ ragg::agg_png(
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
-read_relr(Y, 0, 0) |> 
+read_relr(Y, "on", "off") |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 

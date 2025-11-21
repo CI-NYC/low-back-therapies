@@ -15,7 +15,7 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 
 # data <- data[1:50000,]
   
@@ -33,10 +33,11 @@ Y <- args[[4]]
 cens <- args[[5]]
 # options: [2, 5]
 folds <- as.numeric(args[[6]])
+intervention <- args[[7]]
 
 # paramaters to modify
 # learners
-version <- "mlr3superlearner"
+version <- "sensitivity"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -52,7 +53,13 @@ use <- data |> filter(subset_oud == subset)
 # Shift function function factory 
 factory <- function(treatment, func) {
   fs <- lapply(1:14, function(x) function(x) x)
-  fs[[treatment]] <- func
+  if (treatment %in% c(12,13,14)) {
+    remainder <- setdiff(c(12, 13, 14), treatment)
+    fs[[treatment]] <- func
+    fs[remainder] <- list(function(x) x*0, function(x) x*0)
+  } else {
+    fs[[treatment]] <- func
+  }
   
   function(data, m) {
     out <- list(
@@ -68,9 +75,9 @@ factory <- function(treatment, func) {
       fs[[9]](data[[m[9]]]),  # "exposure_massage therapy"
       fs[[10]](data[[m[10]]]),   # "exposure_physical therapy"
       fs[[11]](data[[m[11]]]),   # "exposure_steroid"
-      fs[[12]](data[[m[12]]]),   # "exposure_opioid"
-      fs[[13]](data[[m[13]]]),   # "exposure_max_daily_dose_mme"
-      fs[[14]](data[[m[14]]])   # "exposure_days_supply"
+      fs[[12]](data[[m[12]]]),   # "exposure_opioid_le7days_le50mme"
+      fs[[13]](data[[m[13]]]),   # "exposure_opioid_g7days_le50mme"
+      fs[[14]](data[[m[14]]])   # "exposure_opioid_g50mme"
     )
     setNames(out, m)
   }
@@ -128,9 +135,12 @@ A <- list(c("exposure_acetaminophen",
             "exposure_massage_therapy",
             "exposure_physical_therapy",
             "exposure_steroid",
-            "exposure_opioid",
-            "exposure_max_daily_dose_mme",
-            "exposure_days_supply"
+            # "exposure_opioid",
+            # "exposure_max_daily_dose_mme",
+            # "exposure_days_supply"
+            "exposure_opioid_le7days_le50mme",
+            "exposure_opioid_g7days_le50mme",
+            "exposure_opioid_g50mme"
 ))
 
 
@@ -148,10 +158,11 @@ fit <- lmtp_tmle(
   folds = folds, 
   control = lmtp_control(.learners_outcome_folds = SL_folds,
                          .learners_trt_folds = SL_folds,
-                         .discrete = F)
+                         .discrete = F,
+                         .trim=0.995)
 )
 
 print("worked")
 
 saveRDS(fit, file.path(drv_root, "analysis", version,  
-                       glue("fit_{gsub(' ', '_', subset)}_{Y}_outcome_fix_treatment_{A[[1]][treatment]}.rds")))
+                       glue("fit_{intervention}_outcome_{Y}_treatment_{A[[1]][treatment]}.rds")))
