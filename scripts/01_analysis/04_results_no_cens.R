@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "opioid_categorized"
-Y <- "oud_hillary_period_4"
+Y <- "oud_hillary_period_2"
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
@@ -134,8 +134,8 @@ relabel <- function(data) {
            treatment == "exposure_massage_therapy" ~ "Massage therapy", 
            treatment == "exposure_physical_therapy" ~ "Physical therapy",
            treatment == "exposure_steroid" ~ "Steroid", 
-           treatment == "exposure_opioid_le7days_le50mme" ~ "Opioid, \u2264 7 days and \u2264 50 MME", 
-           treatment == "exposure_opioid_g7days_le50mme" ~ "Opioid, > 7 days and \u2264 50 MME", 
+           treatment == "exposure_opioid_le7days_le50mme" ~ "Opioid, \u2264 7 days & \u2264 50 MME", 
+           treatment == "exposure_opioid_g7days_le50mme" ~ "Opioid, > 7 days & \u2264 50 MME", 
            treatment == "exposure_opioid_g50mme" ~ "Opioid, > 50 MME", 
            TRUE ~ treatment
          ))

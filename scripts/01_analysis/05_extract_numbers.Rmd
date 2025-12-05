@@ -2,7 +2,9 @@
 title: "05_extract_numbers"
 author: "Anton Hung"
 date: "2025-12-05"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -93,3 +95,30 @@ df <- read_relr(Y, "on", "off")
 df
 ```
 
+
+
+
+```{r}
+Y <- "oud_period_2"
+
+df <- read_relr(Y, "on", "off")
+df
+```
+
+
+
+```{r}
+Y <- "oud_period_4"
+
+df <- read_relr_no_cens(Y, "on", "off")
+df
+```
+
+
+
+```{r}
+Y <- "oud_period_2"
+
+df <- read_relr_no_cens(Y, "on", "off")
+df
+```

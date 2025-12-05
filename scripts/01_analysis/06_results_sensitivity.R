@@ -15,29 +15,29 @@ library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
 
-version <- "opioid_categorized"
+version <- "sensitivity"
 Y <- "oud_hillary_period_2"
 
 A <- (c("exposure_acetaminophen",
-            # "exposure_acupuncture",
-            "exposure_anti_inflammatory",
-            "exposure_benzodiazepine",
-            "exposure_chiropractic",
-            "exposure_duloxetine",
-            "exposure_gabapentin",
-            "exposure_intervention",
-            "exposure_muscle_relaxant",
-            "exposure_massage_therapy",
-            "exposure_physical_therapy",
-            "exposure_steroid",
-            # "exposure_opioid",
-            # "exposure_max_daily_dose_mme",
-            # "exposure_days_supply"
-            "exposure_opioid_le7days_le50mme",
-            "exposure_opioid_g7days_le50mme",
-            "exposure_opioid_g50mme"
+        # "exposure_acupuncture",
+        "exposure_anti_inflammatory",
+        "exposure_benzodiazepine",
+        "exposure_chiropractic",
+        "exposure_duloxetine",
+        "exposure_gabapentin",
+        "exposure_intervention",
+        "exposure_muscle_relaxant",
+        "exposure_massage_therapy",
+        "exposure_physical_therapy",
+        "exposure_steroid",
+        # "exposure_opioid",
+        # "exposure_max_daily_dose_mme",
+        # "exposure_days_supply"
+        "exposure_opioid_le7days_le50mme",
+        "exposure_opioid_g7days_le50mme",
+        "exposure_opioid_g50mme"
 ))
 
 read_res <- function(Y, intervention) {
@@ -57,7 +57,7 @@ read_diff <- function(Y, intervention1, intervention2) {
       readRDS() |> 
       lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{intervention2}_outcome_{Y}_treatment_{treatment}.rds"))))
     mutate(diff$estimates, treatment = treatment, .before = "shift") #|>
-      # mutate(estimate = shift - ref)
+    # mutate(estimate = shift - ref)
   })
 }
 
@@ -114,7 +114,7 @@ label_counts <- function(data, subset, m) {
 }
 
 cl_n_oud <-setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 0, m)),
-                  A[1:length(A)])
+                    A[1:length(A)])
 # cl_y_oud <- setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 1, m)), 
 #                   A[1:length(A)])
 
@@ -222,7 +222,7 @@ extract_count <- function(x) {
 }
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
@@ -235,7 +235,7 @@ read_diff(Y, "on", "off") |>
 dev.off()
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
+  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
