@@ -35,7 +35,7 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "oud_period_2"
+Y <- "oud_hillary_period_2"
 cens <- "cens_period_2"
 # "oud_period_2", "cens_period_2", # 1
 # "oud_period_4", "cens_period_4", # 2 

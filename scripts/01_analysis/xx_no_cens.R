@@ -15,14 +15,14 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 # data <- data[1:50000,]
 
 # args <- commandArgs(TRUE)
 
 # paramaters to modify
 # learners
-version <- "opioid_categorized"
+version <- "sensitivity"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -96,8 +96,9 @@ A <- list(c("exposure_acetaminophen",
             "exposure_opioid_g50mme"
 ))
 
-
-
+# --------
+# No cens
+# --------
 fit <- lmtp_tmle(
   data_n_oud,
   trt = A,
@@ -117,8 +118,7 @@ fit <- lmtp_tmle(
 
 
 saveRDS(fit, file.path(drv_root, "analysis", version,
-                       glue("fit_0_{Y}_outcome_fix_no_cens.rds")))
-
+                       glue("fit_outcome_{Y}_no_cens.rds")))
 
 
 # fit <- lmtp_tmle(
