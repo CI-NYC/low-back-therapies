@@ -1,0 +1,366 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={05\_extract\_numbers},
+  pdfauthor={Anton Hung},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{05\_extract\_numbers}
+\author{Anton Hung}
+\date{2025-12-05}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{.libPaths}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"\textasciitilde{}/libs"}\NormalTok{, }\FunctionTok{.libPaths}\NormalTok{()))}
+\FunctionTok{library}\NormalTok{(lmtp)}
+\FunctionTok{library}\NormalTok{(glue)}
+\FunctionTok{library}\NormalTok{(purrr)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(data.table)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'data.table'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:dplyr':
+## 
+##     between, first, last
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     transpose
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{source}\NormalTok{(}\StringTok{"\textasciitilde{}/medicaid/low{-}back{-}therapies/R/helpers.R"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'arrow'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:utils':
+## 
+##     timestamp
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{load\_data}\NormalTok{(}\StringTok{"pain\_cohort\_clean\_imputed.fst"}\NormalTok{, }\FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"final"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} \FunctionTok{as.data.table}\NormalTok{()}
+
+\NormalTok{version }\OtherTok{\textless{}{-}} \StringTok{"opioid\_categorized"}
+
+\NormalTok{A }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{c}\NormalTok{(}\StringTok{"exposure\_acetaminophen"}\NormalTok{,}
+        \CommentTok{\# "exposure\_acupuncture",}
+        \StringTok{"exposure\_anti\_inflammatory"}\NormalTok{,}
+        \StringTok{"exposure\_benzodiazepine"}\NormalTok{,}
+        \StringTok{"exposure\_chiropractic"}\NormalTok{,}
+        \StringTok{"exposure\_duloxetine"}\NormalTok{,}
+        \StringTok{"exposure\_gabapentin"}\NormalTok{,}
+        \StringTok{"exposure\_intervention"}\NormalTok{,}
+        \StringTok{"exposure\_muscle\_relaxant"}\NormalTok{,}
+        \StringTok{"exposure\_massage\_therapy"}\NormalTok{,}
+        \StringTok{"exposure\_physical\_therapy"}\NormalTok{,}
+        \StringTok{"exposure\_steroid"}\NormalTok{,}
+        \CommentTok{\# "exposure\_opioid",}
+        \CommentTok{\# "exposure\_max\_daily\_dose\_mme",}
+        \CommentTok{\# "exposure\_days\_supply"}
+        \StringTok{"exposure\_opioid\_le7days\_le50mme"}\NormalTok{,}
+        \StringTok{"exposure\_opioid\_g7days\_le50mme"}\NormalTok{,}
+        \StringTok{"exposure\_opioid\_g50mme"}
+\NormalTok{))}
+
+\NormalTok{read\_res }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(Y, intervention) \{}
+  \FunctionTok{map\_dfr}\NormalTok{(A, }\ControlFlowTok{function}\NormalTok{(treatment) \{}
+    \FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"analysis"}\NormalTok{, version,}
+              \FunctionTok{glue}\NormalTok{(}\StringTok{"fit\_\{intervention\}\_outcome\_\{Y\}\_treatment\_\{treatment\}.rds"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{readRDS}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{tidy}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{treatment =}\NormalTok{ treatment, }\AttributeTok{.before =} \StringTok{"estimate"}\NormalTok{)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\NormalTok{read\_relr }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(Y, intervention1, intervention2) \{}
+  \FunctionTok{map\_dfr}\NormalTok{(A, }\ControlFlowTok{function}\NormalTok{(treatment) \{}
+\NormalTok{    diff }\OtherTok{\textless{}{-}} \FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"analysis"}\NormalTok{, version,}
+                      \FunctionTok{glue}\NormalTok{(}\StringTok{"fit\_\{intervention1\}\_outcome\_\{Y\}\_treatment\_\{treatment\}.rds"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{readRDS}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{lmtp\_contrast}\NormalTok{(}\AttributeTok{ref =} \FunctionTok{readRDS}\NormalTok{(}\FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"analysis"}\NormalTok{, version, }\FunctionTok{glue}\NormalTok{(}\StringTok{"fit\_\{intervention2\}\_outcome\_\{Y\}\_treatment\_\{treatment\}.rds"}\NormalTok{))), }
+                    \AttributeTok{type =} \StringTok{"rr"}\NormalTok{)}
+    \FunctionTok{mutate}\NormalTok{(diff}\SpecialCharTok{$}\NormalTok{estimates, }\AttributeTok{treatment =}\NormalTok{ treatment, }\AttributeTok{.before =} \StringTok{"shift"}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{estimate =}\NormalTok{ estimate }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{conf.low =}\NormalTok{ conf.low }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{conf.high =}\NormalTok{ conf.high }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{  \})}
+\NormalTok{\}}
+
+\NormalTok{read\_relr\_no\_cens }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(Y, intervention1, intervention2) \{}
+  \FunctionTok{map\_dfr}\NormalTok{(A, }\ControlFlowTok{function}\NormalTok{(treatment) \{}
+\NormalTok{    diff }\OtherTok{\textless{}{-}} \FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"analysis"}\NormalTok{, version,}
+                      \FunctionTok{glue}\NormalTok{(}\StringTok{"fit\_\{intervention1\}\_outcome\_\{Y\}\_treatment\_\{treatment\}.rds"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{readRDS}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{lmtp\_contrast}\NormalTok{(}\AttributeTok{ref =} \FunctionTok{readRDS}\NormalTok{(}\FunctionTok{file.path}\NormalTok{(drv\_root, }\StringTok{"analysis"}\NormalTok{, version, }\FunctionTok{glue}\NormalTok{(}\StringTok{"fit\_outcome\_\{Y\}\_no\_cens.rds"}\NormalTok{))), }
+                    \AttributeTok{type =} \StringTok{"rr"}\NormalTok{)}
+    \FunctionTok{mutate}\NormalTok{(diff}\SpecialCharTok{$}\NormalTok{estimates, }\AttributeTok{treatment =}\NormalTok{ treatment, }\AttributeTok{.before =} \StringTok{"shift"}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+      \FunctionTok{mutate}\NormalTok{(}\AttributeTok{estimate =}\NormalTok{ estimate }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{conf.low =}\NormalTok{ conf.low }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+             \AttributeTok{conf.high =}\NormalTok{ conf.high }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{  \})}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Y }\OtherTok{\textless{}{-}} \StringTok{"oud\_period\_4"}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_relr}\NormalTok{(Y, }\StringTok{"on"}\NormalTok{, }\StringTok{"off"}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 14 x 8
+##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
+##    <chr>            <dbl>  <dbl>    <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
+##  1 exposure_aceta~ 0.0315 0.0251   0.255     0.0378   0.166     0.352  1.83e-  9
+##  2 exposure_anti_~ 0.0258 0.0253   0.0179    0.0209  -0.0230    0.0605 3.97e-  1
+##  3 exposure_benzo~ 0.0373 0.0237   0.574     0.0283   0.489     0.664  6.49e- 58
+##  4 exposure_chiro~ 0.0201 0.0262  -0.234     0.0364  -0.287    -0.178  2.21e- 13
+##  5 exposure_dulox~ 0.0334 0.0252   0.324     0.0372   0.231     0.424  4.55e- 14
+##  6 exposure_gabap~ 0.0519 0.0219   1.37      0.0241   1.26      1.49   4.59e-281
+##  7 exposure_inter~ 0.0313 0.0251   0.247     0.0346   0.165     0.334  1.84e- 10
+##  8 exposure_muscl~ 0.0246 0.0267  -0.0789    0.0207  -0.115    -0.0408 7.02e-  5
+##  9 exposure_massa~ 0.0224 0.0255  -0.121     0.0122  -0.142    -0.0998 4.35e- 26
+## 10 exposure_physi~ 0.0176 0.0267  -0.341     0.0425  -0.393    -0.283  1.17e- 22
+## 11 exposure_stero~ 0.0252 0.0257  -0.0160    0.0273  -0.0673    0.0381 5.55e-  1
+## 12 exposure_opioi~ 0.0266 0.0226   0.174     0.0279   0.111     0.240  9.26e-  9
+## 13 exposure_opioi~ 0.0397 0.0226   0.756     0.0299   0.656     0.862  5.80e- 79
+## 14 exposure_opioi~ 0.0476 0.0226   1.10      0.0379   0.952     1.27   9.72e- 86
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Y }\OtherTok{\textless{}{-}} \StringTok{"oud\_period\_2"}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_relr}\NormalTok{(Y, }\StringTok{"on"}\NormalTok{, }\StringTok{"off"}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 14 x 8
+##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
+##    <chr>            <dbl>  <dbl>    <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
+##  1 exposure_aceta~ 0.0225 0.0174   0.293     0.0417   0.192     0.403  6.92e- 10
+##  2 exposure_anti_~ 0.0179 0.0175   0.0222    0.0227  -0.0223    0.0686 3.34e-  1
+##  3 exposure_benzo~ 0.0261 0.0164   0.594     0.0320   0.497     0.697  4.38e- 48
+##  4 exposure_chiro~ 0.0133 0.0182  -0.272     0.0455  -0.334    -0.204  3.14e- 12
+##  5 exposure_dulox~ 0.0259 0.0174   0.487     0.0450   0.361     0.624  1.26e- 18
+##  6 exposure_gabap~ 0.0387 0.0149   1.59      0.0269   1.46      1.73   3.83e-274
+##  7 exposure_inter~ 0.0248 0.0173   0.432     0.0398   0.325     0.549  1.66e- 19
+##  8 exposure_muscl~ 0.0167 0.0187  -0.107     0.0225  -0.146    -0.0668 4.90e-  7
+##  9 exposure_massa~ 0.0154 0.0177  -0.131     0.0132  -0.153    -0.108  2.61e- 26
+## 10 exposure_physi~ 0.0122 0.0186  -0.343     0.0474  -0.401    -0.279  8.49e- 19
+## 11 exposure_stero~ 0.0172 0.0179  -0.0411    0.0296  -0.0950    0.0161 1.56e-  1
+## 12 exposure_opioi~ 0.0181 0.0156   0.159     0.0308   0.0906    0.231  1.81e-  6
+## 13 exposure_opioi~ 0.0284 0.0156   0.815     0.0338   0.699     0.939  1.31e- 69
+## 14 exposure_opioi~ 0.0351 0.0156   1.24      0.0415   1.07      1.43   3.62e- 84
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Y }\OtherTok{\textless{}{-}} \StringTok{"oud\_period\_4"}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_relr\_no\_cens}\NormalTok{(Y, }\StringTok{"on"}\NormalTok{, }\StringTok{"off"}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 14 x 8
+##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
+##    <chr>            <dbl>  <dbl>    <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
+##  1 exposure_aceta~ 0.0315 0.0254  0.241     0.0354   1.58e-1   0.330   1.03e-  9
+##  2 exposure_anti_~ 0.0258 0.0254  0.0175    0.00882  3.86e-5   0.0352  4.95e-  2
+##  3 exposure_benzo~ 0.0373 0.0254  0.473     0.0245   4.04e-1   0.545   3.73e- 56
+##  4 exposure_chiro~ 0.0201 0.0254 -0.207     0.0348  -2.60e-1  -0.151   2.44e- 11
+##  5 exposure_dulox~ 0.0334 0.0254  0.317     0.0356   2.29e-1   0.413   9.71e- 15
+##  6 exposure_gabap~ 0.0519 0.0254  1.05      0.0196   9.70e-1   1.13    1.26e-293
+##  7 exposure_inter~ 0.0313 0.0254  0.235     0.0328   1.59e-1   0.317   1.12e- 10
+##  8 exposure_muscl~ 0.0246 0.0254 -0.0308    0.0117  -5.27e-2  -0.00836 7.36e-  3
+##  9 exposure_massa~ 0.0224 0.0254 -0.115     0.0103  -1.33e-1  -0.0972  1.70e- 32
+## 10 exposure_physi~ 0.0176 0.0254 -0.307     0.0404  -3.59e-1  -0.249   1.22e- 19
+## 11 exposure_stero~ 0.0252 0.0254 -0.00402   0.0227  -4.74e-2   0.0413  8.59e-  1
+## 12 exposure_opioi~ 0.0266 0.0254  0.0481    0.0229   2.09e-3   0.0962  4.02e-  2
+## 13 exposure_opioi~ 0.0397 0.0254  0.568     0.0260   4.90e-1   0.650   6.24e- 67
+## 14 exposure_opioi~ 0.0476 0.0254  0.878     0.0345   7.55e-1   1.01    2.23e- 74
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Y }\OtherTok{\textless{}{-}} \StringTok{"oud\_period\_2"}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_relr\_no\_cens}\NormalTok{(Y, }\StringTok{"on"}\NormalTok{, }\StringTok{"off"}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 14 x 8
+##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
+##    <chr>            <dbl>  <dbl>    <dbl>     <dbl>    <dbl>     <dbl>     <dbl>
+##  1 exposure_aceta~ 0.0225 0.0176   0.278    0.0390   0.184      0.380  3.29e- 10
+##  2 exposure_anti_~ 0.0179 0.0176   0.0169   0.00947 -0.00177    0.0360 7.63e-  2
+##  3 exposure_benzo~ 0.0261 0.0176   0.487    0.0279   0.407      0.570  1.01e- 45
+##  4 exposure_chiro~ 0.0133 0.0176  -0.244    0.0439  -0.306     -0.176  1.86e- 10
+##  5 exposure_dulox~ 0.0259 0.0176   0.475    0.0432   0.355      0.605  2.44e- 19
+##  6 exposure_gabap~ 0.0387 0.0176   1.20     0.0219   1.11       1.30   1.69e-284
+##  7 exposure_inter~ 0.0248 0.0176   0.413    0.0378   0.312      0.521  5.32e- 20
+##  8 exposure_muscl~ 0.0167 0.0176  -0.0497   0.0129  -0.0735    -0.0253 8.06e-  5
+##  9 exposure_massa~ 0.0154 0.0176  -0.124    0.0112  -0.143     -0.104  6.55e- 32
+## 10 exposure_physi~ 0.0122 0.0176  -0.306    0.0451  -0.365     -0.242  5.23e- 16
+## 11 exposure_stero~ 0.0172 0.0176  -0.0235   0.0246  -0.0696     0.0248 3.34e-  1
+## 12 exposure_opioi~ 0.0181 0.0176   0.0311   0.0256  -0.0193     0.0840 2.31e-  1
+## 13 exposure_opioi~ 0.0284 0.0176   0.615    0.0296   0.524      0.712  3.75e- 59
+## 14 exposure_opioi~ 0.0351 0.0176   0.995    0.0378   0.852      1.15   1.11e- 74
+\end{verbatim}
+
+\end{document}

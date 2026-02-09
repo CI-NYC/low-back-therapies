@@ -1,6 +1,6 @@
 # -------------------------------------
 # Script: 00_filter_low_back_claims.R
-# Author: Nick Williams
+# Author: Anton Hung
 # Purpose: Find all low back pain claims within the specified date range 
 #   in the Other Services and Inpatient files
 # Notes:

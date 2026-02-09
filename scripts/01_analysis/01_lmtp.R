@@ -15,7 +15,8 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) 
+# sensitivity analysis: repeat for pain_cohort_clean_imputed_7day_gap.fst
 
 # data <- data[1:50000,]
   
@@ -37,7 +38,7 @@ intervention <- args[[7]]
 
 # paramaters to modify
 # learners
-version <- "sensitivity"
+version <- "opioid_categorized" # repeat for 1) opioid_categorized 2) sensitivity analysis
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -52,6 +53,7 @@ use <- data |> filter(subset_oud == subset)
 
 # Shift function function factory 
 factory <- function(treatment, func) {
+  # modification which is only applicable for opioid categories, due to being mutually exclusive
   fs <- lapply(1:14, function(x) function(x) x)
   if (treatment %in% c(12,13,14)) {
     remainder <- setdiff(c(12, 13, 14), treatment)
@@ -110,7 +112,7 @@ W <- c(
   "counseling_washout_cal",
   "num_iph_washout_cal",
   "num_oth_washout_cal",
-  "num_rxl_washout_cal",
+  # "num_rxl_washout_cal",
   "n_ED_visits_0_washout_cal",
   "n_ED_visits_1_washout_cal",
   "n_ED_visits_3_washout_cal",

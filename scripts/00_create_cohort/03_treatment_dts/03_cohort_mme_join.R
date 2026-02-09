@@ -1,7 +1,8 @@
 # -------------------------------------
 # Script: 02_cohort_mme_join.R
-# Author: Nick Williams
-# Purpose: Calculate MME/strength per day for opioids in exposure period
+# Author: Anton Hung
+# Updates: 
+# Purpose: gather opioid treatment claims. Only opioids for pain. keeping start and end dates, and MME dose
 # Notes: Modified from: 
 #   - https://github.com/CI-NYC/medicaid-treatments-oud-risk/blob/main/scripts/01_create_treatments/01_00_treatment_dose_mme.R
 #   - https://github.com/CI-NYC/medicaid-treatments-oud-risk/blob/main/scripts/01_create_treatments/01_01_treatment_dose_mme.R

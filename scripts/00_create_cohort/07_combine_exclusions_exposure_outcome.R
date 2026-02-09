@@ -75,46 +75,36 @@ for (i in c("", "_7day_gap")){
     join(cens, how = "left") |>
     join(chronic_pain, how = "left") |>
     join(prolonged_opioid_use, how = "left") |>
-    join(chronic_opioid_therapy, how = "left") #|>
-    # mutate(cens_hillary_period_1 = cens_period_1,
-    #        cens_hillary_period_2 = cens_period_2,
-    #        cens_hillary_period_3 = cens_period_3,
-    #        cens_hillary_period_4 = cens_period_4,
-    #        # cens_hillary_period_5 = cens_period_5,
-    #        cens_chronic_pain_period_2 = cens_period_2,
-    #        cens_chronic_pain_period_4 = cens_period_4,
-    #        cens_prolonged_opioid_period_4 = cens_period_4,
-    #        cens_chronic_opioid_period_4 = cens_period_4,
-    #)
+    join(chronic_opioid_therapy, how = "left") 
   
-  convert_cens_to_na <- function (data, outcomes, cens) {
-    DT <- as.data.table(data)
-    tau <- length(outcomes)
-    for (j in 1:(tau)) {
-      modify <- setdiff(cens[match(cens[j], cens):tau], cens[j])
-      outcome_j <- outcomes[j]
-      DT[get(outcome_j) == 1, `:=`((modify), lapply(.SD, function(x) NA_real_)), .SDcols = modify]
-    }
-    DT[]
-    DT
-  }
-  
-  convert_outcome_to_na <- function (data, outcomes, cens) {
-    DT <- as.data.table(data)
-    tau <- length(outcomes)
-    for (j in 1:(tau - 1)) {
-      modify <- outcomes[match(outcomes[j], outcomes):tau]
-      # cens_j <- cens[j]
-      # DT[get(cens_j) == 0, `:=`((modify), lapply(.SD, function(x) NA_real_)), .SDcols = modify]
-      
-      if(j > 1){ # if previously experienced outcome but then censored at later point, considered to have had outcome at subsequent timepoints
-        outcome_j_1 <- outcomes[j-1]
-        DT[get(outcome_j_1) == 1, `:=`((modify), lapply(.SD, function(x) 1)), .SDcols = modify]
-      }
-    }
-    DT[]
-    DT
-  }
+  # convert_cens_to_na <- function (data, outcomes, cens) {
+  #   DT <- as.data.table(data)
+  #   tau <- length(outcomes)
+  #   for (j in 1:(tau)) {
+  #     modify <- setdiff(cens[match(cens[j], cens):tau], cens[j])
+  #     outcome_j <- outcomes[j]
+  #     DT[get(outcome_j) == 1, `:=`((modify), lapply(.SD, function(x) NA_real_)), .SDcols = modify]
+  #   }
+  #   DT[]
+  #   DT
+  # }
+  # 
+  # convert_outcome_to_na <- function (data, outcomes, cens) {
+  #   DT <- as.data.table(data)
+  #   tau <- length(outcomes)
+  #   for (j in 1:(tau - 1)) {
+  #     modify <- outcomes[match(outcomes[j], outcomes):tau]
+  #     # cens_j <- cens[j]
+  #     # DT[get(cens_j) == 0, `:=`((modify), lapply(.SD, function(x) NA_real_)), .SDcols = modify]
+  #     
+  #     if(j > 1){ # if previously experienced outcome but then censored at later point, considered to have had outcome at subsequent timepoints
+  #       outcome_j_1 <- outcomes[j-1]
+  #       DT[get(outcome_j_1) == 1, `:=`((modify), lapply(.SD, function(x) 1)), .SDcols = modify]
+  #     }
+  #   }
+  #   DT[]
+  #   DT
+  # }
   
   cohort <- cohort |>
     left_join(opioid_naive_exclusion)|>
@@ -124,23 +114,12 @@ for (i in c("", "_7day_gap")){
     filter(!is.na(subset_oud))
   
   cohort <- cohort |>
-    convert_outcome_to_na(paste0("oud_period_", 1:4), paste0("cens_period_", 1:4)) |>
-    # convert_cens_to_na(paste0("oud_period_", 1:4), paste0("cens_period_", 1:4)) |>
-    convert_outcome_to_na(paste0("oud_hillary_period_", 1:4), paste0("cens_period_", 1:4)) |>
-    # convert_cens_to_na(paste0("oud_hillary_period_", 1:4), paste0("cens_hillary_period_", 1:4)) |>
-    convert_outcome_to_na(paste0("outcome_chronic_pain_period_", c(2,4)), paste0("cens_period_", c(2,4))) |>
-    # convert_cens_to_na(paste0("outcome_chronic_pain_period_", c(2,4)), paste0("cens_chronic_pain_period_", c(2,4))) |>
-    # convert_outcome_to_na("outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4") |>
-    # convert_cens_to_na("outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4") |>
-    mutate(oud_period_4 = case_when(oud_period_3 == 1 ~ 1,
-                                    cens_period_4 == 0 ~ as.numeric(NA),
+    mutate(oud_period_4 = case_when(cens_period_4 == 0 ~ as.numeric(NA),
                                     TRUE ~ oud_period_4),
-           oud_hillary_period_4 = case_when(oud_hillary_period_3 == 1 ~ 1,
-                                    cens_period_4 == 0 ~ as.numeric(NA),
-                                    TRUE ~ oud_hillary_period_4),
-           outcome_chronic_pain_period_4 = case_when(outcome_chronic_pain_period_2 == 1 ~ 1,
-                                            cens_period_4 == 0 ~ as.numeric(NA),
-                                            TRUE ~ outcome_chronic_pain_period_4),
+           oud_hillary_period_4 = case_when(cens_period_4 == 0 ~ as.numeric(NA),
+                                            TRUE ~ oud_hillary_period_4),
+           outcome_chronic_pain_period_4 = case_when(cens_period_4 == 0 ~ as.numeric(NA),
+                                                      TRUE ~ outcome_chronic_pain_period_4),
            oud_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
                                     TRUE ~ oud_period_2),
            oud_hillary_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),

@@ -1,5 +1,5 @@
 # -------------------------------------
-# Script: 08_non_pharmaceuticals.R
+# Script: finalize_treatment_dts
 # Author: Anton Hung
 # Updated:
 # Purpose: Looks through compiled treatments after low back pain diagnosis and 

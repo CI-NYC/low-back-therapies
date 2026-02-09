@@ -1,10 +1,25 @@
 # -------------------------------------
-# Script: 08_non_pharmaceuticals.R
+# Script: nonpharma
 # Author: Anton Hung
 # Updated:
-# Purpose: Finds dates for all claims for non-pharmacologic therapies
+# Purpose: get all dates for non-pharmacologic treatments, and record the type of treatment.
+#           this is done by looping through the ICD-10 codes for the following types
+#           of treatments:
+#           1. Physical therapy
+#           2. Chiropractic
+#           3. Acupuncture
+#           4. Blocks
+#           5. Interventions (a group combining the following less common treatments:)
+#             a. "Ablative techniques"
+#             b. "Botulinum toxin injections"
+#             c. "Electrical nerve stimulation"
+#             d. "Intrathecal drug therapies"
+#             e. "Epidural steroids"
+#             f. "Minimally invasive spinal procedures"
+#             g. "Trigger point injection"
 # Notes:
 # -------------------------------------
+
 
 library(arrow)
 library(dplyr)

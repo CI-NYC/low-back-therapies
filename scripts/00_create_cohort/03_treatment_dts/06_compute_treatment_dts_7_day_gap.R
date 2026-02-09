@@ -1,10 +1,9 @@
 # -------------------------------------
-# Script: 08_non_pharmaceuticals.R
+# Script: compute_treatment_dts_7_days
 # Author: Anton Hung
 # Updated:
-# Purpose: Looks through compiled treatments after low back pain diagnosis and 
-#           Keeps treatments only if they are within a 30 day (or 7 day) gap
-#           of the previous treatment.
+# Purpose: Like compute_treatment_dts_30_days, but uses 7 days as the allowable
+#           gap between treatments
 # Notes:
 # -------------------------------------
 

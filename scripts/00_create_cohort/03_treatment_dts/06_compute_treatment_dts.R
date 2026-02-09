@@ -1,10 +1,11 @@
 # -------------------------------------
-# Script: 08_non_pharmaceuticals.R
+# Script: compute_treatment_dts_30_days
 # Author: Anton Hung
 # Updated:
-# Purpose: Looks through compiled treatments after low back pain diagnosis and 
-#           Keeps treatments only if they are within a 30 day (or 7 day) gap
-#           of the previous treatment.
+# Purpose: Looks through all treatments within 3 months of low back pain diagnosis and 
+#           identifies the cutoff date for the initial treatment period.
+#          The initial treatment period ends when there is more than a 30 day gap
+#           until the next treatment, or at the end of 3 months
 # Notes:
 # -------------------------------------
 

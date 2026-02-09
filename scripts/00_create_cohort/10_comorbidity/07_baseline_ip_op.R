@@ -16,14 +16,13 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Read in OTH and IPH as arrow datsets ----------------------------------
 
-# oth <- open_oth()
-otl <- open_otl()
-ipl <- open_ipl()
+oth <- open_oth()
 iph <- open_iph()
 rxl <- open_rxl()
 
 # read in cohort dates file
 dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root, "outcome"))
 
 # # https://resdac.org/sites/datadocumentation.resdac.org/files/2021-01/5011_Identifying_IP_Stays.pdf
 # inpatient_cds <- c("001", "060", "084", "086", "090", "091", "092", "093")
@@ -52,54 +51,55 @@ num_iph_washout_cal <-
 
 # outpatient visits ------------------------------------------------------------
 icd_codes_to_check_oth <-
-  otl |>
-  filter(BENE_ID %in% dts_cohorts$BENE_ID) |>
-  select(BENE_ID, CLM_ID, LINE_SRVC_BGN_DT, REV_CNTR_CD, TOS_CD) |>
-  filter(!is.na(TOS_CD),
-         !REV_CNTR_CD %in% ed_visit_cds) |>
+  oth |>
+  filter(BENE_ID %in% dts_cohorts$BENE_ID,
+         !CLM_ID %in% ED_visits$ed_visit_ID) |>
+  select(BENE_ID, SRVC_BGN_DT) |>
   collect()
 
 # obtain the date for all outpatient visits within washout period
 all_oth_icds_in_washout_cal <-
   icd_codes_to_check_oth |>
   inner_join(dts_cohorts |> select(BENE_ID, washout_start_dt, washout_end_dt)) |>
-  filter(LINE_SRVC_BGN_DT %within% interval(washout_start_dt, washout_end_dt))  
+  filter(SRVC_BGN_DT %within% interval(washout_start_dt, washout_end_dt))  
 
 # count number of outpatient visits during washout period
 num_oth_washout_cal <-
   all_oth_icds_in_washout_cal |>
-  distinct(BENE_ID, LINE_SRVC_BGN_DT) |>
+  distinct(BENE_ID, SRVC_BGN_DT) |>
   group_by(BENE_ID) |>
   summarise(num_oth_washout_cal = n(), .groups = "drop")
 
-# pharmacy claims --------------------------------------------------------
-rxl_washout_cal <- 
-  rxl |>
-  select(BENE_ID, RX_FILL_DT) |>
-  collect() |>
-  inner_join(dts_cohorts |> select(BENE_ID, washout_start_dt, washout_end_dt)) |>
-  filter(RX_FILL_DT %within% interval(washout_start_dt, washout_end_dt))
-
-num_rxl_washout_cal <-
-  rxl_washout_cal |>
-  distinct(BENE_ID, RX_FILL_DT) |>
-  group_by(BENE_ID) |>
-  summarise(num_rxl_washout_cal = n(), .groups = "drop")
+# # pharmacy claims --------------------------------------------------------
+# rxl_washout_cal <- 
+#   rxl |>
+#   select(BENE_ID, RX_FILL_DT) |>
+#   collect() |>
+#   inner_join(dts_cohorts |> select(BENE_ID, washout_start_dt, washout_end_dt)) |>
+#   filter(RX_FILL_DT %within% interval(washout_start_dt, washout_end_dt))
+# 
+# num_rxl_washout_cal <-
+#   rxl_washout_cal |>
+#   distinct(BENE_ID, RX_FILL_DT) |>
+#   group_by(BENE_ID) |>
+#   summarise(num_rxl_washout_cal = n(), .groups = "drop")
 
 cohort <- dts_cohorts |> 
   select(BENE_ID) |>
   left_join(num_iph_washout_cal, by = "BENE_ID") |>
   left_join(num_oth_washout_cal, by = "BENE_ID") |>
-  left_join(num_rxl_washout_cal, by = "BENE_ID") |>
+  # left_join(num_rxl_washout_cal, by = "BENE_ID") |>
   mutate(num_iph_washout_cal = replace_na(num_iph_washout_cal, 0),
-         num_oth_washout_cal = replace_na(num_oth_washout_cal, 0),
-         num_rxl_washout_cal = replace_na(num_rxl_washout_cal, 0))
+         num_oth_washout_cal = replace_na(num_oth_washout_cal, 0)
+         # num_rxl_washout_cal = replace_na(num_rxl_washout_cal, 0)
+         )
 
 # cap at a reasonable number (99th percentile)
 cohort <- cohort |>
   mutate(num_iph_washout_cal = ifelse(num_iph_washout_cal > 5, 5, num_iph_washout_cal),
-         num_oth_washout_cal = ifelse(num_oth_washout_cal > 100, 100, num_oth_washout_cal),
-         num_rxl_washout_cal = ifelse(num_rxl_washout_cal > 40, 40, num_rxl_washout_cal))
+         num_oth_washout_cal = ifelse(num_oth_washout_cal > 71, 71, num_oth_washout_cal),
+         # num_rxl_washout_cal = ifelse(num_rxl_washout_cal > 40, 40, num_rxl_washout_cal)
+         )
 
 write_data(cohort, "baseline_ip_op_rx.fst", file.path(drv_root, "baseline_covariates"))
 
