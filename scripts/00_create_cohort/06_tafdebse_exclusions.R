@@ -48,7 +48,7 @@ exclusion_age <-
   drop_na() |> 
   fmutate(age_enrollment = floor(time_length(interval(BIRTH_DT, washout_start_dt), "years")), 
           exclusion_age = fcase(age_enrollment < 19, 1, 
-                                age_enrollment >= 65, 1, 
+                                age_enrollment >= 64, 1, 
                                 default = 0)) |> 
   group_by(BENE_ID) |> 
   add_tally() |> 

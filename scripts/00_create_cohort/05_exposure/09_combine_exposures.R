@@ -16,29 +16,31 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_
 
 mme <- load_data("exposure_max_daily_dose_mme.fst", file.path(drv_root, "treatment"))
 days_supply <- load_data("exposure_days_supply.fst", file.path(drv_root, "treatment"))
-days_supply$treatment_name <- ifelse(mme$exposure_max_daily_dose_mme <= 50, 
-                              ifelse(days_supply$exposure_days_supply <= 7, "Opioid_le7days_le50mme", 
-                                     "Opioid_g7days_le50mme"),
-                              "Opioid_g50mme")
+opioid <- left_join(mme, days_supply) |>
+  fmutate(treatment_name = case_when(
+    exposure_max_daily_dose_mme <= 50 & exposure_days_supply <= 7   ~ "Opioid <=7days <=50mme",
+    exposure_max_daily_dose_mme <= 50 & exposure_days_supply > 7    ~ "Opioid >7days <=50mme",
+    exposure_max_daily_dose_mme > 50                                ~ "Opioid >50mme",
+    TRUE ~ NA
+  )) |>
+  select(BENE_ID, treatment_name)
 
-opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
-  select(BENE_ID, treatment_start_dt, treatment_end_dt, treatment_name) |> distinct()
 nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment"))
 nonpharma_dts <- load_data("nonpharma_dts.fst", file.path(drv_root, "treatment"))
-# treatment_end_dt <- load_data("exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
-# treatment_end_dt_7_days <- load_data("exposure_end_dt_7_days.fst", file.path(drv_root, "treatment"))
+treatment_end_dt <- load_data("exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
+treatment_end_dt_7_days <- load_data("exposure_end_dt_7_days.fst", file.path(drv_root, "treatment"))
 
 # Exposure: Which treatments were present during the exposure period? -----------
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> 
-  right_join(cohort |> select(BENE_ID, last_treatment_dt)) |>
-  filter(treatment_start_dt <= last_treatment_dt) |>
+  left_join(treatment_end_dt) |>
+  fsubset(treatment_start_dt <= last_treatment_dt) |>
   as.data.table()
 
-combinations_wide <- cohort %>%
+exposures <- cohort %>%
   left_join(treatments) %>%
   select(BENE_ID, treatment_name) %>%
-  rbind(days_supply |> select(BENE_ID, treatment_name)) |>
-  distinct() %>%    
+  rbind(opioid) |>
+  distinct() %>%
   mutate(present = 1) %>%
   pivot_wider(
     id_cols = BENE_ID,
@@ -49,23 +51,16 @@ combinations_wide <- cohort %>%
   rename_with(~paste0("exposure_", tolower(.)), -1)
 # ------------------------------------------------------------------------------
 
-exposures <- combinations_wide |>
-  left_join(mme) |>
-  left_join(days_supply |> select(-treatment_name)) |>
-  mutate(exposure_max_daily_dose_mme = replace_na(exposure_max_daily_dose_mme, 0),
-         exposure_days_supply = replace_na(exposure_days_supply, 0))
-
 # replace spaces and dashes with underscore, because in the analysis, ranger has an issue with these characters.
 names(exposures) <- gsub("[ -]", "_", names(exposures))
 
 write_data(exposures, "exposures.fst", file.path(drv_root, "treatment"))
 
-
-cohort <- cohort |>
-  left_join(exposures) |>
-  mutate(exposure_period_end_dt = first_treatment_dt + 90) # 91 day exposure period
-
-write_data(cohort, "pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment"))
+# cohort <- cohort |>
+#   left_join(exposures) |>
+#   mutate(exposure_period_end_dt = first_treatment_dt + 90) # 91 day exposure period
+# 
+# write_data(cohort, "pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment"))
 
 
 ## 7 day gap
@@ -76,10 +71,14 @@ rm(days_supply)
 cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 mme <- load_data("exposure_max_daily_dose_mme_7day_gap.fst", file.path(drv_root, "treatment"))
 days_supply <- load_data("exposure_days_supply_7day_gap.fst", file.path(drv_root, "treatment"))
-days_supply$treatment_name <- ifelse(mme$exposure_max_daily_dose_mme <= 50, 
-                                     ifelse(days_supply$exposure_days_supply <= 7, "Opioid_le7days_le50mme", 
-                                            "Opioid_g7days_le50mme"),
-                                     "Opioid_g50mme")
+opioid <- left_join(mme, days_supply) |>
+  mutate(treatment_name = case_when(
+    exposure_max_daily_dose_mme <= 50 & exposure_days_supply <= 7   ~ "Opioid <=7days <=50mme",
+    exposure_max_daily_dose_mme <= 50 & exposure_days_supply > 7    ~ "Opioid >7days <=50mme",
+    exposure_max_daily_dose_mme > 50                                ~ "Opioid >50mme",
+    TRUE ~ NA
+  )) |>
+  select(BENE_ID, treatment_name)
 
 
 # Exposure: Which treatments were present during the exposure period? -----------

@@ -24,10 +24,10 @@ otl <- open_otl()
 
 # load cohort
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
-cohort[, let(exposure_end_dt_possible_latest = pain_diagnosis_dt + days(121))] # first treatment must be within 3 months, then looking within 3 months from the first treatment date. Also collecting treatments within 6 months of first treatment for exploratory analysis.
+cohort[, let(exposure_end_dt_possible_latest = diagnosis_dt + days(121))] # first treatment must be within 3 months, then looking within 3 months from the first treatment date. Also collecting treatments within 6 months of first treatment for exploratory analysis.
 
-mme <- readRDS("~/medicaid/low-back-therapies/data/public/opioids_mme.rds")
-bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
+mme <- readRDS(file.path(home_dir, "data/public/opioids_mme.rds"))
+bup_list <- read_fst(file.path(home_dir, "data/public/bup_list.fst"))
 
 rxl_opioids <-
   rxl |>
@@ -50,12 +50,12 @@ otl_opioids <- left_join(cohort, otl_opioids)
 
 rxl_opioids <- 
   rxl_opioids |> 
-  filter((RX_FILL_DT >= pain_diagnosis_dt) & 
+  filter((RX_FILL_DT >= diagnosis_dt) & 
            (RX_FILL_DT <= exposure_end_dt_possible_latest))
 
 otl_opioids <- 
   otl_opioids |> 
-  filter((LINE_SRVC_BGN_DT >= pain_diagnosis_dt) & 
+  filter((LINE_SRVC_BGN_DT >= diagnosis_dt) & 
            (LINE_SRVC_BGN_DT <= exposure_end_dt_possible_latest))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
@@ -79,7 +79,7 @@ rxl_opioids <-
   rxl_opioids |>
   select(BENE_ID,
          CLM_ID,
-         pain_diagnosis_dt, 
+         diagnosis_dt, 
          # last_treatment_dt,
          exposure_end_dt_possible_latest,
          opioid,
@@ -108,7 +108,7 @@ otl_opioids <-
   otl_opioids |>
   select(BENE_ID,
          CLM_ID,
-         pain_diagnosis_dt, 
+         diagnosis_dt, 
          # last_treatment_dt,
          exposure_end_dt_possible_latest,
          NDC,

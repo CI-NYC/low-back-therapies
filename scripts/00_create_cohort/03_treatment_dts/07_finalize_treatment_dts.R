@@ -39,9 +39,9 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |>
 cohort_dts <- cohort |>
   right_join(treatments) |>
   group_by(BENE_ID) |>
-  mutate(first_treatment_dt = min(treatment_start_dt)) |>
+  mutate(day0_dt = min(treatment_start_dt)) |>
   as.data.table() |>
-  select(BENE_ID, pain_diagnosis_dt, first_treatment_dt, last_treatment_dt) |>
+  select(BENE_ID, diagnosis_dt, day0_dt, last_treatment_dt) |>
   distinct()
 
 write_data(cohort_dts, "low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion"))
@@ -58,9 +58,11 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |>
 cohort_dts <- cohort |>
   right_join(treatments) |>
   group_by(BENE_ID) |>
-  mutate(first_treatment_dt = min(treatment_start_dt)) |>
+  mutate(day0_dt = min(treatment_start_dt)) |>
   as.data.table() |>
-  select(BENE_ID, pain_diagnosis_dt, first_treatment_dt, last_treatment_dt) |>
+  select(BENE_ID, diagnosis_dt, day0_dt, last_treatment_dt) |>
   distinct()
 
 write_data(cohort_dts, "low_back_cohort_treatment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
+
+# 1 939 232

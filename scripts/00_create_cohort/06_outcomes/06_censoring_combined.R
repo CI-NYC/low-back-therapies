@@ -138,8 +138,7 @@ for (i in c("")){
     mutate(across(starts_with("dual_elig2_cens"), replace_na)) |> 
     select(BENE_ID, starts_with("dual_elig2_cens"))
   
-  enrollment_cens <- load_data(paste0("all_possible_enrollment_dates/censoring_enrollment", i, ".fst"), file.path(drv_root, "outcome")) |>
-    filter(BENE_ID %in% c(cohort$BENE_ID))
+  enrollment_cens <- load_data("cens_enrollment_by_period.fst", file.path(drv_root, "outcome"))
   
   cens <- 
     list(

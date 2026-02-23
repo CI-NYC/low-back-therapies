@@ -18,8 +18,9 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # Load washout dates
 washout <- load_data("low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 
-washout[, let(washout_start_dt = first_treatment_dt - days(182),
-              washout_end_dt = first_treatment_dt - days(1))]
+washout[, let(washout_start_dt = day0_dt - days(182),
+              washout_end_dt = day0_dt - days(1),
+              exposure_end_dt = day0_dt + days(90))]
 
 # Load all dates
 dates <- open_dedts()

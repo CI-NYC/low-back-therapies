@@ -10,6 +10,10 @@ library(arrow)
 library(fst)
 
 drv_root <- "/mnt/general-data/disability/low-back-therapies"
+home_dir <- "~/medicaid/low-back-therapies"
+
+follow_up_period_length <- 181
+num_periods <- 2
 
 write_data <- function(data, file, dir) {
   write_fst(data, file.path(dir, file))

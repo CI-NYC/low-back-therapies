@@ -397,3 +397,18 @@ Spinal cord stimulation:
       "64560":
       "64561":
       "64565":
+
+Alcohol:
+    ICD10:
+        "F10":
+
+Other substances:
+    ICD10:
+        "F12":
+        "F13":
+        "F14":
+        "F15":
+        "F16": Hallucinogen
+        "F17": Nicotine
+        "F18": Inhalant
+        "F19": Other psychoactive substance

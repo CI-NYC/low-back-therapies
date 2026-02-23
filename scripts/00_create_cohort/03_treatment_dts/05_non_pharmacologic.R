@@ -34,15 +34,15 @@ otl <- open_otl()
 # Read in cohort and dates
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
-  mutate(exposure_end_dt_possible_latest = pain_diagnosis_dt + days(121))
+  mutate(exposure_end_dt_possible_latest = diagnosis_dt + days(121))
 
 # Read in CPT, HCPC, and Modifier codes for mediator claims
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/mediator_codes.yml")
+codes <- read_yaml(file.path(home_dir, "data/public/mediator_codes.yml"))
 mediators <- c("Physical therapy",
                # "Counseling",
                "Massage therapy",
                "Chiropractic",
-               "Acupuncture",
+               # "Acupuncture",
                "Blocks",
                "Ablative techniques", ##
                "Botulinum toxin injections", ## 
@@ -65,7 +65,7 @@ for (mediator in mediators) {
 treatments_df <- treatments_df  |>
   mutate(treatment = ifelse(treatment %in% c("Physical therapy",
                                              "Massage therapy",
-                                             "Acupuncture",
+                                             # "Acupuncture",
                                              "Chiropractic",
                                              # "Blocks",
                                              "Spinal cord stimulation"
@@ -88,9 +88,9 @@ claims[, LINE_SRVC_BGN_DT := fifelse(is.na(LINE_SRVC_BGN_DT),
 claims <- unique(merge(claims, cohort, by = "BENE_ID"))
 
 # Filter to claims within mediator time-frame
-claims <- claims[LINE_SRVC_BGN_DT %within% interval(pain_diagnosis_dt, 
+claims <- claims[LINE_SRVC_BGN_DT %within% interval(diagnosis_dt, 
                                                     exposure_end_dt_possible_latest), 
-                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, pain_diagnosis_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
+                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, diagnosis_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
 
 treatments_dts <- claims |>
   left_join(treatments_df, by = c("LINE_PRCDR_CD" = "cd")) |>

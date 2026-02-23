@@ -21,9 +21,8 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   left_join(cohort) |>
   filter(treatment_start_dt <= last_treatment_dt) |>
-  mutate(exposure_period_end_dt = first_treatment_dt + days(90)) |>
   arrange(BENE_ID, treatment_start_dt) |> 
-  mutate(treatment_end_dt = pmin(treatment_end_dt + 1, exposure_period_end_dt)) |>
+  mutate(treatment_end_dt = pmin(treatment_end_dt + 1, exposure_end_dt)) |>
   select(BENE_ID, rx_start=treatment_start_dt, rx_end=treatment_end_dt)
 
 

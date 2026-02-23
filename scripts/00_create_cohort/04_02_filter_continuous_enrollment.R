@@ -20,15 +20,9 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # drv_root <- file.path(drv_root, "exclusion")
 washout <- load_data("low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
 
-washout[, let(washout_start_dt = first_treatment_dt - days(182),
-              washout_end_dt = first_treatment_dt - days(1))]
-
-washout_7day_gap <- load_data("low_back_cohort_treatment_dts_7day_gap.fst", file.path(drv_root, "exclusion")) |> as.data.table()
-
-washout_7day_gap[, let(washout_start_dt = first_treatment_dt - days(182),
-              washout_end_dt = first_treatment_dt - days(1))]
-
-
+washout[, let(washout_start_dt = day0_dt - days(182),
+              washout_end_dt = day0_dt - days(1),
+              exposure_end_dt = day0_dt + days(90))]
 
 # Load temporary files for 01_01_filter_continuous_enrollment.R
 files <- 
@@ -42,8 +36,8 @@ find_enrollment_periods <- function(data) {
     out <- data.table(BENE_ID = data$BENE_ID, 
                       washout_start_dt = data$washout_start_dt, 
                       washout_end_dt = data$washout_end_dt,
-                      pain_diagnosis_dt = data$pain_diagnosis_dt,
-                      # exposure_end_dt = data$exposure_end_dt, 
+                      diagnosis_dt = data$diagnosis_dt,
+                      exposure_end_dt = data$exposure_end_dt,
                       enrollment_start_dt = data$ENRLMT_START_DT, 
                       enrollment_end_dt = data$ENRLMT_END_DT)
   } else {
@@ -81,13 +75,13 @@ find_enrollment_periods <- function(data) {
     out <- data.table(BENE_ID = data$BENE_ID[1], 
                       washout_start_dt = data$washout_start_dt[1], 
                       washout_end_dt = data$washout_end_dt[1], 
-                      pain_diagnosis_dt = data$pain_diagnosis_dt[1],
-                      # exposure_end_dt = data$exposure_end_dt[1], 
+                      diagnosis_dt = data$diagnosis_dt[1],
+                      exposure_end_dt = data$exposure_end_dt,
                       enrollment_start_dt = as.Date(int_start(enrollment_period)), 
                       enrollment_end_dt = as.Date(int_end(enrollment_period)))
   }
   
-  out[(washout_start_dt >= enrollment_start_dt) & (washout_end_dt <= enrollment_end_dt)]
+  out[(washout_start_dt >= enrollment_start_dt) & (washout_end_dt < enrollment_end_dt)]
 }
 
 # # Test case
@@ -124,19 +118,10 @@ cohort <-
   rbindlist()
 
 washout <- merge(washout, cohort)
-washout_7day_gap <- merge(washout_7day_gap, cohort)
+# washout_7day_gap <- merge(washout_7day_gap, cohort)
 
 # export
 write_data(distinct(washout), "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
-write_data(distinct(washout_7day_gap), "pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
+# write_data(distinct(washout_7day_gap), "pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 
-# # TEMPORARY FIX
-# tmp <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
-# tmp2 <- load_data("pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
-# 
-# tmp <- tmp |>
-#   filter(BENE_ID %in% tmp2$BENE_ID)
-# tmp2 <- tmp2 |>
-#   filter(BENE_ID %in% tmp$BENE_ID)
-# 
-# write_data(tmp, "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+# 1680252

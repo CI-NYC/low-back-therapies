@@ -20,7 +20,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
-  mutate(treatment_start_dt_possible_latest = pain_diagnosis_dt + days(30))
+  mutate(treatment_start_dt_possible_latest = diagnosis_dt + days(30))
 
 opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, treatment_start_dt, treatment_end_dt, treatment_name) |> distinct()
@@ -33,21 +33,21 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_
 cohort <- cohort |>
   right_join(treatments) |>
   group_by(BENE_ID) |>
-  summarise(first_treatment_dt = min(treatment_start_dt),
-            has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>
-  filter(has_treatment == 1)
+  fsummarise(first_treatment_dt = min(treatment_start_dt),
+             has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>
+  fsubset(has_treatment == 1)
 
 
 # Keep treatments within 3 months of the first treatment 
-# (so, the max time between diagnosis and 1st treatment is 3 months,
-# and the max time between diagnosis and end of exposure period is 6 months).
+# (so, the max time between diagnosis and 1st treatment is 1 month,
+# and the max time between diagnosis and end of exposure period is 4 months).
 # The exposure period is 3 months long
 cohort <- cohort |>
   right_join(treatments) |>
-  select(BENE_ID, first_treatment_dt, treatment_start_dt, treatment_end_dt) |>
-  filter(treatment_start_dt <= (first_treatment_dt + days(90))) |>
-  mutate(treatment_end_dt = pmin(treatment_end_dt, first_treatment_dt + days(90))) |>
-  arrange(BENE_ID, treatment_start_dt, treatment_end_dt) |>
+  fselect(BENE_ID, first_treatment_dt, treatment_start_dt, treatment_end_dt) |>
+  fsubset(treatment_start_dt <= (first_treatment_dt + days(90))) |>
+  fmutate(treatment_end_dt = pmin(treatment_end_dt, first_treatment_dt + days(90))) |>
+  roworder(BENE_ID, treatment_start_dt, treatment_end_dt) |>
   as.data.table()
 
 # cohort <- cohort |>
