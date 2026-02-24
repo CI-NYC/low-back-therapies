@@ -42,7 +42,7 @@ oth_pain <-
     SRVC_BGN_DT)
   ) |> 
   filter((SRVC_BGN_DT >= exclusion_start_dt) & 
-           (SRVC_BGN_DT < first_treatment_dt), 
+           (SRVC_BGN_DT < day0_dt), 
          DGNS_CD_1 %in% codes | DGNS_CD_2 %in% codes) |> 
   select(BENE_ID) |> 
   distinct()
@@ -59,7 +59,7 @@ iph_pain <-
     SRVC_BGN_DT)
   ) |> 
   filter((SRVC_BGN_DT >= exclusion_start_dt) & 
-           (SRVC_BGN_DT < first_treatment_dt)) |>
+           (SRVC_BGN_DT < day0_dt)) |>
   filter(DGNS_CD_1 %in% codes |
            DGNS_CD_2 %in% codes |
            DGNS_CD_3 %in% codes |

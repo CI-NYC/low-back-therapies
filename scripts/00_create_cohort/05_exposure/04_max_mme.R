@@ -12,7 +12,6 @@ library(lubridate)
 library(data.table)
 library(foreach)
 library(doFuture)
-library(tictoc)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -20,23 +19,15 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
-  left_join(cohort) |>
+  right_join(cohort) |> # keep people who passed enrollment criteria in the cohort
   filter(treatment_start_dt <= last_treatment_dt) |>
-  mutate(exposure_period_end_dt = first_treatment_dt + days(90)) |>
-  mutate(treatment_end_dt = as.Date(pmin(treatment_end_dt, exposure_period_end_dt)))
+  mutate(treatment_end_dt = as.Date(pmin(treatment_end_dt, exposure_end_dt)))
 
 setDT(opioids)
 setkey(opioids, BENE_ID)
 
-opioids <- opioids[, .(BENE_ID, first_treatment_dt, last_treatment_dt, 
+opioids <- opioids[, .(BENE_ID, day0_dt, last_treatment_dt, 
                        treatment_start_dt, treatment_end_dt, NDC, opioid, mme_strength_per_day)]
-
-
-num_opioids <- opioids |>
-  group_by(BENE_ID) |>
-  summarize(num_opioids = n())
-
-saveRDS(num_opioids, file.path(drv_root, "treatment/num_opioids.rds"))
 
 # Calculate max daily dose -----------------------------------------------------
 
@@ -52,7 +43,7 @@ calculate_max_daily_dose <- function(data) {
     by = .(date)
   ][, .(exposure_max_daily_dose_mme = max(total_mme_strength))]
 }
-tic()
+
 plan(multisession, workers = 8)
 
 # Apply function
@@ -67,7 +58,7 @@ out <- foreach(data = opioids$data,
                }
 
 plan(sequential)
-toc()
+
 testthat::test_that(
   "All observations have a max daily MME",
   testthat::expect_false(any(is.na(out$exposure_max_daily_dose_mme)))

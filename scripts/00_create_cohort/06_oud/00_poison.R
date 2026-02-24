@@ -58,6 +58,6 @@ oud_poison <-
 
 oud_poison <- 
   inner_join(oud_poison, cohort) |> 
-  filter(oud_poison_dt %within% interval(washout_start_dt, first_treatment_dt + 455))
+  filter(oud_poison_dt %within% interval(washout_start_dt, day0_dt + 455))
 
 write_data(oud_poison, "pain_washout_continuous_enrollment_opioid_requirements_oud_poison_dts.fst", file.path(drv_root, "exclusion"))

@@ -33,7 +33,7 @@ cohort <- as_tibble(cohort)
 cohort <- fmutate(
   cohort, 
   period_1 = interval(
-    exposure_period_end_dt, exposure_period_end_dt + days(91)
+    exposure_end_dt, exposure_end_dt + days(91)
   ), 
   period_2 = interval(
     int_end(period_1) + days(1), int_end(period_1) + days(91)
@@ -48,6 +48,22 @@ cohort <- fmutate(
     int_end(period_4) + days(1), int_end(period_4) + days(91)
   )
 )
+
+start_period <- (0:(num_periods - 1)) * (follow_up_period_length + 1)
+end_period   <- start_period + follow_up_period_length
+
+# Build list of interval columns
+period_cols <- lapply(seq_len(num_periods), function(i) {
+  interval(
+    cohort$exposure_period_end_dt + days(start_offsets[i]),
+    cohort$exposure_period_end_dt + days(end_offsets[i])
+  )
+})
+
+names(period_cols) <- paste0("period_", seq_len(num_periods))
+
+# Add them to the cohort
+cohort <- fmutate(cohort, !!!period_cols)
 
 in_period <- function(data, date_col, period_col, overlap = FALSE, prefix) {
   if (isFALSE(overlap)) {

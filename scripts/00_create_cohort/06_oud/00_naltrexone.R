@@ -41,7 +41,7 @@ rxl <-
 
 rxl_nal <- 
   fsubset(rxl, BENE_ID %in% cohort$BENE_ID) |> 
-  fmutate(moud_end_dt = RX_FILL_DT + days(DAYS_SUPPLY + 21)) |> 
+  fmutate(moud_end_dt = RX_FILL_DT + days(DAYS_SUPPLY)) |> 
   fselect(BENE_ID, moud_start_dt = RX_FILL_DT, moud_end_dt) |> 
   funique()
 
@@ -70,7 +70,7 @@ otl_ndc_nal <-
     is.na(LINE_SRVC_BGN_DT) ~ LINE_SRVC_END_DT, 
     TRUE ~ LINE_SRVC_BGN_DT
   )) |> 
-  fmutate(moud_end_dt = LINE_SRVC_BGN_DT + 21 + 30) |> 
+  fmutate(moud_end_dt = LINE_SRVC_BGN_DT + 30) |> 
   fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT, moud_end_dt) |> 
   funique()
 
@@ -95,7 +95,7 @@ otl_hcpcs_nal <-
   fsubset(otl_hcpcs_nal, BENE_ID %in% cohort$BENE_ID) |> 
   fmutate(
     LINE_SRVC_BGN_DT = fifelse(is.na(LINE_SRVC_BGN_DT), LINE_SRVC_END_DT, LINE_SRVC_BGN_DT), 
-    moud_end_dt = LINE_SRVC_BGN_DT + 21 + 30
+    moud_end_dt = LINE_SRVC_BGN_DT + 30
   ) |> 
   fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT, moud_end_dt) |> 
   funique()
