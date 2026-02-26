@@ -1,9 +1,11 @@
 # -------------------------------------
 # Script: 06_tafiph_exclusions.R
-# Author: Nick Williams
+# Author: Anton Hung
 # Updated:
 # Purpose: Create exclusions based on TAFIPH files
 # Notes: Modified from https://github.com/CI-NYC/disability-chronic-pain/blob/93bbeb9d2edff361bf622a9889c7e1d811f0f238/scripts/03_initial_cohort_exclusions/clean_tafihp.R
+#        (Jan 2026) Addition: exclusion flag for whether or not there is an inpatient
+#                             encounter during day 0 and the month prior.
 # -------------------------------------
 
 library(arrow)
@@ -17,7 +19,7 @@ library(yaml)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Source ICD codes from the disability and chronic pain paper
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/icd_codes.yml")
+codes <- read_yaml(file.path(home_dir, "data/public/icd_codes.yml"))
 
 # Read in IPH dataset
 iph <- open_iph()
@@ -48,10 +50,21 @@ icd_exclusions <-
   group_by(BENE_ID) |>
   summarize(across(starts_with("exclusion"), ~ ifelse(sum(.x) >= 1, 1, 0)))
 
+# exclude patients for ANY IPH encounter during day -30 to day 0, inclusive.
+icd_month_prior <- 
+  join(fselect(cohort, BENE_ID, day0_dt), 
+       icd, 
+       how = "inner") |> 
+  fmutate(SRVC_BGN_DT = fifelse(is.na(SRVC_BGN_DT), SRVC_END_DT, SRVC_BGN_DT)) |> 
+  fsubset(SRVC_BGN_DT %within% interval(day0_dt - days(30), day0_dt)) |> 
+  as_tibble()
+
+
 icd_exclusions <- 
   join(cohort, icd_exclusions, how = "left") |> 
   mutate(across(starts_with("exclusion"), ~ replace_na(.x))) |> 
-  fselect(BENE_ID, exclusion_pall_iph, exclusion_cancer_iph)
+  mutate(exclusion_monthprior_hospitalization = as.numeric(BENE_ID %in% icd_month_prior$BENE_ID)) |>
+  fselect(BENE_ID, exclusion_pall_iph, exclusion_cancer_iph, exclusion_monthprior_hospitalization)
 
 # export
 write_data(icd_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root, "exclusion"))

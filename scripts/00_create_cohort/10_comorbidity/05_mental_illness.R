@@ -206,7 +206,7 @@ all_mental_ill <-
 all_mental_ill_clean <- 
   dts_cohorts |>
   left_join(all_mental_ill) |>
-  mutate(mental_ill_washout_cal = case_when(min_mental_ill_dt_0 %within% interval(washout_start_dt, pain_diagnosis_dt - 1) ~ 1,
+  mutate(mental_ill_washout_cal = case_when(min_mental_ill_dt_0 %within% interval(washout_start_dt, washout_end_dt) ~ 1,
                                                  TRUE ~ 0)) |>
   select(BENE_ID, min_mental_ill_dt_0,
          mental_ill_washout_cal)

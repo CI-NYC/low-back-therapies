@@ -4,14 +4,12 @@
 # Purpose:
 # Notes:
 # -------------------------------------
-#devtools::install_github("shodaiinose/lmtp", ref = "riesz-local")
 library(tidyverse)
 library(data.table)
 library(stringr)
 library(readr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
-# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 df <- load_data("pain_cohort_with_MH.fst", file.path(drv_root, "final")) |> as.data.table()
 

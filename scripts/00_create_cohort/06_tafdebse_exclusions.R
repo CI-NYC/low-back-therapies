@@ -20,7 +20,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/eligibility_codes.yml")
+codes <- read_yaml(file.path(home_dir, "data/public/eligibility_codes.yml"))
 
 # Load demographics dataset
 demo <- open_demo()

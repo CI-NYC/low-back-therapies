@@ -209,7 +209,7 @@ all_bipolar <-
 all_bipolar_clean <- 
   dts_cohorts |>
   left_join(all_bipolar) |>
-  mutate(bipolar_washout_cal = case_when(min_bipolar_dt_0 %within% interval(washout_start_dt, pain_diagnosis_dt - 1) ~ 1,
+  mutate(bipolar_washout_cal = case_when(min_bipolar_dt_0 %within% interval(washout_start_dt, day0_dt - 1) ~ 1,
                                               TRUE ~ 0)) |>
   select(BENE_ID, min_bipolar_dt_0,
          bipolar_washout_cal)

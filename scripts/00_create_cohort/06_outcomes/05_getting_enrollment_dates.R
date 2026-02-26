@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load washout dates
 washout <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> 
-  mutate(study_end_dt = day0_dt + days(455)) |>
+  mutate(study_end_dt = exposure_end_dt + num_periods*follow_up_period_length) |>
   as.data.table()
 
 # Load all dates

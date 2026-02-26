@@ -10,7 +10,6 @@ library(fst)
 library(collapse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
-# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 # load demographics dataset
 demo <- open_demo()

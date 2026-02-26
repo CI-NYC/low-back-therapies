@@ -96,8 +96,8 @@ cohort <- dts_cohorts |>
 
 # cap at a reasonable number (99th percentile)
 cohort <- cohort |>
-  mutate(num_iph_washout_cal = ifelse(num_iph_washout_cal > 5, 5, num_iph_washout_cal),
-         num_oth_washout_cal = ifelse(num_oth_washout_cal > 71, 71, num_oth_washout_cal),
+  mutate(num_iph_washout_cal = ifelse(num_iph_washout_cal > 1, 1, num_iph_washout_cal),
+         num_oth_washout_cal = ifelse(num_oth_washout_cal > 60, 60, num_oth_washout_cal),
          # num_rxl_washout_cal = ifelse(num_rxl_washout_cal > 40, 40, num_rxl_washout_cal)
          )
 

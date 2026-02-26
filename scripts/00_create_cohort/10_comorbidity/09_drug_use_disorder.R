@@ -22,7 +22,7 @@ oth <- open_oth()
 # Read in IPH
 iph <- open_iph()
 
-codebook <- read_yaml("/home/amh2389/medicaid/low-back-therapies/data/public/mediator_codes.yml")
+codebook <- read_yaml(file.path(home_dir, "data/public/mediator_codes.yml"))
 
 find_substance <- function(which_substance, new_column_name) {
   codes <- (names(codebook[[which_substance]]$ICD10))
@@ -47,43 +47,25 @@ find_substance <- function(which_substance, new_column_name) {
   has_substance_abuse <- rbind(substance_oth, substance_iph) |>
     right_join(cohort) |>
     filter(SRVC_BGN_DT %within% interval(washout_start_dt, washout_end_dt)) |>
-    group_by(BENE_ID, washout_start_dt) |>
+    group_by(BENE_ID) |>
     mutate(!!new_column_name := 1) |>
     ungroup() |>
-    select(BENE_ID, washout_start_dt, !!new_column_name) |>
+    select(BENE_ID, !!new_column_name) |>
     distinct()
 }
 
 ### ALCOHOL
 sud_alcohol_washout_cal <- find_substance("Alcohol", "sud_alcohol_washout_cal")
 
-### CANNABIS
-sud_cannabis_washout_cal <- find_substance("Cannabis", "sud_cannabis_washout_cal")
-
-### SEDATIVES
-sud_sedative_washout_cal <- find_substance("Sedatives", "sud_sedative_washout_cal")
-
-### COCAINE
-sud_cocaine_washout_cal <- find_substance("Cocaine", "sud_cocaine_washout_cal")
-
-### AMPHETAMINES
-sud_amphetamine_washout_cal <- find_substance("Amphetamines", "sud_amphetamine_washout_cal")
-
 ### OTHER SUBSTANCES
 sud_other_washout_cal <- find_substance("Other substances", "sud_other_washout_cal")
 
 
 ### Putting all together
-
 cohort <- cohort |>
-  select(BENE_ID, washout_start_dt) |>
+  select(BENE_ID) |>
   left_join(sud_alcohol_washout_cal) |>
-  left_join(sud_cannabis_washout_cal) |>
-  left_join(sud_sedative_washout_cal) |>
-  left_join(sud_cocaine_washout_cal) |>
-  left_join(sud_amphetamine_washout_cal) |>
   left_join(sud_other_washout_cal) |>
   mutate(across(starts_with("sud_"), ~replace(., is.na(.), 0)))
 
 write_data(cohort, "substance_use_disorder_washout_cal.fst", file.path(drv_root, "baseline_covariates"))
-

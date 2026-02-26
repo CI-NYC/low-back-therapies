@@ -1,8 +1,8 @@
 # -------------------------------------
-# Script: 08_non_pharmaceuticals.R
+# Script: counseling
 # Author: Anton Hung
 # Updated:
-# Purpose: create variable for counsleing during the washout period
+# Purpose: create variable for mental health counseling during the washout period
 # Notes:
 # -------------------------------------
 
@@ -19,7 +19,7 @@ otl <- open_otl()
 # Read in cohort and dates
 dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
 
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/mediator_codes.yml")
+codes <- read_yaml(file.path(home_dir, "data/public/mediator_codes.yml"))
 
 codes <- c(names(codes$Counseling[["CPT"]]),
            names(codes$Counseling[["HCPC"]]),

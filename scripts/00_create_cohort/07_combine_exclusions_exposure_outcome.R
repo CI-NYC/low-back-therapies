@@ -11,16 +11,13 @@ library(collapse)
 library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
-# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 for (i in c("", "_7day_gap")){
-  print(i)
-    
+  
   # opioid naive exclusion
-  opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
+  opioid_naive <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
   # base cohort
-  cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts",i,".fst"), file.path(drv_root, "exclusion")) |>
-    filter(BENE_ID %in% opioid_naive_exclusion$BENE_ID)
+  cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts.fst"), file.path(drv_root, "exclusion"))
   # washout pain exclusion
   washout_pain <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
   # debse exclusions
@@ -42,19 +39,10 @@ for (i in c("", "_7day_gap")){
   prolonged_opioid_use <- load_data("outcome_prolonged_opioid_use.fst", file.path(drv_root,"outcome")) |> select(BENE_ID, outcome_prolonged_opioid_use) |> distinct()
   chronic_opioid_therapy <- load_data("outcome_chronic_opioid_therapy.fst", file.path(drv_root, "outcome"))
   
-  ### if OUD is observed in the exposure period, then flag those beneficiaries as having OUD in period 1
-  # OUD (Composite)
-  oud <- oud |>
-    mutate(oud_period_1 = pmax(oud_period_exposure, oud_period_1))
-  
-  # OUD (ICD only)
-  hillary <- hillary |>
-    mutate(oud_hillary_period_1 = pmax(oud_hillary_period_exposure, oud_hillary_period_1))
-  
   
   cohort <- list(
     cohort, 
-    # opioid_naive_exclusion,
+    opioid_naive,    
     # oud_exclusions,
     washout_pain,
     debse_exclusions, 
@@ -78,24 +66,24 @@ for (i in c("", "_7day_gap")){
     join(chronic_opioid_therapy, how = "left") 
   
   cohort <- cohort |>
-    left_join(opioid_naive_exclusion)|>
+    left_join(opioid_naive)|>
     left_join(oud_exclusions) |>
     mutate(subset_oud = ifelse(exclusion_opioid_naive == 0 & exclusion_oud == 0, 0,
                                ifelse(exclusion_oud_hillary == 1, 1, NA))) |>
     filter(!is.na(subset_oud))
   
   cohort <- cohort |>
-    select(BENE_ID, 
-            ends_with("dt"),
-            starts_with("exposure"),
-            starts_with("subset"),
-            starts_with("cens"),
-            starts_with("oud"),
-            starts_with("outcome"),
-            -paste0("cens_period_", c(1,3,5)),
-            -paste0("oud_period_", c("exposure",1,3,5)),
-            -paste0("oud_hillary_period_", c("exposure",1,3,5))
-           )
+    mutate(oud_period_1 = case_when(cens_period_1 == 0 ~ as.numeric(NA),
+                                    TRUE ~ oud_period_1),
+           oud_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
+                                    TRUE ~ oud_period_2),
+           oud_hillary_period_1 = case_when(cens_period_1 == 0 ~ as.numeric(NA),
+                                            TRUE ~ oud_hillary_period_1),
+           oud_hillary_period_2 = case_when(cens_period_2 == 0 ~ as.numeric(NA),
+                                            TRUE ~ oud_hillary_period_2)
+    ) |>
+    select(-starts_with("exclusion"),
+           -ends_with("exposure")) 
   
   write_data(cohort, paste0("inclusion_exclusion_cohort_with_exposure_outcomes",i,".fst"), file.path(drv_root, "exclusion"))
 

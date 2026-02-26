@@ -70,13 +70,12 @@ table_one_function <- function(df){
       oth_0_washout_cal_bin = as.numeric(num_oth_washout_cal == 0),
       oth_20_washout_cal_bin = as.numeric(num_oth_washout_cal > 0 & num_oth_washout_cal <= 25),
       oth_40_washout_cal_bin = as.numeric(num_oth_washout_cal > 25 & num_oth_washout_cal <= 50),
-      oth_60_washout_cal_bin = as.numeric(num_oth_washout_cal > 50 & num_oth_washout_cal <= 75),
-      oth_80_washout_cal_bin = as.numeric(num_oth_washout_cal > 75),
-      rxl_0_washout_cal_bin = as.numeric(num_rxl_washout_cal == 0),
-      rxl_10_washout_cal_bin = as.numeric(num_rxl_washout_cal > 0 & num_rxl_washout_cal <= 10),
-      rxl_20_washout_cal_bin = as.numeric(num_rxl_washout_cal > 10 & num_rxl_washout_cal <= 20),
-      rxl_30_washout_cal_bin = as.numeric(num_rxl_washout_cal > 20 & num_rxl_washout_cal <= 30),
-      rxl_40_washout_cal_bin = as.numeric(num_rxl_washout_cal > 30)
+      oth_60_washout_cal_bin = as.numeric(num_oth_washout_cal > 50),
+      # rxl_0_washout_cal_bin = as.numeric(num_rxl_washout_cal == 0),
+      # rxl_10_washout_cal_bin = as.numeric(num_rxl_washout_cal > 0 & num_rxl_washout_cal <= 10),
+      # rxl_20_washout_cal_bin = as.numeric(num_rxl_washout_cal > 10 & num_rxl_washout_cal <= 20),
+      # rxl_30_washout_cal_bin = as.numeric(num_rxl_washout_cal > 20 & num_rxl_washout_cal <= 30),
+      # rxl_40_washout_cal_bin = as.numeric(num_rxl_washout_cal > 30)
       # ed_0_washout_cal_bin = as.numeric(n_ED_visits_washout_cal == 0),
       # ed_2_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(1,2)),
       # ed_4_washout_cal_bin = as.numeric(n_ED_visits_washout_cal %in% c(3,4)),
@@ -106,11 +105,11 @@ table_one_function <- function(df){
       missing_dem_ssi_benefits,
       # other SSI categories
       ends_with("cal"),
-      -"num_iph_washout_cal", -"num_oth_washout_cal", -"num_rxl_washout_cal",
+      -"num_iph_washout_cal", -"num_oth_washout_cal",
       ends_with("cal_bin"),
       # treatments
       exposure_acetaminophen,
-      exposure_acupuncture,
+      # exposure_acupuncture,
       `exposure_anti_inflammatory`,
       exposure_benzodiazepine,
       exposure_chiropractic,
@@ -125,20 +124,20 @@ table_one_function <- function(df){
       # exposure_opioid,
       # all_of(paste0("exposure_", c(selected_opioids, "other_opioid"))),
       starts_with("exposure_opioid"),
-      exposure_max_daily_dose_mme,
-      exposure_days_supply,
+      # exposure_max_daily_dose_mme,
+      # exposure_days_supply,
       # outcomes
+      oud_period_1,
       oud_period_2,
-      oud_period_4,
+      oud_hillary_period_1,
       oud_hillary_period_2,
-      oud_hillary_period_4,
-      outcome_prolonged_opioid_use,
-      outcome_chronic_opioid_therapy,
-      outcome_chronic_pain_period_2,
-      outcome_chronic_pain_period_4,
+      # outcome_prolonged_opioid_use,
+      # outcome_chronic_opioid_therapy,
+      # outcome_chronic_pain_period_2,
+      # outcome_chronic_pain_period_4,
       # censoring
-      cens_period_2,
-      cens_period_4
+      cens_period_1,
+      cens_period_2
       # cens_hillary_period_4,
       # cens_prolonged_opioid_period_4,
       # cens_chronic_opioid_period_4,
@@ -164,10 +163,11 @@ table_one_function <- function(df){
     mutate(emergency = NA, .before = n_ED_visits_0_washout_cal) |>
     mutate(inpatient = NA, .before = iph_0_washout_cal_bin) |>
     mutate(outpatient = NA, .before = oth_0_washout_cal_bin) |>
-    mutate(prescription = NA, .before = rxl_0_washout_cal_bin) |>
+    # mutate(prescription = NA, .before = rxl_0_washout_cal_bin) |>
     mutate(treatments = NA, .before = exposure_acetaminophen) |>
-    mutate(outcomes = NA, .before = oud_period_2) |>
-    mutate(censoring = NA, .before = cens_period_2) |>
+    mutate(opioid = NA, .before = `exposure_opioid_>50mme`) |>
+    mutate(outcomes = NA, .before = oud_period_1) |>
+    mutate(censoring = NA, .before = cens_period_1) |>
     # mutate(ed_visits = NA, .before = ed_visit_period_exposure) |>
     as.data.table()
   
@@ -211,18 +211,20 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}Depression",
                     "\\hspace{0.5cm}Other mental illness",
                     "\\hspace{0.5cm}Mental health counseling",
+                    "Alcohol use disorder",
+                    "Other drug use disorder (non-opioid)",
                     "\\textbf{Healthcare Utilization}",
                     "Emergency department",
                     paste0("\\hspace{0.5cm}", c("0", "1-2", "3+")),
                     "Inpatient hospitalizations",
                     paste0("\\hspace{0.5cm}", c("0", "1+")),
                     "Outpatient visits",
-                    paste0("\\hspace{0.5cm}", c("0", "1-25", "26-50", "51-75", "76+")),
-                    "Prescriptions",
-                    paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
+                    paste0("\\hspace{0.5cm}", c("0", "1-25", "26-50", "51+")),
+                    # "Prescriptions",
+                    # paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
                     "\\textbf{Treatments (months 1-3)}",
                     "Acetaminophen",
-                    "Acupuncture",
+                    # "Acupuncture",
                     "Anti-inflammatory",
                     "Benzodiazepine",
                     "Chiropractic",
@@ -239,17 +241,17 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}$>50$ MME",
                     "\\hspace{0.5cm}$>7$ days, $\\le50$ MME",
                     "\\hspace{0.5cm}$\\le7$ days, $\\le50$ MME",
-                    "\\hspace{0.5cm}Max daily MME",
-                    "\\hspace{0.5cm}Days supply",
+                    # "\\hspace{0.5cm}Max daily MME",
+                    # "\\hspace{0.5cm}Days supply",
                     "\\textbf{Outcomes (months 3-15)}",
                     "OUD by 9 months",
                     "OUD by 15 months",
                     "OUD (ICD only) by 9 months",
                     "OUD (ICD only) by 15 months",
-                    "At least monthly opioid prescribing",
-                    "$\\ge$90 days supply for opioids",
-                    "Chronic LBP by 9 months",
-                    "Chronic LBP by 15 months",
+                    # "At least monthly opioid prescribing",
+                    # "$\\ge$90 days supply for opioids",
+                    # "Chronic LBP by 9 months",
+                    # "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
                     "Uncensored through 9 months",
                     "Uncensored through 15 months"
@@ -267,13 +269,13 @@ table_one_function <- function(df){
   )
   
   ############# Preparing continuous variables
-  continuous_vars <- c("dem_age",
+  continuous_vars <- c("dem_age"
                        # "num_iph_washout_cal",
                        # "num_oth_washout_cal",
                        # "num_rxl_washout_cal",
                        # "n_ED_visits_washout_cal",
-                       "exposure_max_daily_dose_mme",
-                       "exposure_days_supply"
+                       # "exposure_max_daily_dose_mme",
+                       # "exposure_days_supply"
                        # "ed_visit_period_exposure", 
                        # "ed_visit_period_1", 
                        # "ed_visit_period_2", 
@@ -281,13 +283,13 @@ table_one_function <- function(df){
                        # "ed_visit_period_4",
                        # "ed_visit_period_5"
   )
-  continuous_names <- c("Age",
+  continuous_names <- c("Age"
                         # "\\hspace{0.5cm}Inpatient",
                         # "\\hspace{0.5cm}Outpatient",
                         # "\\hspace{0.5cm}Prescriptions",
                         # "\\hspace{0.5cm}Emergency department",
-                        "\\hspace{0.5cm}Max daily MME",
-                        "\\hspace{0.5cm}Days supply"
+                        # "\\hspace{0.5cm}Max daily MME",
+                        # "\\hspace{0.5cm}Days supply"
                         # "\\hspace{0.5cm}Exposure",
                         # "\\hspace{0.5cm}0-3 months",
                         # "\\hspace{0.5cm}3-6 months",

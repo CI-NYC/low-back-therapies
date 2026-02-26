@@ -110,6 +110,8 @@ W <- c(
   "depression_washout_cal",
   "mental_ill_washout_cal",
   "counseling_washout_cal",
+  "sud_alcohol_washout_cal",
+  "sud_other_washout_cal",
   "num_iph_washout_cal",
   "num_oth_washout_cal",
   # "num_rxl_washout_cal",
@@ -140,9 +142,9 @@ A <- list(c("exposure_acetaminophen",
             # "exposure_opioid",
             # "exposure_max_daily_dose_mme",
             # "exposure_days_supply"
-            "exposure_opioid_le7days_le50mme",
-            "exposure_opioid_g7days_le50mme",
-            "exposure_opioid_g50mme"
+            "exposure_opioid_<=7days_<=50mme",
+            "exposure_opioid_>7days_<=50mme",
+            "exposure_opioid_>50mme"
 ))
 
 

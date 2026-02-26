@@ -4,14 +4,12 @@
 # Purpose:
 # Notes:
 # -------------------------------------
-#devtools::install_github("shodaiinose/lmtp", ref = "riesz-local")
 library(tidyverse)
 library(data.table)
 library(stringr)
 library(readr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
-# drv_root <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort"
 
 df <- load_data("pain_cohort_with_MH_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
 
@@ -94,7 +92,7 @@ df[, `:=`(dem_sex_m = fifelse(dem_sex == "M", 1, 0), # Sex (reference category s
 
 
 # truncating max MME exposure due to low coverage (99th percentile as discussed)
-df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.995, na.rm=T)))]
+# df[, `:=`(exposure_max_daily_dose_mme = pmin(exposure_max_daily_dose_mme, quantile(exposure_max_daily_dose_mme, 0.995, na.rm=T)))]
 # 240 MME
 
 # Save in the mediation folder
