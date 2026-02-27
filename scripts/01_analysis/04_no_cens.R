@@ -30,8 +30,8 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "oud_hillary_period_2"
-cens <- "cens_period_2"
+Y <- "oud_period_1"
+cens <- "cens_period_1"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)
