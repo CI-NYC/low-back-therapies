@@ -15,14 +15,14 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
 # data <- data[1:50000,]
 
 # args <- commandArgs(TRUE)
 
 # paramaters to modify
 # learners
-version <- "sensitivity"
+version <- "opioid_categorized"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -30,12 +30,11 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "oud_hillary_period_4"
-cens <- "cens_period_4"
+Y <- "oud_hillary_period_2"
+cens <- "cens_period_2"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)
-data_y_oud <- data |> filter(subset_oud == 1)
 
 
 W <- c(
@@ -47,13 +46,13 @@ W <- c(
   "dem_race_hawaiian",
   "dem_race_hispanic",
   "dem_race_multiracial",
-  "dem_primary_language_english",
+  "dem_primary_language_english", 
   "dem_married_or_partnered",
   "dem_household_size_2",
   "dem_household_size_2plus",
-  "dem_veteran",
+  "dem_veteran", 
   "dem_probable_high_income",
-  "dem_tanf_benefits",
+  "dem_tanf_benefits", 
   "dem_ssi_benefits_mandatory_optional",
   "bipolar_washout_cal",
   "anxiety_washout_cal",
@@ -61,9 +60,11 @@ W <- c(
   "depression_washout_cal",
   "mental_ill_washout_cal",
   "counseling_washout_cal",
+  "sud_alcohol_washout_cal",
+  "sud_other_washout_cal",
   "num_iph_washout_cal",
   "num_oth_washout_cal",
-  "num_rxl_washout_cal",
+  # "num_rxl_washout_cal",
   "n_ED_visits_0_washout_cal",
   "n_ED_visits_1_washout_cal",
   "n_ED_visits_3_washout_cal",
@@ -91,9 +92,9 @@ A <- list(c("exposure_acetaminophen",
             # "exposure_opioid",
             # "exposure_max_daily_dose_mme",
             # "exposure_days_supply"
-            "exposure_opioid_le7days_le50mme",
-            "exposure_opioid_g7days_le50mme",
-            "exposure_opioid_g50mme"
+            "exposure_opioid_<=7days_<=50mme",
+            "exposure_opioid_>7days_<=50mme",
+            "exposure_opioid_>50mme"
 ))
 
 # --------
