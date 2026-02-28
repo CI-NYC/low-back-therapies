@@ -42,9 +42,9 @@ A <- (c("exposure_acetaminophen",
         # "exposure_opioid",
         # "exposure_max_daily_dose_mme",
         # "exposure_days_supply"
-        "exposure_opioid_le7days_le50mme",
-        "exposure_opioid_g7days_le50mme",
-        "exposure_opioid_g50mme"
+            "exposure_opioid_<=7days_<=50mme",
+            "exposure_opioid_>7days_<=50mme",
+            "exposure_opioid_>50mme"
 ))
 
 read_res <- function(Y, intervention) {
@@ -89,16 +89,6 @@ read_relr_no_cens <- function(Y, intervention1, intervention2) {
 
 
 ```{r}
-Y <- "oud_period_4"
-
-df <- read_relr(Y, "on", "off")
-df
-```
-
-
-
-
-```{r}
 Y <- "oud_period_2"
 
 df <- read_relr(Y, "on", "off")
@@ -107,8 +97,18 @@ df
 
 
 
+
 ```{r}
-Y <- "oud_period_4"
+Y <- "oud_period_1"
+
+df <- read_relr(Y, "on", "off")
+df
+```
+
+
+
+```{r}
+Y <- "oud_period_2"
 
 df <- read_relr_no_cens(Y, "on", "off")
 df
@@ -117,7 +117,7 @@ df
 
 
 ```{r}
-Y <- "oud_period_2"
+Y <- "oud_period_1"
 
 df <- read_relr_no_cens(Y, "on", "off")
 df

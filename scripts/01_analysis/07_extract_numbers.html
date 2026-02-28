@@ -405,9 +405,9 @@ A &lt;- (c(&quot;exposure_acetaminophen&quot;,
         # &quot;exposure_opioid&quot;,
         # &quot;exposure_max_daily_dose_mme&quot;,
         # &quot;exposure_days_supply&quot;
-        &quot;exposure_opioid_le7days_le50mme&quot;,
-        &quot;exposure_opioid_g7days_le50mme&quot;,
-        &quot;exposure_opioid_g50mme&quot;
+            &quot;exposure_opioid_&lt;=7days_&lt;=50mme&quot;,
+            &quot;exposure_opioid_&gt;7days_&lt;=50mme&quot;,
+            &quot;exposure_opioid_&gt;50mme&quot;
 ))
 
 read_res &lt;- function(Y, intervention) {
@@ -447,27 +447,6 @@ read_relr_no_cens &lt;- function(Y, intervention1, intervention2) {
              conf.high = conf.high - 1)
   })
 }</code></pre>
-<pre class="r"><code>Y &lt;- &quot;oud_period_4&quot;
-
-df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
-df</code></pre>
-<pre><code>## # A tibble: 14 × 8
-##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
-##    &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_aceta… 0.0315 0.0251   0.255     0.0378   0.166     0.352  1.83e-  9
-##  2 exposure_anti_… 0.0258 0.0253   0.0179    0.0209  -0.0230    0.0605 3.97e-  1
-##  3 exposure_benzo… 0.0373 0.0237   0.574     0.0283   0.489     0.664  6.49e- 58
-##  4 exposure_chiro… 0.0201 0.0262  -0.234     0.0364  -0.287    -0.178  2.21e- 13
-##  5 exposure_dulox… 0.0334 0.0252   0.324     0.0372   0.231     0.424  4.55e- 14
-##  6 exposure_gabap… 0.0519 0.0219   1.37      0.0241   1.26      1.49   4.59e-281
-##  7 exposure_inter… 0.0313 0.0251   0.247     0.0346   0.165     0.334  1.84e- 10
-##  8 exposure_muscl… 0.0246 0.0267  -0.0789    0.0207  -0.115    -0.0408 7.02e-  5
-##  9 exposure_massa… 0.0224 0.0255  -0.121     0.0122  -0.142    -0.0998 4.35e- 26
-## 10 exposure_physi… 0.0176 0.0267  -0.341     0.0425  -0.393    -0.283  1.17e- 22
-## 11 exposure_stero… 0.0252 0.0257  -0.0160    0.0273  -0.0673    0.0381 5.55e-  1
-## 12 exposure_opioi… 0.0266 0.0226   0.174     0.0279   0.111     0.240  9.26e-  9
-## 13 exposure_opioi… 0.0397 0.0226   0.756     0.0299   0.656     0.862  5.80e- 79
-## 14 exposure_opioi… 0.0476 0.0226   1.10      0.0379   0.952     1.27   9.72e- 86</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
 df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
@@ -475,41 +454,41 @@ df</code></pre>
 <pre><code>## # A tibble: 14 × 8
 ##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
 ##    &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_aceta… 0.0225 0.0174   0.293     0.0417   0.192     0.403  6.92e- 10
-##  2 exposure_anti_… 0.0179 0.0175   0.0222    0.0227  -0.0223    0.0686 3.34e-  1
-##  3 exposure_benzo… 0.0261 0.0164   0.594     0.0320   0.497     0.697  4.38e- 48
-##  4 exposure_chiro… 0.0133 0.0182  -0.272     0.0455  -0.334    -0.204  3.14e- 12
-##  5 exposure_dulox… 0.0259 0.0174   0.487     0.0450   0.361     0.624  1.26e- 18
-##  6 exposure_gabap… 0.0387 0.0149   1.59      0.0269   1.46      1.73   3.83e-274
-##  7 exposure_inter… 0.0248 0.0173   0.432     0.0398   0.325     0.549  1.66e- 19
-##  8 exposure_muscl… 0.0167 0.0187  -0.107     0.0225  -0.146    -0.0668 4.90e-  7
-##  9 exposure_massa… 0.0154 0.0177  -0.131     0.0132  -0.153    -0.108  2.61e- 26
-## 10 exposure_physi… 0.0122 0.0186  -0.343     0.0474  -0.401    -0.279  8.49e- 19
-## 11 exposure_stero… 0.0172 0.0179  -0.0411    0.0296  -0.0950    0.0161 1.56e-  1
-## 12 exposure_opioi… 0.0181 0.0156   0.159     0.0308   0.0906    0.231  1.81e-  6
-## 13 exposure_opioi… 0.0284 0.0156   0.815     0.0338   0.699     0.939  1.31e- 69
-## 14 exposure_opioi… 0.0351 0.0156   1.24      0.0415   1.07      1.43   3.62e- 84</code></pre>
-<pre class="r"><code>Y &lt;- &quot;oud_period_4&quot;
+##  1 exposure_aceta… 0.0302 0.0249   0.216     0.0419   0.120     0.320  3.24e-  6
+##  2 exposure_anti_… 0.0254 0.0249   0.0181    0.0220  -0.0249    0.0631 4.15e-  1
+##  3 exposure_benzo… 0.0353 0.0237   0.485     0.0313   0.397     0.579  1.20e- 36
+##  4 exposure_chiro… 0.0197 0.0260  -0.241     0.0387  -0.296    -0.181  1.08e- 12
+##  5 exposure_dulox… 0.0312 0.0249   0.251     0.0424   0.151     0.359  1.30e-  7
+##  6 exposure_gabap… 0.0499 0.0218   1.28      0.0257   1.17      1.40   7.21e-227
+##  7 exposure_inter… 0.0309 0.0248   0.246     0.0371   0.159     0.340  2.91e-  9
+##  8 exposure_muscl… 0.0245 0.0263  -0.0710    0.0218  -0.110    -0.0304 7.36e-  4
+##  9 exposure_massa… 0.0224 0.0252  -0.109     0.0130  -0.132    -0.0860 7.61e- 19
+## 10 exposure_physi… 0.0174 0.0264  -0.342     0.0459  -0.399    -0.280  7.29e- 20
+## 11 exposure_stero… 0.0248 0.0254  -0.0270    0.0287  -0.0802    0.0294 3.42e-  1
+## 12 exposure_opioi… 0.0258 0.0224   0.155     0.0307   0.0873    0.226  2.79e-  6
+## 13 exposure_opioi… 0.0410 0.0224   0.831     0.0312   0.722     0.946  8.77e- 84
+## 14 exposure_opioi… 0.0495 0.0224   1.21      0.0407   1.04      1.40   9.96e- 85</code></pre>
+<pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
 
-df &lt;- read_relr_no_cens(Y, &quot;on&quot;, &quot;off&quot;)
+df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
 df</code></pre>
 <pre><code>## # A tibble: 14 × 8
 ##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
 ##    &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_aceta… 0.0315 0.0254  0.241     0.0354   1.58e-1   0.330   1.03e-  9
-##  2 exposure_anti_… 0.0258 0.0254  0.0175    0.00882  3.86e-5   0.0352  4.95e-  2
-##  3 exposure_benzo… 0.0373 0.0254  0.473     0.0245   4.04e-1   0.545   3.73e- 56
-##  4 exposure_chiro… 0.0201 0.0254 -0.207     0.0348  -2.60e-1  -0.151   2.44e- 11
-##  5 exposure_dulox… 0.0334 0.0254  0.317     0.0356   2.29e-1   0.413   9.71e- 15
-##  6 exposure_gabap… 0.0519 0.0254  1.05      0.0196   9.70e-1   1.13    1.26e-293
-##  7 exposure_inter… 0.0313 0.0254  0.235     0.0328   1.59e-1   0.317   1.12e- 10
-##  8 exposure_muscl… 0.0246 0.0254 -0.0308    0.0117  -5.27e-2  -0.00836 7.36e-  3
-##  9 exposure_massa… 0.0224 0.0254 -0.115     0.0103  -1.33e-1  -0.0972  1.70e- 32
-## 10 exposure_physi… 0.0176 0.0254 -0.307     0.0404  -3.59e-1  -0.249   1.22e- 19
-## 11 exposure_stero… 0.0252 0.0254 -0.00402   0.0227  -4.74e-2   0.0413  8.59e-  1
-## 12 exposure_opioi… 0.0266 0.0254  0.0481    0.0229   2.09e-3   0.0962  4.02e-  2
-## 13 exposure_opioi… 0.0397 0.0254  0.568     0.0260   4.90e-1   0.650   6.24e- 67
-## 14 exposure_opioi… 0.0476 0.0254  0.878     0.0345   7.55e-1   1.01    2.23e- 74</code></pre>
+##  1 exposure_aceta… 0.0209 0.0170   0.231     0.0467   0.123     0.349  8.99e-  6
+##  2 exposure_anti_… 0.0174 0.0171   0.0128    0.0240  -0.0338    0.0616 5.96e-  1
+##  3 exposure_benzo… 0.0243 0.0162   0.504     0.0353   0.404     0.612  6.68e- 31
+##  4 exposure_chiro… 0.0123 0.0178  -0.309     0.0494  -0.373    -0.238  8.16e- 14
+##  5 exposure_dulox… 0.0236 0.0170   0.391     0.0522   0.256     0.541  2.66e- 10
+##  6 exposure_gabap… 0.0362 0.0146   1.47      0.0285   1.34      1.61   3.52e-221
+##  7 exposure_inter… 0.0248 0.0169   0.470     0.0435   0.350     0.600  8.02e- 19
+##  8 exposure_muscl… 0.0164 0.0181  -0.0945    0.0238  -0.136    -0.0513 3.04e-  5
+##  9 exposure_massa… 0.0149 0.0173  -0.134     0.0142  -0.158    -0.110  4.18e- 24
+## 10 exposure_physi… 0.0117 0.0181  -0.351     0.0506  -0.412    -0.283  1.33e- 17
+## 11 exposure_stero… 0.0166 0.0174  -0.0469    0.0314  -0.104     0.0137 1.26e-  1
+## 12 exposure_opioi… 0.0174 0.0152   0.145     0.0340   0.0714    0.224  6.61e-  5
+## 13 exposure_opioi… 0.0292 0.0152   0.927     0.0355   0.798     1.07   3.61e- 76
+## 14 exposure_opioi… 0.0361 0.0152   1.38      0.0447   1.18      1.60   4.22e- 84</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
 df &lt;- read_relr_no_cens(Y, &quot;on&quot;, &quot;off&quot;)
@@ -517,20 +496,41 @@ df</code></pre>
 <pre><code>## # A tibble: 14 × 8
 ##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
 ##    &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_aceta… 0.0225 0.0176   0.278    0.0390   0.184      0.380  3.29e- 10
-##  2 exposure_anti_… 0.0179 0.0176   0.0169   0.00947 -0.00177    0.0360 7.63e-  2
-##  3 exposure_benzo… 0.0261 0.0176   0.487    0.0279   0.407      0.570  1.01e- 45
-##  4 exposure_chiro… 0.0133 0.0176  -0.244    0.0439  -0.306     -0.176  1.86e- 10
-##  5 exposure_dulox… 0.0259 0.0176   0.475    0.0432   0.355      0.605  2.44e- 19
-##  6 exposure_gabap… 0.0387 0.0176   1.20     0.0219   1.11       1.30   1.69e-284
-##  7 exposure_inter… 0.0248 0.0176   0.413    0.0378   0.312      0.521  5.32e- 20
-##  8 exposure_muscl… 0.0167 0.0176  -0.0497   0.0129  -0.0735    -0.0253 8.06e-  5
-##  9 exposure_massa… 0.0154 0.0176  -0.124    0.0112  -0.143     -0.104  6.55e- 32
-## 10 exposure_physi… 0.0122 0.0176  -0.306    0.0451  -0.365     -0.242  5.23e- 16
-## 11 exposure_stero… 0.0172 0.0176  -0.0235   0.0246  -0.0696     0.0248 3.34e-  1
-## 12 exposure_opioi… 0.0181 0.0176   0.0311   0.0256  -0.0193     0.0840 2.31e-  1
-## 13 exposure_opioi… 0.0284 0.0176   0.615    0.0296   0.524      0.712  3.75e- 59
-## 14 exposure_opioi… 0.0351 0.0176   0.995    0.0378   0.852      1.15   1.11e- 74</code></pre>
+##  1 exposure_aceta… 0.0302 0.0251   0.206    0.0395   0.116     0.303   2.22e-  6
+##  2 exposure_anti_… 0.0254 0.0251   0.0110   0.00935 -0.00736   0.0297  2.42e-  1
+##  3 exposure_benzo… 0.0353 0.0251   0.406    0.0274   0.332     0.484   2.19e- 35
+##  4 exposure_chiro… 0.0197 0.0251  -0.213    0.0370  -0.268    -0.154   8.41e- 11
+##  5 exposure_dulox… 0.0312 0.0251   0.244    0.0406   0.148     0.347   8.02e-  8
+##  6 exposure_gabap… 0.0499 0.0251   0.988    0.0208   0.909     1.07    1.11e-239
+##  7 exposure_inter… 0.0309 0.0251   0.233    0.0352   0.151     0.321   2.49e-  9
+##  8 exposure_muscl… 0.0245 0.0251  -0.0244   0.0120  -0.0470   -0.00115 3.98e-  2
+##  9 exposure_massa… 0.0224 0.0251  -0.106    0.0109  -0.124    -0.0862  1.71e- 24
+## 10 exposure_physi… 0.0174 0.0251  -0.306    0.0436  -0.363    -0.244   4.97e- 17
+## 11 exposure_stero… 0.0248 0.0251  -0.0134   0.0238  -0.0583    0.0337  5.71e-  1
+## 12 exposure_opioi… 0.0258 0.0251   0.0303   0.0257  -0.0204    0.0836  2.46e-  1
+## 13 exposure_opioi… 0.0410 0.0251   0.633    0.0271   0.549     0.722   2.83e- 73
+## 14 exposure_opioi… 0.0495 0.0251   0.974    0.0373   0.835     1.12    2.41e- 74</code></pre>
+<pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
+
+df &lt;- read_relr_no_cens(Y, &quot;on&quot;, &quot;off&quot;)
+df</code></pre>
+<pre><code>## # A tibble: 14 × 8
+##    treatment        shift    ref estimate std.error conf.low conf.high   p.value
+##    &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+##  1 exposure_aceta… 0.0209 0.0171   0.220     0.0441  0.119      0.330  6.48e-  6
+##  2 exposure_anti_… 0.0174 0.0171   0.0143    0.0102 -0.00575    0.0348 1.63e-  1
+##  3 exposure_benzo… 0.0243 0.0171   0.420     0.0312  0.336      0.510  2.09e- 29
+##  4 exposure_chiro… 0.0123 0.0171  -0.281     0.0477 -0.345     -0.210  4.98e- 12
+##  5 exposure_dulox… 0.0236 0.0171   0.380     0.0503  0.250      0.522  1.52e- 10
+##  6 exposure_gabap… 0.0362 0.0171   1.11      0.0230  1.02       1.21   2.42e-232
+##  7 exposure_inter… 0.0248 0.0171   0.447     0.0413  0.335      0.569  3.36e- 19
+##  8 exposure_muscl… 0.0164 0.0171  -0.0419    0.0133 -0.0665    -0.0167 1.26e-  3
+##  9 exposure_massa… 0.0149 0.0171  -0.127     0.0119 -0.148     -0.107  3.77e- 30
+## 10 exposure_physi… 0.0117 0.0171  -0.315     0.0482 -0.376     -0.247  4.31e- 15
+## 11 exposure_stero… 0.0166 0.0171  -0.0288    0.0261 -0.0773     0.0221 2.62e-  1
+## 12 exposure_opioi… 0.0174 0.0171   0.0136    0.0286 -0.0418     0.0721 6.38e-  1
+## 13 exposure_opioi… 0.0292 0.0171   0.706     0.0311  0.605      0.813  4.04e- 66
+## 14 exposure_opioi… 0.0361 0.0171   1.11      0.0408  0.947      1.28   1.39e- 74</code></pre>
 
 
 
