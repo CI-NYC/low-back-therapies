@@ -12,10 +12,12 @@ library(collapse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 
+
+
 # opioid naive exclusion
 opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
 # base cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> filter(BENE_ID %in% opioid_naive_exclusion$BENE_ID)
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 # debse exclusions
 debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
 # iph exclusions
@@ -45,112 +47,88 @@ cohort <- list(
   reduce(join, how = "left") |>
   mutate(across(everything(), ~ replace_na(., 0)))
 
-nrow(cohort)
+print(paste("Has diagnosis:", nrow(load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")))))
+print(paste("Has treatment:", nrow(load_data("low_back_cohort_treatment_dts.fst", file.path(drv_root, "exclusion")))))
+print(paste("Washout continuously enrolled:", nrow(cohort)))
+
 
 # exclusion oud
-cohort |>
-  filter(exclusion_oud == 1) |>
-  nrow()
-
-cohort <- cohort |>
-  filter(exclusion_oud == 0)
-
-# exclusion opioid_naive
-cohort |>
-  filter(exclusion_opioid_naive == 1) |>
-  nrow()
+print(paste("Not opioid naive:", sum(cohort$exclusion_opioid_naive)))
 
 cohort <- cohort |>
   filter(exclusion_opioid_naive == 0)
 
-nrow(cohort)
+# exclusion oud
+print(paste("Has OUD:", sum(cohort$exclusion_oud)))
 
+cohort <- cohort |>
+  filter(exclusion_oud == 0)
 
 # exclusion prior pain
-cohort |>
-  filter(exclusion_washout_pain == 1) |>
-  nrow()
+print(paste("Has other pain within 1 month:", sum(cohort$exclusion_washout_pain)))
 
 cohort <- cohort |>
   filter(exclusion_washout_pain == 0)
 
+print(paste("Remaining after OUD and other key exclusions:", nrow(cohort)))
+
 # exclusion MD
-cohort |>
-  filter(exclusion_maryland == 1) |>
-  nrow()
+print(paste("Maryland:", sum(cohort$exclusion_maryland)))
 
 cohort <- cohort |>
   filter(exclusion_maryland == 0)
 
 # exclusion age
-cohort |>
-  filter(exclusion_age == 1) |>
-  nrow()
+print(paste("Age:", nrow(filter(cohort, exclusion_age == 1 | exclusion_double_bdays == 1))))
 
 cohort <- cohort |>
-  filter(exclusion_age == 0)
-
-# exclusion double birthday
-cohort |>
-  filter(exclusion_double_bdays == 1) |>
-  nrow()
-
-cohort <- cohort |>
-  filter(exclusion_double_bdays == 0)
+  filter(exclusion_double_bdays == 0,
+         exclusion_age == 0)
 
 # exclusion pregnancy
-cohort |>
-  filter(exclusion_pregnancy == 1) |>
-  nrow()
+print(paste("Pregnant:", sum(cohort$exclusion_pregnancy)))
 
 cohort <- cohort |>
   filter(exclusion_pregnancy == 0)
 
 # exclusion unknown sex
-cohort |>
-  filter(exclusion_missing_sex == 1) |>
-  nrow()
+print(paste("Missing sex:", sum(cohort$exclusion_missing_sex)))
 
 cohort <- cohort |>
   filter(exclusion_missing_sex == 0)
 
-nrow(cohort)
-
 # exclusion dual eligible
-cohort |>
-  filter(exclusion_dual_eligible == 1) |>
-  nrow()
+print(paste("Dual eligible:", sum(cohort$exclusion_dual_eligible)))
 
 cohort <- cohort |>
   filter(exclusion_dual_eligible == 0)
 
-nrow(cohort)
-
 
 # exclusion cancer
-cohort |>
-  filter(exclusion_cancer == 1 | exclusion_cancer_oth == 1 | exclusion_cancer_iph == 1) |>
-  nrow()
+print(paste("Cancer:", nrow(filter(cohort, exclusion_cancer == 1 | exclusion_cancer_oth == 1 | exclusion_cancer_iph == 1))))
 
 cohort <- cohort |>
   filter(exclusion_cancer == 0,
          exclusion_cancer_oth == 0,
          exclusion_cancer_iph == 0)
 
-nrow(cohort)
-
 # exclusion institution or palliative
-cohort |>
-  filter(exclusion_pall_iph == 1 | exclusion_pall_oth == 1 | exclusion_institution == 1) |>
-  nrow()
+print(paste("Institutionalized:", nrow(filter(cohort, exclusion_pall_iph == 1 | exclusion_pall_oth == 1 | exclusion_institution == 1))))
 
 cohort <- cohort |>
   filter(exclusion_pall_iph == 0,
          exclusion_pall_oth == 0,
          exclusion_institution == 0)
 
-nrow(cohort)
+# exclusion inpatient
+print(paste("Inpatient:", nrow(filter(cohort, exclusion_monthprior_hospitalization == 1 | exclusion_monthprior_otherinpatient == 1))))
 
+cohort <- cohort |>
+  filter(exclusion_monthprior_hospitalization == 0,
+         exclusion_monthprior_otherinpatient == 0)
+
+
+print(paste("Final remaining:", nrow(cohort)))
 
 
 

@@ -15,8 +15,8 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) 
-# sensitivity analysis: repeat for pain_cohort_clean_imputed_7day_gap.fst
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) 
+# repeat for pain_cohort_clean_imputed.fst (regular), pain_cohort_clean_imputed_7day_gap.fst (sensitivity analysis)
 
 # data <- data[1:50000,]
   
@@ -38,7 +38,7 @@ intervention <- args[[7]]
 
 # paramaters to modify
 # learners
-version <- "opioid_categorized" # repeat for 1) opioid_categorized 2) sensitivity analysis
+version <- "sensitivity" # repeat for 1) opioid_categorized 2) sensitivity
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",

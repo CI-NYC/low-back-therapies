@@ -18,7 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "sensitivity"
-Y <- "oud_hillary_period_2"
+Y <- "oud_period_2"
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
@@ -35,9 +35,9 @@ A <- (c("exposure_acetaminophen",
         # "exposure_opioid",
         # "exposure_max_daily_dose_mme",
         # "exposure_days_supply"
-        "exposure_opioid_le7days_le50mme",
-        "exposure_opioid_g7days_le50mme",
-        "exposure_opioid_g50mme"
+        "exposure_opioid_<=7days_<=50mme",
+        "exposure_opioid_>7days_<=50mme",
+        "exposure_opioid_>50mme"
 ))
 
 read_res <- function(Y, intervention) {

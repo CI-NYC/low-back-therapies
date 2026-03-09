@@ -15,14 +15,16 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
+# repeat for pain_cohort_clean_imputed.fst (regular), pain_cohort_clean_imputed_7day_gap.fst (sensitivity analysis)
+
 # data <- data[1:50000,]
 
 # args <- commandArgs(TRUE)
 
 # paramaters to modify
 # learners
-version <- "opioid_categorized"
+version <- "sensitivity"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -30,8 +32,8 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "oud_period_1"
-cens <- "cens_period_1"
+Y <- "oud_hillary_period_1"
+cens <- "cens_period_2"
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)

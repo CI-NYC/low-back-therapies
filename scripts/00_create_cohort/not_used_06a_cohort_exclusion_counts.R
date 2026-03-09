@@ -49,11 +49,19 @@ nrow(cohort)
 
 # exclusion oud
 cohort |>
-  filter(exclusion_oud_hillary == 0) |>
+  filter(exclusion_oud == 1) |>
   nrow()
 
 cohort <- cohort |>
-  filter(exclusion_oud_hillary == 1)
+  filter(exclusion_oud == 0)
+
+# exclusion opioid_naive
+cohort |>
+  filter(exclusion_opioid_naive == 1) |>
+  nrow()
+
+cohort <- cohort |>
+  filter(exclusion_opioid_naive == 0)
 
 nrow(cohort)
 
