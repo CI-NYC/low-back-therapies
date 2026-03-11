@@ -5,15 +5,18 @@ path <- "~/medicaid/low-back-therapies/scripts/00_create_cohort/12_tables"
 source(file.path(path, "00_table_one_function.R"))
 
 # overall_1 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[1:52,]
-oud_no_1 <- table_one_function(data |> filter(subset_oud == 0))[1:54,]
+oud_no_1 <- table_one_function(data |> filter(subset_oud == 0)) |>
+  slice(1:which(Characteristic == "\\hspace{0.5cm}26+"))
 # oud_yes_1 <- table_one_function(data |> filter(subset_oud == 1))[1:52,2]
 
 # overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[60:91,]
-oud_no_2 <- table_one_function(data |> filter(subset_oud == 0))[55:79,]
+oud_no_2 <- table_one_function(data |> filter(subset_oud == 0)) |>
+  slice(which(Characteristic == "\\textbf{Treatments (months 1-3)}"):which(Characteristic == "Uncensored through 15 months"))
 # oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[60:91,2]
 
 # overall_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud %in% c(0,1)))[60:79,]
-oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0))[55:71,]
+oud_no_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 0)) |>
+  slice(which(Characteristic == "\\textbf{Treatments (months 1-3)}"):which(Characteristic == "\\hspace{0.5cm}$\\le7$ days, $\\le50$ MME"))
 # oud_yes_2_7day_gap <- table_one_function(data_7day_gap |> filter(subset_oud == 1))[60:79,2]
 
 # part1 <- cbind(overall_1, oud_no_1, oud_yes_1)

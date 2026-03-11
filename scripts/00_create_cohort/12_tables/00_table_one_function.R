@@ -69,8 +69,7 @@ table_one_function <- function(df){
       # iph_3_washout_cal_bin = as.numeric(num_iph_washout_cal >= 5),
       oth_0_washout_cal_bin = as.numeric(num_oth_washout_cal == 0),
       oth_20_washout_cal_bin = as.numeric(num_oth_washout_cal > 0 & num_oth_washout_cal <= 25),
-      oth_40_washout_cal_bin = as.numeric(num_oth_washout_cal > 25 & num_oth_washout_cal <= 50),
-      oth_60_washout_cal_bin = as.numeric(num_oth_washout_cal > 50),
+      oth_40_washout_cal_bin = as.numeric(num_oth_washout_cal > 25),
       # rxl_0_washout_cal_bin = as.numeric(num_rxl_washout_cal == 0),
       # rxl_10_washout_cal_bin = as.numeric(num_rxl_washout_cal > 0 & num_rxl_washout_cal <= 10),
       # rxl_20_washout_cal_bin = as.numeric(num_rxl_washout_cal > 10 & num_rxl_washout_cal <= 20),
@@ -219,7 +218,7 @@ table_one_function <- function(df){
                     "Inpatient hospitalizations",
                     paste0("\\hspace{0.5cm}", c("0", "1+")),
                     "Outpatient visits",
-                    paste0("\\hspace{0.5cm}", c("0", "1-25", "26-50", "51+")),
+                    paste0("\\hspace{0.5cm}", c("0", "1-25", "26+")),
                     # "Prescriptions",
                     # paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
                     "\\textbf{Treatments (months 1-3)}",
@@ -300,9 +299,9 @@ table_one_function <- function(df){
   
   summarise_continuous_variable <- function(data, variable){
     data <- data[data[[variable]] > 0, ]
-    return(paste0(round(median(data[[variable]], na.rm=T),2)," (",
-                  round(quantile(data[[variable]], 0.25, na.rm=T),2),", ",
-                  round(quantile(data[[variable]], 0.75, na.rm=T),2),")"))
+    return(paste0(round(median(data[[variable]], na.rm=T),1)," (",
+                  round(quantile(data[[variable]], 0.25, na.rm=T),1),", ",
+                  round(quantile(data[[variable]], 0.75, na.rm=T),1),")"))
   }
   
   continuous_values <- as.vector(sapply(continuous_vars, function(variable) summarise_continuous_variable(df, variable)))
@@ -313,7 +312,7 @@ table_one_function <- function(df){
   ############# Preparing binary variables
   number <- sapply(df, function(x) sum(x, na.rm=T))
   proportion <- sapply(df, function(x) mean(x, na.rm=T))
-  number_proportion <- paste0(number, " (", round(proportion*100,2), "\\%)")
+  number_proportion <- paste0(number, " (", round(proportion*100,1), "\\%)")
   
   
   
