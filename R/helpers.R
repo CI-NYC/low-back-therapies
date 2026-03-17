@@ -10,6 +10,7 @@ library(arrow)
 library(fst)
 
 drv_root <- "/mnt/general-data/disability/low-back-therapies"
+drv_root_30_day_treatment <- "/mnt/general-data/disability/low-back-therapies/30_day_treatment"
 home_dir <- "~/medicaid/low-back-therapies"
 
 follow_up_period_length <- 181

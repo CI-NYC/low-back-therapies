@@ -18,9 +18,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
 
 version <- "sensitivity"
-run_index <- 3 # rerun for 1,2,3,4
-
-Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
+Y <- "oud_period_2"
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
@@ -237,7 +235,7 @@ extract_count <- function(x) {
 # dev.off()
 
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/sensitivity_mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.png"), 
+  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 

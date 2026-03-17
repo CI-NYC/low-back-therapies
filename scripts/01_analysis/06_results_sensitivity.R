@@ -16,9 +16,10 @@ library(data.table)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
-
 version <- "sensitivity"
-Y <- "oud_period_2"
+run_index <- 4 # rerun for 1,2,3,4
+
+Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
