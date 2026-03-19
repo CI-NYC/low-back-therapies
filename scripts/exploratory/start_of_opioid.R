@@ -19,10 +19,10 @@ opioid_data <- load_data("exposure_period_opioids.fst", file.path(drv_root, "tre
   distinct()
 
 p <- ggplot(opioid_data, aes(x=days_until_opioid_start)) +
-  geom_histogram(binwidth=1) +
+  geom_histogram(binwidth=7) +
   labs(x="Days until opioid start", y="Count") +
-  labs(title = "Histogram of Days Until Opioid Start among those with Opioid Exposure (n=114,294)",
-       subtitle = "75,229 individuals received opioids on day 0") +
+  # labs(title = "Histogram of Days Until Opioid Start among those with Opioid Exposure (n=114294)",
+  #      subtitle = "85897 individuals received opioids in first 7 days") +
   theme_minimal()
 
-ggsave("/home/amh2389/medicaid/low-back-therapies/scripts/exploratory/days_until_opioid_start_histogram.png", p, width=10, height=7.5, dpi=300)
+ggsave("/home/amh2389/medicaid/low-back-therapies/scripts/exploratory/days_until_opioid_start_histogram.png", p, width=8, height=6, dpi=300)

@@ -9,6 +9,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(pillar.sigfig = 4)
 ```
 
 
@@ -23,9 +24,9 @@ library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final")) |> as.data.table()
 
-version <- "opioid_categorized"
+version <- "30_day_exposure"
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
@@ -92,7 +93,10 @@ read_relr_no_cens <- function(Y, intervention1, intervention2) {
 Y <- "oud_period_2"
 
 df <- read_relr(Y, "on", "off")
-df
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
 ```
 
 
@@ -102,23 +106,8 @@ df
 Y <- "oud_period_1"
 
 df <- read_relr(Y, "on", "off")
-df
-```
-
-
-
-```{r}
-Y <- "oud_period_2"
-
-df <- read_relr_no_cens(Y, "on", "off")
-df
-```
-
-
-
-```{r}
-Y <- "oud_period_1"
-
-df <- read_relr_no_cens(Y, "on", "off")
-df
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
 ```
