@@ -16,10 +16,12 @@ library(data.table)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) |> as.data.table()
-version <- "sensitivity"
-run_index <- 4 # rerun for 1,2,3,4
+version <- "sensitivity" # sensitivity analysis using 7-day allowable gaps
+# run_index <- 4 # rerun for 1,2,3,4
 
-Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
+for (Y in c("oud_period_1", "oud_period_2")){
+
+# Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
 
 A <- (c("exposure_acetaminophen",
         # "exposure_acupuncture",
@@ -135,9 +137,9 @@ relabel <- function(data) {
            treatment == "exposure_massage_therapy" ~ "Massage therapy", 
            treatment == "exposure_physical_therapy" ~ "Physical therapy",
            treatment == "exposure_steroid" ~ "Steroid", 
-           treatment == "exposure_opioid_le7days_le50mme" ~ "Opioid, \u2264 7 days & \u2264 50 MME", 
-           treatment == "exposure_opioid_g7days_le50mme" ~ "Opioid, > 7 days & \u2264 50 MME", 
-           treatment == "exposure_opioid_g50mme" ~ "Opioid, > 50 MME", 
+           treatment == "exposure_opioid_<=7days_<=50mme" ~ "Opioid, \u2264 7 days & \u2264 50 MME", 
+           treatment == "exposure_opioid_>7days_<=50mme" ~ "Opioid, > 7 days & \u2264 50 MME", 
+           treatment == "exposure_opioid_>50mme" ~ "Opioid, > 50 MME", 
            TRUE ~ treatment
          ))
 }
@@ -222,29 +224,29 @@ extract_count <- function(x) {
   })
 }
 
+# ragg::agg_png(
+#   glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"),
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+# 
+# print(read_diff(Y, "on", "off") |>
+#   relabel() |>
+#   filter(extract_count(cl_n_oud) > 10) |>
+#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |>
+#   plot_diff())
+# 
+# dev.off()
+
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/7day_mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
-read_diff(Y, "on", "off") |> 
+print(read_relr(Y, "on", "off") |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_diff()
-
-dev.off()
-
-ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/sensitivity/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
-
-read_relr(Y, "on", "off") |> 
-  relabel() |> 
-  filter(extract_count(cl_n_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_relr()
+  plot_relr())
 
 dev.off()
 
@@ -273,3 +275,5 @@ dev.off()
 #   plot_relr()
 # 
 # dev.off()
+
+}

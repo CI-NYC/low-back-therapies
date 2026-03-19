@@ -1,5 +1,6 @@
 library(tidyverse)
 library(collapse)
+library(xtable)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -51,12 +52,12 @@ dat2 <- dat |>
   # 7. opioid >50 MME w/o overlapping gabapentin
   mutate(group = case_when(
     exposure_gabapentin == 1 & overlap == FALSE ~ "gabapentin w/o overlapping opioid",
-    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid <=7 days, <=50 MME",
-    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid >7 days, <=50 MME",
-    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>50mme` == 1 ~ "gabapentin w/ overlapping opioid >50 MME",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "opioid <=7 days, <=50 MME w/o overlapping gabapentin",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>7days_<=50mme` == 1 ~ "opioid >7 days, <=50 MME w/o overlapping gabapentin",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>50mme` == 1 ~ "opioid >50 MME w/o overlapping gabapentin",
+    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid $\\le7$ days, $\\le50$ MME",
+    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid $>7$ days, $\\le50$ MME",
+    exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>50mme` == 1 ~ "gabapentin w/ overlapping opioid $>50$ MME",
+    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "opioid $\\le7$ days, $\\le50$ MME w/o overlapping gabapentin",
+    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>7days_<=50mme` == 1 ~ "opioid $>7$ days, $\\le50$ MME w/o overlapping gabapentin",
+    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>50mme` == 1 ~ "opioid $>50$ MME w/o overlapping gabapentin",
     TRUE ~ "neither gabapentin nor opioid"
   )) 
 
@@ -65,8 +66,9 @@ number <- table(dat2$group)
 proportion <- prop.table(number)
 number_proportion <- paste0(number, " (", round(proportion*100,1), "\\%)")
 
-as.data.frame(cbind(group, number_proportion)) |>
+dat2 <- as.data.frame(cbind(group, number_proportion)) |>
   slice(-5)
+
 
 #                                                  group number_proportion
 # 1  gabapentin w/ overlapping opioid <=7 days, <=50 MME     3468 (0.7\\%)
@@ -76,3 +78,15 @@ as.data.frame(cbind(group, number_proportion)) |>
 # 5 opioid <=7 days, <=50 MME w/o overlapping gabapentin   60235 (11.8\\%)
 # 6            opioid >50 MME w/o overlapping gabapentin    12756 (2.5\\%)
 # 7  opioid >7 days, <=50 MME w/o overlapping gabapentin    24788 (4.8\\%)
+
+# part1[part1 == "0 (NaN\\%)"] <- ""
+print(
+  xtable(
+    caption = "",
+    dat2,
+  ),
+  include.rownames = FALSE,
+  sanitize.text.function = identity,
+  booktabs  = TRUE,
+  caption.placement      = "top",
+)

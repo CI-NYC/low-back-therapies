@@ -17,9 +17,10 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) |> as.data.table()
 
-version <- "opioid_categorized"
-Y <- "oud_hillary_period_1"
+version <- "opioid_categorized" # sensitivity analysis using 30-day allowable gaps
 
+for (Y in c("oud_period_1", "oud_period_2")){
+  
 A <- (c("exposure_acetaminophen",
             # "exposure_acupuncture",
             "exposure_anti_inflammatory",
@@ -221,29 +222,29 @@ extract_count <- function(x) {
   })
 }
 
+# ragg::agg_png(
+#   glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+# 
+# read_diff(Y, "on", "off") |> 
+#   relabel() |> 
+#   filter(extract_count(cl_n_oud) > 10) |> 
+#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
+#   plot_diff()
+# 
+# dev.off()
+
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/30day_mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
-read_diff(Y, "on", "off") |> 
+print(read_relr(Y, "on", "off") |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_diff()
-
-dev.off()
-
-ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
-
-read_relr(Y, "on", "off") |> 
-  relabel() |> 
-  filter(extract_count(cl_n_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_relr()
+  plot_relr())
 
 dev.off()
 
@@ -272,3 +273,5 @@ dev.off()
 #   plot_relr()
 # 
 # dev.off()
+
+}

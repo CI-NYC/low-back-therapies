@@ -16,10 +16,13 @@ library(data.table)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final")) |> as.data.table()
-version <- "30_day_exposure"
-run_index <- 4 # rerun for 1,2,3,4
 
-Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
+version <- "30_day_exposure" # primary analysis
+# run_index <- 4 # rerun for 1,2,3,4
+
+for (Y in c("oud_period_1", "oud_period_2")){
+  
+# Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
 
 A <- (c("exposure_acetaminophen",
             # "exposure_acupuncture",
@@ -222,29 +225,29 @@ extract_count <- function(x) {
   })
 }
 
+# ragg::agg_png(
+#   glue("~/medicaid/low-back-therapies/figures/30_day_exposure/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+# 
+# read_diff(Y, "on", "off") |> 
+#   relabel() |> 
+#   filter(extract_count(cl_n_oud) > 10) |> 
+#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
+#   plot_diff()
+# 
+# dev.off()
+
 ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/30_day_exposure/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.png"), 
+  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
 
-read_diff(Y, "on", "off") |> 
+print(read_relr(Y, "on", "off") |> 
   relabel() |> 
   filter(extract_count(cl_n_oud) > 10) |> 
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_diff()
-
-dev.off()
-
-ragg::agg_png(
-  glue("~/medicaid/low-back-therapies/figures/30_day_exposure/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
-
-read_relr(Y, "on", "off") |> 
-  relabel() |> 
-  filter(extract_count(cl_n_oud) > 10) |> 
-  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-  plot_relr()
+  plot_relr())
 
 dev.off()
 
@@ -273,3 +276,4 @@ dev.off()
 #   plot_relr()
 # 
 # dev.off()
+}
