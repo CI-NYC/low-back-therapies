@@ -72,7 +72,7 @@ read_relr <- function(Y, intervention1, intervention2) {
   })
 }
 
-read_relr_no_cens <- function(Y, intervention1, intervention2) {
+read_relr_no_cens <- function(Y, intervention1) {
   map_dfr(A, function(treatment) {
     diff <- file.path(drv_root, "analysis", version,
                       glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
@@ -105,7 +105,17 @@ df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
 ```{r}
 Y <- "oud_period_1"
 
-df <- read_relr(Y, "on", "off")
+df <- read_relr_no_cens(Y, "on")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+```{r}
+Y <- "oud_period_2"
+
+df <- read_relr_no_cens(Y, "on")
 df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),

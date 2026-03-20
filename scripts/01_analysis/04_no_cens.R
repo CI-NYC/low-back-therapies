@@ -15,16 +15,28 @@ library(dplyr)
 
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
-data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
-# repeat for pain_cohort_clean_imputed.fst (regular), pain_cohort_clean_imputed_7day_gap.fst (sensitivity analysis)
 
-# data <- data[1:50000,]
+### paramaters to modify =======================================================
 
-# args <- commandArgs(TRUE)
+## Uncomment whichever cohort is relevant to your current run ----------
+# sensitivity analysis cohort with 30-day gap between treatments
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+version <- "opioid_categorized"
 
-# paramaters to modify
+# # sensitivity analysis cohort with 7-day gap between treatments
+# data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) 
+# version <- "sensitivity"
+
+# # cohort with 30 day exposure
+# data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+# version <- "30_day_exposure"
+# -----------------------------------------------------------------------
+
+run_index <- 4 # rerun for 1,2,3,4
+
+###  ===========================================================================
+
 # learners
-version <- "sensitivity"
 sl <- list("glm", "lightgbm",
         # "ranger",
         # "nnet",
@@ -32,8 +44,16 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- "oud_hillary_period_1"
-cens <- "cens_period_2"
+
+Y <- c("oud_period_1", 
+       "oud_period_2", 
+       "oud_hillary_period_1", 
+       "oud_hillary_period_2")[run_index]
+cens <- c("cens_period_1", 
+          "cens_period_2", 
+          "cens_period_1", 
+          "cens_period_2")[run_index]
+
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)

@@ -10,6 +10,12 @@ library(tibble)
 
 script <- "/home/amh2389/medicaid/low-back-therapies/scripts/01_analysis/01_lmtp.R"
 
+### Parameters to modify -------------------------
+
+run_index <- 4 # rerun for 1,2,3,4
+
+### ----------------------------------------------
+
 # args <- commandArgs(TRUE)
 
 # subset 1 is non-OUD group. subset 2 is OUD group
@@ -35,16 +41,14 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- "oud_period_2"
-cens <- "cens_period_2"
-# "oud_period_2", "cens_period_2", # 1
-# "oud_period_4", "cens_period_4", # 2 
-# "oud_hillary_period_2", "cens_hillary_period_2", # 3
-# "oud_hillary_period_4", "cens_hillary_period_4", # 4
-# "outcome_chronic_pain_period_2", "cens_chronic_pain_period_2", # 5
-# "outcome_chronic_pain_period_4", "cens_chronic_pain_period_4", # 6
-# "outcome_prolonged_opioid_use", "cens_prolonged_opioid_period_4",
-# "outcome_chronic_opioid_therapy", "cens_chronic_opioid_period_4"
+Y <- c("oud_period_1", 
+       "oud_period_2", 
+       "oud_hillary_period_1", 
+       "oud_hillary_period_2")[run_index]
+cens <- c("cens_period_1", 
+          "cens_period_2", 
+          "cens_period_1", 
+          "cens_period_2")[run_index]
 
 # Execute for non-OUD subgroup ---------------------------------
 

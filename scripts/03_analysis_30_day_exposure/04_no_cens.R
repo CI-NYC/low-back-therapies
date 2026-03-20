@@ -16,6 +16,8 @@ library(dplyr)
 set.seed(1)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
+### Uncomment whichever cohort is relevant to your current run -----------------
+
 # # regular cohort and results directory
 # data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final")) 
 # version <- "opioid_categorized"
@@ -38,8 +40,16 @@ sl <- list("glm", "lightgbm",
         list("cv_glmnet", alpha = 1))
 
 SL_folds <- 2
-Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
-cens <- c("cens_period_1", "cens_period_2", "cens_period_1", "cens_period_2")[run_index]
+
+Y <- c("oud_period_1", 
+       "oud_period_2", 
+       "oud_hillary_period_1", 
+       "oud_hillary_period_2")[run_index]
+cens <- c("cens_period_1", 
+          "cens_period_2", 
+          "cens_period_1", 
+          "cens_period_2")[run_index]
+
 print(paste0("no_cens; ", ", Version: ", version, ", ", paste(Y)))
 
 data_n_oud <- data |> filter(subset_oud == 0)

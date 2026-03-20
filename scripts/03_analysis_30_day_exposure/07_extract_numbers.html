@@ -434,7 +434,7 @@ read_relr &lt;- function(Y, intervention1, intervention2) {
   })
 }
 
-read_relr_no_cens &lt;- function(Y, intervention1, intervention2) {
+read_relr_no_cens &lt;- function(Y, intervention1) {
   map_dfr(A, function(treatment) {
     diff &lt;- file.path(drv_root, &quot;analysis&quot;, version,
                       glue(&quot;fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds&quot;)) |&gt; 
@@ -473,7 +473,7 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 ## 14 exposure_opioid_&gt;50mme             121.2    102.4     141.8</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
 
-df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
+df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
 df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
@@ -481,62 +481,44 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              22.9     10.5      36.7
-##  2 exposure_anti_inflammatory           0       -4.9       5.1
-##  3 exposure_benzodiazepine             60       48.1      72.9
-##  4 exposure_chiropractic              -34.1    -41       -26.5
-##  5 exposure_duloxetine                 41.1     29.1      54.2
-##  6 exposure_gabapentin                151.6    136.2     167.9
-##  7 exposure_intervention               57.9     42.8      74.6
-##  8 exposure_muscle_relaxant            -9.5    -14        -4.8
-##  9 exposure_massage_therapy           -12.2    -14.7      -9.7
-## 10 exposure_physical_therapy          -31.7    -39.6     -22.9
-## 11 exposure_steroid                    -2.4     -9         4.7
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme     25.4     16.9      34.6
-## 13 exposure_opioid_&gt;7days_&lt;=50mme     100       84.7     116.6
-## 14 exposure_opioid_&gt;50mme             134.3    111.3     159.8</code></pre>
+##  1 exposure_acetaminophen              22       10.2      35  
+##  2 exposure_anti_inflammatory           1.3     -1.1       3.8
+##  3 exposure_benzodiazepine             50.8     40.7      61.7
+##  4 exposure_chiropractic              -31.3    -38.2     -23.6
+##  5 exposure_duloxetine                 40       28.6      52.5
+##  6 exposure_gabapentin                119.1    107.9     130.9
+##  7 exposure_intervention               56       41.6      71.9
+##  8 exposure_muscle_relaxant            -4.3     -7.1      -1.3
+##  9 exposure_massage_therapy           -11.7    -13.9      -9.5
+## 10 exposure_physical_therapy          -29      -36.8     -20.1
+## 11 exposure_steroid                    -1       -6.8       5.2
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme     12.2      5.7      19.1
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      78.9     66.6      92.2
+## 14 exposure_opioid_&gt;50mme             109.6     90.4     130.9</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
-df &lt;- read_relr_no_cens(Y, &quot;on&quot;, &quot;off&quot;)
-df</code></pre>
-<pre><code>## # A tibble: 14 × 8
-##    treatment     shift     ref  estimate std.error conf.low conf.high    p.value
-##    &lt;chr&gt;         &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-##  1 exposure_a… 0.02622 0.02266  0.1570     0.04532  0.05869  0.2645   1.290e-  3
-##  2 exposure_a… 0.02276 0.02266  0.004634   0.01069 -0.01619  0.02590  6.653e-  1
-##  3 exposure_b… 0.03344 0.02266  0.4757     0.03024  0.3908   0.5659   6.709e- 38
-##  4 exposure_c… 0.01729 0.02266 -0.2370     0.03886 -0.2929  -0.1766   3.378e- 12
-##  5 exposure_d… 0.02978 0.02266  0.3142     0.04000  0.2152   0.4214   8.365e- 12
-##  6 exposure_g… 0.04702 0.02266  1.075      0.02314  0.9829   1.171    1.928e-218
-##  7 exposure_i… 0.03100 0.02266  0.3681     0.03937  0.2665   0.4778   1.724e- 15
-##  8 exposure_m… 0.02186 0.02266 -0.03514    0.01337 -0.06009 -0.009520 7.462e-  3
-##  9 exposure_m… 0.02148 0.02266 -0.05214    0.01109 -0.07252 -0.03132  1.363e-  6
-## 10 exposure_p… 0.01501 0.02266 -0.3375     0.05320 -0.4031  -0.2647   9.968e- 15
-## 11 exposure_s… 0.02174 0.02266 -0.04059    0.02730 -0.09058  0.01214  1.290e-  1
-## 12 exposure_o… 0.02472 0.02266  0.09091    0.02649  0.03571  0.1491   1.022e-  3
-## 13 exposure_o… 0.03954 0.02266  0.7452     0.02986  0.6460   0.8504   1.295e- 77
-## 14 exposure_o… 0.04522 0.02266  0.9959     0.04247  0.8364   1.169    1.554e- 59</code></pre>
-<pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
-
-df &lt;- read_relr_no_cens(Y, &quot;on&quot;, &quot;off&quot;)
-df</code></pre>
-<pre><code>## # A tibble: 14 × 8
-##    treatment      shift     ref estimate std.error conf.low conf.high    p.value
-##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-##  1 exposure_a… 0.01745  0.01431  0.2196    0.05183  0.1018    0.3500  1.282e-  4
-##  2 exposure_a… 0.01450  0.01431  0.01294   0.01229 -0.01117   0.03763 2.956e-  1
-##  3 exposure_b… 0.02158  0.01431  0.5081    0.03554  0.4066    0.6169  6.660e- 31
-##  4 exposure_c… 0.009831 0.01431 -0.3131    0.05432 -0.3825   -0.2360  4.682e- 12
-##  5 exposure_d… 0.02004  0.01431  0.4003    0.04338  0.2861    0.5246  8.477e- 15
-##  6 exposure_g… 0.03135  0.01431  1.191     0.02676  1.079     1.309   8.392e-189
-##  7 exposure_i… 0.02233  0.01431  0.5603    0.04940  0.4163    0.7189  2.137e- 19
-##  8 exposure_m… 0.01370  0.01431 -0.04274   0.01546 -0.07132  -0.01329 4.722e-  3
-##  9 exposure_m… 0.01264  0.01431 -0.1170    0.01275 -0.1388   -0.09469 1.659e- 22
-## 10 exposure_p… 0.01017  0.01431 -0.2896    0.06003 -0.3685   -0.2009  1.223e-  8
-## 11 exposure_s… 0.01417  0.01431 -0.01017   0.03089 -0.06832   0.05161 7.407e-  1
-## 12 exposure_o… 0.01606  0.01431  0.1222    0.03046  0.05719   0.1913  1.533e-  4
-## 13 exposure_o… 0.02561  0.01431  0.7893    0.03658  0.6655    0.9223  5.696e- 57
-## 14 exposure_o… 0.03000  0.01431  1.096     0.04917  0.9038    1.309   3.271e- 51</code></pre>
+df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
+df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))</code></pre>
+<pre><code>## # A tibble: 14 × 4
+##    treatment                       estimate conf.low conf.high
+##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 exposure_acetaminophen              15.7      5.9      26.5
+##  2 exposure_anti_inflammatory           0.5     -1.6       2.6
+##  3 exposure_benzodiazepine             47.6     39.1      56.6
+##  4 exposure_chiropractic              -23.7    -29.3     -17.7
+##  5 exposure_duloxetine                 31.4     21.5      42.1
+##  6 exposure_gabapentin                107.5     98.3     117.1
+##  7 exposure_intervention               36.8     26.6      47.8
+##  8 exposure_muscle_relaxant            -3.5     -6        -1  
+##  9 exposure_massage_therapy            -5.2     -7.3      -3.1
+## 10 exposure_physical_therapy          -33.8    -40.3     -26.5
+## 11 exposure_steroid                    -4.1     -9.1       1.2
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme      9.1      3.6      14.9
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      74.5     64.6      85  
+## 14 exposure_opioid_&gt;50mme              99.6     83.6     116.9</code></pre>
 
 
 

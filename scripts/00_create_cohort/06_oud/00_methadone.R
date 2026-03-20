@@ -4,6 +4,7 @@
 # Purpose: Identify MOUD methadone periods
 # Notes: 
 #   - Methadone tablets are considered a 1 day use
+#   - 3 week (21 day) grace period is used
 # -------------------------------------
 
 library(arrow)
@@ -47,7 +48,7 @@ otl_methadone <-
   fsubset((LINE_PRCDR_CD == "S0109" & STATE_CD == "IA" & year(LINE_SRVC_BGN_DT) == 2016) | 
             LINE_PRCDR_CD != "S0109") |> 
   fmutate(moud_start_dt = LINE_SRVC_BGN_DT, 
-          moud_end_dt = moud_start_dt) |> 
+          moud_end_dt = moud_start_dt + 21) |> 
   fselect(BENE_ID, moud_start_dt, moud_end_dt)
 
 # # - Save all moud periods for the initial cohort

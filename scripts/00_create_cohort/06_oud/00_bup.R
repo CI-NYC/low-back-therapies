@@ -3,6 +3,7 @@
 # Author: Nick Williams
 # Purpose: Identify MOUD buprenorphine periods
 # Notes:
+#   - 3 week (21 day) grace period is used
 # -------------------------------------
 
 library(arrow)
@@ -49,7 +50,7 @@ rxl_buprenorphine <-
           strength_per_day = strength * pills_per_day) |> 
   fsubset(check == 0 | 
             (check == 1 & strength_per_day >= 10 & strength_per_day < 50)) |> 
-  fmutate(moud_end_dt = RX_FILL_DT + days(DAYS_SUPPLY)) |> 
+  fmutate(moud_end_dt = RX_FILL_DT + days(DAYS_SUPPLY - 1 + 21)) |> 
   fselect(BENE_ID, moud_start_dt = RX_FILL_DT, moud_end_dt) |> 
   funique()
 
@@ -86,11 +87,11 @@ otl_ndc_bup <-
       # - buprenorphine injections have a 30 days supply
       fsubset(otl_ndc_bup, form == "injection") |> 
         fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT) |> 
-        fmutate(moud_end_dt = moud_start_dt + 30), 
+        fmutate(moud_end_dt = moud_start_dt + 29 + 21), 
       # - BUP-NX, assuming 1 day supply
       fsubset(otl_ndc_bup, form %in% c("tablet","film") & check == 0) |>
         fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT) |> 
-        fmutate(moud_end_dt = moud_start_dt), 
+        fmutate(moud_end_dt = moud_start_dt + 21), 
       # - only keep buprenorphine that are used for the treatment of moud
       fsubset(otl_ndc_bup, form %in% c("tablet","film") & check == 1) |> 
         fmutate(strength_times_quantity = fifelse(NDC_UOM_CD == "UN", strength * NDC_QTY, strength)) |> 
@@ -98,7 +99,7 @@ otl_ndc_bup <-
         fsummarize(strength_per_day = sum(strength_times_quantity)) |> 
         fsubset(strength_per_day >= 10) |> 
         fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT) |>
-        fmutate(moud_end_dt =  moud_start_dt)
+        fmutate(moud_end_dt =  moud_start_dt + 21)
     )
   ) |> 
   funique()
@@ -131,9 +132,9 @@ otl_hcpcs_bup <-
   ) |> 
   fselect(BENE_ID, moud_start_dt = LINE_SRVC_BGN_DT, form) |> 
   fmutate(moud_end_dt = fcase(
-    form == "implant", moud_start_dt + 182,
-    form == "injection", moud_start_dt + 30,
-    form == "tablet", moud_start_dt 
+    form == "implant", moud_start_dt + 21 + 182,
+    form == "injection", moud_start_dt + 21 + 30,
+    form == "tablet", moud_start_dt + 21
   )) |> 
   fselect(-form) |> 
   funique()

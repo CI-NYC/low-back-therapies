@@ -31,7 +31,7 @@ nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_na
 cohort <- as_tibble(cohort)
 
 start_periods <- (0:(num_periods - 1)) * (follow_up_period_length) + 1 # +1 because the first day is exposure end_dt, and we want non-overlapping periods.
-end_periods   <- start_periods + follow_up_period_length - 1 # -1 because the bookends should both be included in the period length
+end_periods   <- start_periods + follow_up_period_length - 1 # -1 because the follow_up_period_length is meant to be inclusive of the bookends
 
 # Build interval list
 periods <- lapply(seq_len(num_periods), function(i) {
