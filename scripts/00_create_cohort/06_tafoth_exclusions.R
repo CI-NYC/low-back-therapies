@@ -37,7 +37,7 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_
 
 # Load icd codes
 codes <- read_yaml(file.path(home_dir, "data/public/icd_codes.yml"))
-codes_inpatient <- c(13, 21, 32, 24, 55, 31, 09, 41)
+codes_inpatient <- c(13, 21, 32, 24, 55, 31, 09, 51)
 
 # Read in OTH dataset
 oth <- open_oth()

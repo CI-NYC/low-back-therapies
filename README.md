@@ -20,28 +20,101 @@ Raw data not included due to privacy restrictions.
 
 ---
 
-## Who is included in the cohort?
+## Eligibility criteria
+
+Washout period: 6 months
 
 Patients included in this cohort have an ICD-10 diagnosis code for low back pain, defined as one of the following codes found in the other services file, excluding those diagnosed in an inpatient or residential setting. See [here](scripts/00_create_cohort/00_filter_diagnosis_claims.R).
 
-Patients must receive pain treatment within 1 month of diagnosis. [Pharmacologic treatments](scripts/00_create_cohort/03_treatment_dts/04_nonopioid_pain_rx.R) include acetaminophen, anti-inflammatories, benzodiazepines, gabapentinoids, duloxetine, muscle relaxants, steroids, and [opioid analgesics](scripts/00_create_cohort/03_treatment_dts/03_cohort_mme_join.R) (excluding opioid formulations indicated for OUD treatment). [Non-pharmacologic treatments](scripts/00_create_cohort/03_treatment_dts/05_non_pharmacologic.R) include chiropractic therapy, physical therapy, massage therapy, and other interventions including ablative techniques, botulism toxin injections, electrical nerve stimulation, intrathecal drug therapies, epidural steroids, and minimally invasive spinal procedures. In the primary analysis, treatments are collected from day 0 (first treatment date) to day 30. Sensitivity analyses are also conducted, re-defining the initial treatment period to be all treatments within 30/7 day gaps, up until a max of 3 months.
+Patients must receive pain treatment within 1 month of diagnosis. [Pharmacologic treatments](scripts/00_create_cohort/03_treatment_dts/04_nonopioid_pain_rx.R) include acetaminophen, anti-inflammatories, benzodiazepines, gabapentinoids, duloxetine, muscle relaxants, steroids, and [opioid analgesics](scripts/00_create_cohort/03_treatment_dts/03_cohort_mme_join.R) (excluding opioid formulations indicated for OUD treatment). [Non-pharmacologic treatments](scripts/00_create_cohort/03_treatment_dts/05_non_pharmacologic.R) include chiropractic therapy, physical therapy, massage therapy, and other interventions including ablative techniques, botulism toxin injections, electrical nerve stimulation, intrathecal drug therapies, epidural steroids, and minimally invasive spinal procedures.
 
 Participants must be continuously enrolled in Medicaid for the 6-month washout period ([here](scripts/00_create_cohort/04_01_filter_continuous_enrollment.R) and [here](scripts/00_create_cohort/04_02_filter_continuous_enrollment.R)) and be [opioid-naive](scripts/00_create_cohort/05_opioid_naive_exclusions.R) in the washout period.
 
 Participants are also excluded if they were diagnosed with any other pain condition during the 3 months preceding day 0, or having any history of: OUD diagnosis, overdose, medication for treating OUD, opioid prescription, pregnancy, dual eligibility for Medicaid and Medicare, cancer, or institutionalization.
 
-The final dataset includes [14 exposure columns](scripts/00_create_cohort/05_exposure/09_combine_exposures.R), a binary column for each of the treatments above, with opioid further specified as Opioid <= 7 days supply and <= 50mme, Opioid > 7 days and <= 50mme, or Opioid > 50mme. 
+---
 
-Exposure columns: 
+## Exposures
 
+Exposure period: 1 month (3 months for sensitivity analysis)
 
-The outcome was [new OUD and overdose diagnosis](scripts/00_create_cohort/06_outcomes/01_oud.R), evaluated during months 2-7 (6 months of follow-up, *period 1*) and 2-13 (12 months of follow-up, *period 2*). Individuals were censored ([here](scripts/00_create_cohort/06_outcomes/05_getting_enrollment_dates.R), [here](scripts/00_create_cohort/06_outcomes/06_censoring_enrollment.R) and [here](scripts/00_create_cohort/06_outcomes/07_censoring_combined.R)) at loss of Medicaid enrollment, Medicare eligibility, death (if recorded), or December 31, 2019.
+In the primary analysis, treatments are measured from day 0 (first treatment date) to day 30. Sensitivity analyses are also conducted, re-defining the initial treatment period to be all treatments within 30/7 day gaps, up until a max of 3 months.
+
+The final dataset includes [14 exposure columns](scripts/00_create_cohort/05_exposure/09_combine_exposures.R), a binary column for each of the treatments outlined in [Eligibility criteria](#eligibility-criteria), with opioid further specified as Opioid <= 7 days supply and <= 50mme, Opioid > 7 days and <= 50mme, or Opioid > 50mme. 
+
+#### Example exposure columns: 
+
+| BENE_ID | exposure_benzodiazepine | exposure_gabapentin | exposure_duloxetine | exposure_anti_inflammatory | exposure_muscle_relaxant | exposure_physical_therapy | exposure_steroid | exposure_intervention | exposure_chiropractic | exposure_massage_therapy | exposure_acetaminophen | exposure_opioid_>7days_<=50mme | exposure_opioid_<=7days_<=50mme | exposure_opioid_>50mme |
+|-----|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| aa  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |
+| bb  | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| cc  | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 1 | 0 | 0 |
+| dd  | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+
+---
+
+## Outcome
+
+Outcome periods: 6 and 12 months
+
+The outcome was [new OUD and overdose diagnosis](scripts/00_create_cohort/06_outcomes/01_oud.R), evaluated during months 2-7 (period 1) and 2-13 (period 2). OUD was measured as the presence of an ICD-10 diagnosis code for OUD or opioid overdose, or a prescription fill for MOUD (buprenorphine, methadone, naltrexone)
+
+Individuals were censored ([here](scripts/00_create_cohort/06_outcomes/05_getting_enrollment_dates.R), [here](scripts/00_create_cohort/06_outcomes/06_censoring_enrollment.R) and [here](scripts/00_create_cohort/06_outcomes/07_censoring_combined.R)) at loss of Medicaid enrollment, Medicare eligibility, death (if recorded), or December 31, 2019.
  
-Outcome columns:
+#### Example outcome columns:
+
+| BENE_ID | oud_period_1 | oud_period_2 | cens_period_1 | cens_period_2 | 
+|-----|----|----|---|---|
+| aa  | 0  | 1  | 1 | 1 |
+| bb  | 0  | NA | 1 | 0 |
+| cc  | 1  | NA | 1 | 0 |
+| dd  | 0  | 0  | 1 | 1 |
+| ee  | NA | NA | 0 | 0 |
+
+---
+
+## Baseline covariates
 
 [Baseline covariates](scripts/00_create_cohort/08_baseline_covariates.R) are collected during the 6-month washout period for age, sex, race and ethnicity, primary language, marital status, household size, veteran status, income category, whether or not they received Temporary Assistance for Needy Families (TANF) benefits or Disability Insurance (SSDI) benefits. Clinical covariates included alcohol use disorder, other substance use disorder, and any inpatient or outpatient diagnosis of psychiatric disorders including diagnoses of bipolar disorder, anxiety disorder, major depressive disorder, attention-deficit/hyperactivity disorder, or other psychiatric disorder, and whether they received any mental health counseling. Health system utilization measures included the number of inpatient hospitalizations, outpatient visits, and emergency department visits during the washout period.
 
-Covariates:
+#### Covariate columns:  
+
+  "dem_age",  
+  "dem_sex_m",  
+  "dem_race_aian",  
+  "dem_race_asian",  
+  "dem_race_black",  
+  "dem_race_hawaiian",  
+  "dem_race_hispanic",  
+  "dem_race_multiracial",  
+  "dem_primary_language_english",  
+  "dem_married_or_partnered",  
+  "dem_household_size_2",  
+  "dem_household_size_2plus",  
+  "dem_veteran",   
+  "dem_probable_high_income",  
+  "dem_tanf_benefits",   
+  "dem_ssi_benefits_mandatory_optional",  
+  "bipolar_washout_cal",  
+  "anxiety_washout_cal",  
+  "adhd_washout_cal",  
+  "depression_washout_cal",  
+  "mental_ill_washout_cal",  
+  "counseling_washout_cal",  
+  "sud_alcohol_washout_cal",  
+  "sud_other_washout_cal",  
+  "num_iph_washout_cal",  
+  "num_oth_washout_cal",  
+  "n_ED_visits_0_washout_cal",  
+  "n_ED_visits_1_washout_cal",  
+  "n_ED_visits_3_washout_cal",  
+  "missing_dem_race",  
+  "missing_dem_primary_language_english",  
+  "missing_dem_married_or_partnered",  
+  "missing_dem_household_size",  
+  "missing_dem_veteran",  
+  "missing_dem_tanf_benefits",  
+  "missing_dem_ssi_benefits"
 
 ---
 
@@ -58,7 +131,7 @@ Steps for reproducing the workflow:
 
 4. Here are the details for the different scripts in the analysis directory:
 
-| Script | Modifiable parameters &nbsp;&nbsp; | Description |
+| Script | Modifiable parameters &nbsp;&nbsp;&nbsp; | Description |
 |-----------|----------|-----------|
 | run_main_on | run_index <- 1 | Estimate relative risk of incident OUD over **6** months of follow-up hypothetically **adding a treatment** to initial treatment combination and no disenrollment |
 | run_main_on | run_index <- 2 | Estimate relative risk of incident OUD over **12** months of follow-up hypothetically **adding a treatment** to initial treatment combination and no disenrollment |

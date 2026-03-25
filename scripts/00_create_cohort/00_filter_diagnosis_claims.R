@@ -19,7 +19,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 oth <- open_oth()
 iph <- open_iph()
 
-codes_inpatient <- c(13, 21, 32, 24, 55, 31, 09, 41)
+codes_inpatient <- c(13, 21, 32, 24, 55, 31, 09, 51)
 
 # codes for low back pain, based on search terms
 diagnosis_icds <- read.csv(file.path(home_dir, "data/public/chronic_pain_icd10_20230216.csv")) |>
