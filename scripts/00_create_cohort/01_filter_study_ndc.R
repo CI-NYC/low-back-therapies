@@ -21,7 +21,7 @@ rxl <- open_rxl()
 otl <- open_otl()
 
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |> as.data.table()
-cohort[, let(exposure_end_dt = pain_diagnosis_dt + days(90))] # because diagnosis dt is included in exposure period, total length = 91 days
+cohort[, let(exposure_end_dt = diagnosis_dt + days(121))] # because diagnosis dt is included in exposure period, total length = 91 days
 
 # OTL ---------------------------------------------------------------------
 
@@ -61,4 +61,4 @@ study_ndc <-
   unique() |> 
   na.omit()
 
-write_data(study_ndc, "study_period_unique_ndc.fst", file.path(drv_root, "exclusion"))
+write_data(study_ndc, "study_period_unique_ndc.fst", file.path(home_dir, "data/public"))

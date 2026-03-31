@@ -15,7 +15,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 demo <- open_demo()
 
 # load cohort
-cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root, "exclusion"))
 
 probable_income <- load_data("probable_high_income_cal.fst", file.path(drv_root, "exclusion"))
 
@@ -114,10 +114,42 @@ cohort <-
          starts_with("outcome")
         )
 
-write_data(cohort, "pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+write_data(cohort, "pain_cohort.fst", file.path(drv_root, "final"))
 
 
 
 
 
 
+rm(cohort)
+### 7 day gap
+
+cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes_7day_gap.fst", file.path(drv_root, "exclusion")) |>
+  select(BENE_ID, 
+         ends_with("dt", ignore.case = FALSE),
+         starts_with("dem"),
+         starts_with("exposure"),
+         starts_with("subset"),
+         starts_with("cens"),
+         starts_with("oud"),
+         starts_with("outcome")
+  )
+
+dem <- load_data("pain_cohort.fst", file.path(drv_root, "final")) |>
+  select(BENE_ID, 
+         starts_with("dem"))
+
+cohort <- cohort |>
+  left_join(dem) |>
+  select(BENE_ID, 
+         ends_with("dt", ignore.case = FALSE),
+         starts_with("dem"),
+         starts_with("exposure"),
+         starts_with("subset"),
+         starts_with("cens"),
+         starts_with("oud"),
+         starts_with("outcome")
+         )
+
+write_data(cohort, "pain_cohort_7day_gap.fst", file.path(drv_root, "final"))
+ 

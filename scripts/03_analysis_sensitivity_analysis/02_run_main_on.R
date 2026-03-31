@@ -8,7 +8,7 @@
 library(callr)
 library(tibble)
 
-script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_30_day_exposure/01_lmtp.R"
+script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_sensitivity_analysis/01_lmtp.R"
 
 ### Parameters to modify -------------------------
 

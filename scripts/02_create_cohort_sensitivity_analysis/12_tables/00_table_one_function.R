@@ -4,7 +4,9 @@ library(tidyverse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+
+data_7day_gap <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
 
 # opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
 #   select(BENE_ID, treatment_start_dt, opioid, dose_form)
@@ -221,7 +223,7 @@ table_one_function <- function(df){
                     paste0("\\hspace{0.5cm}", c("0", "1-25", "26+")),
                     # "Prescriptions",
                     # paste0("\\hspace{0.5cm}", c("0", "1-10", "11-20", "21-30", "31+")),
-                    "\\textbf{Treatments (month 1)}",
+                    "\\textbf{Treatments (months 1-3)}",
                     "Acetaminophen",
                     # "Acupuncture",
                     "Anti-inflammatory",
@@ -242,9 +244,9 @@ table_one_function <- function(df){
                     "\\hspace{0.5cm}$>50$ MME",
                     # "\\hspace{0.5cm}Max daily MME",
                     # "\\hspace{0.5cm}Days supply",
-                    "\\textbf{Outcomes (months 2-13)}",
-                    "OUD by 7 months",
-                    "OUD by 13 months",
+                    "\\textbf{Outcomes (months 3-15)}",
+                    "OUD by 9 months",
+                    "OUD by 15 months",
                     # "OUD (ICD only) by 9 months",
                     # "OUD (ICD only) by 15 months",
                     # "At least monthly opioid prescribing",
@@ -252,8 +254,8 @@ table_one_function <- function(df){
                     # "Chronic LBP by 9 months",
                     # "Chronic LBP by 15 months",
                     "\\textbf{Censoring}",
-                    "Uncensored through 7 months",
-                    "Uncensored through 13 months"
+                    "Uncensored through 9 months",
+                    "Uncensored through 15 months"
                     # "Uncensored (OUD ICD-only) throughout entire study period",
                     # "Uncensored (POU) throughout entire study period",
                     # "Uncensored (COT) throughout entire study period",

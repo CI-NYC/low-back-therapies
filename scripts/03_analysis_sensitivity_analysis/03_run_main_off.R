@@ -8,7 +8,7 @@
 library(callr)
 library(tibble)
 
-script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_30_day_exposure/01_lmtp.R"
+script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_sensitivity_analysis/01_lmtp.R"
 
 ### Parameters to modify -------------------------
 
@@ -49,7 +49,6 @@ cens <- c("cens_period_1",
           "cens_period_2", 
           "cens_period_1", 
           "cens_period_2")[run_index]
-
 
 # Execute for non-OUD subgroup ---------------------------------
 

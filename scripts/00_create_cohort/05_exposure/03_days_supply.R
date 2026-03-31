@@ -17,11 +17,11 @@ library(collapse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   right_join(cohort) |> # keep people who passed enrollment criteria in the cohort
-  filter(treatment_start_dt <= last_treatment_dt) |>
+  filter(treatment_start_dt <= exposure_end_dt) |>
   arrange(BENE_ID, treatment_start_dt) |> 
   mutate(treatment_end_dt = pmin(treatment_end_dt + 1, exposure_end_dt)) |>
   select(BENE_ID, rx_start=treatment_start_dt, rx_end=treatment_end_dt)
@@ -64,4 +64,4 @@ opioids <-
   funique() |>
   fmutate(exposure_days_supply = pmax(days, 1)) # sometimes, the only opioid is prescribed on the last day of the period. as.duration would return a days supply of 0, so I am manually converting these to 1.
 
-write_data(opioids, "exposure_days_supply.fst", file.path(drv_root, "treatment"))
+write_data(opioids, "exposure_days_supply.fst", file.path(drv_root_30_day_treatment, "modified_variables"))

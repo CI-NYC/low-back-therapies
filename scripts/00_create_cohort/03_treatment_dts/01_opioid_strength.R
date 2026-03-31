@@ -20,7 +20,7 @@ library(arrow)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-ndc <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
+ndc <- readRDS(file.path(home_dir, "data/public/ndc_to_atc_crosswalk.rds"))
 codes <- read_yaml("~/medicaid/low-back-therapies/data/public/drug_codes.yml")
 
 # find opioid ndcs --------------------------------------------------------
@@ -36,7 +36,7 @@ opioids <- ndc[opioid_flag]
 
 # filter rxl and otl files ------------------------------------------------
 
-opioids <- readRDS("~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids.rds")
+opioids <- readRDS(file.path(home_dir, "data/public/ndc_to_atc_opioids.rds"))
 local <- FALSE
 
 plan(multisession)
@@ -50,4 +50,4 @@ opioids[, dose_form := future_map_chr(opioids$rxcui, get_dose_form, local_host =
 
 plan(sequential)
 
-saveRDS(opioids, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_opioids_with_strength.rds")
+saveRDS(opioids, file.path(home_dir, "data/public/ndc_to_atc_opioids_with_strength.rds"))

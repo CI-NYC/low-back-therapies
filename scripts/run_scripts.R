@@ -6,15 +6,16 @@ setwd("~/medicaid/low-back-therapies/scripts/00_create_cohort")
 
 
 job_groups <- list(
-  # group1 = paste0("03_treatment_dts/", c("03_cohort_mme_join.R","04_nonopioid_pain_rx.R","05_non_pharmacologic.R")),
-  # group2 = paste0("03_treatment_dts/", c("06_compute_treatment_dts.R","06_compute_treatment_dts_7_day_gap.R")),
-  # group3 = "03_treatment_dts/07_finalize_treatment_dts.R"
-  # group4 = "04_01_filter_continuous_enrollment.R",
-  # group5 = "04_02_filter_continuous_enrollment.R",
-  # group6 = paste0("05_exposure/", c("03_days_supply.R", "03_days_supply_7day.R")),
-  # group6 = "05_exposure/04_max_mme.R",
-  # group7 = "05_exposure/04_max_mme_7day.R",
-  # group8 = "05_exposure/09_combine_exposures.R",
+  group00 = "00_filter_diagnosis_claims.R",
+  group0 = "01_filter_study_ndc.R",
+  group1 = paste0("03_treatment_dts/", c("03_cohort_mme_join.R","04_nonopioid_pain_rx.R","05_non_pharmacologic.R")),
+  group2 = paste0("03_treatment_dts/", c("06_compute_treatment_dts.R","06_compute_treatment_dts_7_day_gap.R")),
+  group3 = "03_treatment_dts/07_finalize_treatment_dts.R",
+  group4 = "04_01_filter_continuous_enrollment.R",
+  group5 = "04_02_filter_continuous_enrollment.R",
+  group6 = "05_exposure/01_modify_exposure_end_dt.R",
+  group7 = paste0("05_exposure/", c("03_days_supply.R", "04_max_mme.R")),
+  group8 = "05_exposure/09_combine_exposures.R",
   # group9 = c("05_opioid_naive_exclusions.R","05_other_pain_exclusions.R"),
   # group10 = paste0("06_oud/", c("00_bup.R", "00_hillary.R", "00_methadone.R")),
   # group11 = paste0("06_oud/", c("00_naltrexone.R", "00_poison.R", "00_misuse/00_study_pain_opioids.R")),
@@ -32,7 +33,7 @@ job_groups <- list(
   # group23 = paste0("10_comorbidity/", c("01_adhd.R", "02_anxiety.R", "03_bipolar.R")),
   # group24 = paste0("10_comorbidity/", c("04_depression.R", "05_mental_illness.R")),
   # group25 = c("10_combine_cohort.R"),
-  group26 = c("11_clean_impute_analysis_data.R", "11_clean_impute_analysis_data_7day_gap.R")
+  # group26 = c("11_clean_impute_analysis_data.R", "11_clean_impute_analysis_data_7day_gap.R")
   # group27 = "12_tables/01_finalize_table_one.R"
 )
 
@@ -83,7 +84,7 @@ run_jobs_future <- function(groups, log_dir = "../logs") {
 }
 
 
-plan(multisession, workers = 3)
+plan(multisession, workers = 4)
 
 tryCatch(
   run_jobs_future(job_groups),

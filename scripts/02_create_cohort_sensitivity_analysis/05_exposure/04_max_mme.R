@@ -16,17 +16,17 @@ library(doFuture)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # load cohort and opioid data
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   right_join(cohort) |> # keep people who passed enrollment criteria in the cohort
-  filter(treatment_start_dt <= exposure_end_dt) |>
+  filter(treatment_start_dt <= last_treatment_dt) |>
   mutate(treatment_end_dt = as.Date(pmin(treatment_end_dt, exposure_end_dt)))
 
 setDT(opioids)
 setkey(opioids, BENE_ID)
 
-opioids <- opioids[, .(BENE_ID, day0_dt, 
+opioids <- opioids[, .(BENE_ID, day0_dt, last_treatment_dt, 
                        treatment_start_dt, treatment_end_dt, NDC, opioid, mme_strength_per_day)]
 
 # Calculate max daily dose -----------------------------------------------------
@@ -64,4 +64,4 @@ testthat::test_that(
   testthat::expect_false(any(is.na(out$exposure_max_daily_dose_mme)))
 )
 
-write_data(out, "exposure_max_daily_dose_mme.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
+write_data(out, "exposure_max_daily_dose_mme.fst", file.path(drv_root, "treatment"))

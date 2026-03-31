@@ -16,7 +16,7 @@ library(dplyr)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load washout dates
-washout <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables")) |> 
+washout <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |> 
   mutate(study_end_dt = exposure_end_dt + num_periods*follow_up_period_length) |>
   as.data.table()
 
@@ -63,6 +63,6 @@ chunks <- split_list_into_chunks(tmp, 1e5)
 
 # Save each chunk to a separate RDS file
 for (i in seq_along(chunks)) {
-  file_name <- paste0(drv_root_30_day_treatment, "/modified_variables/tmp_post_exposure/enrollment_period_chunk_", sprintf("%02d", i), ".rds")
+  file_name <- paste0(drv_root, "/outcome/tmp_post_exposure/enrollment_period_chunk_", sprintf("%02d", i), ".rds")
   saveRDS(tmp[chunks[[i]]], file = file_name)
 }

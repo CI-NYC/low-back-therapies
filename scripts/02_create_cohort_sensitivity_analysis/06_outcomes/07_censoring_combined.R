@@ -14,7 +14,7 @@ library(yaml)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts.fst"), file.path(drv_root_30_day_treatment, "modified_variables"))
+cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts.fst"), file.path(drv_root, "exclusion"))
 
 # codes for dual eligibility
 codes <- read_yaml(file.path(home_dir, "data/public/eligibility_codes.yml"))
@@ -128,7 +128,7 @@ dual_cens2 <-
   mutate(across(starts_with("dual_elig2_cens"), replace_na)) |> 
   select(BENE_ID, starts_with("dual_elig2_cens"))
 
-enrollment_cens <- load_data("cens_enrollment_by_period.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
+enrollment_cens <- load_data("cens_enrollment_by_period.fst", file.path(drv_root, "outcome"))
 
 cens <- 
   list(
@@ -149,4 +149,4 @@ cens <-
 cens <- mutate(cens, across(starts_with("cens"), \(x) ifelse(x == 0, 1, 0)))
 
 cens[is.na(cens)] <- 0
-write_data(cens, paste0("pain_washout_continuous_enrollment_censoring.fst"), file.path(drv_root_30_day_treatment, "modified_variables"))
+write_data(cens, paste0("pain_washout_continuous_enrollment_censoring.fst"), file.path(drv_root, "outcome"))

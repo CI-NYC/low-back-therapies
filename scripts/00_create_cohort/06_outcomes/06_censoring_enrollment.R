@@ -18,10 +18,10 @@ library(lmtp)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # Load temporary files from 01_01_filter_continuous_enrollment.R
-files <- file.path(drv_root, "outcome/tmp_post_exposure") |>
+files <- file.path(drv_root_30_day_treatment, "modified_variables/tmp_post_exposure") |>
   list.files(full.names = TRUE)
 
-washout <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |>
+washout <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables")) |>
   select(BENE_ID, exposure_end_dt) |>
   as.data.table()
 
@@ -55,7 +55,7 @@ for (i in seq_along(files)) {
   write_data(
     dt,
     paste0("all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_", sprintf("%02d", i), ".fst"),
-    file.path(drv_root, "outcome")
+    file.path(drv_root_30_day_treatment, "modified_variables")
   )
 }
 
@@ -63,7 +63,7 @@ for (i in seq_along(files)) {
 results_list <- list()
 for (i in seq_along(files)){
   print(i)
-  final_df <- load_data(paste0("outcome/all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_", sprintf("%02d", i), ".fst"), drv_root)
+  final_df <- load_data(paste0("modified_variables/all_possible_enrollment_dates/combined_all_enrolled_dates_cohort_", sprintf("%02d", i), ".fst"), drv_root_30_day_treatment)
   
   results_list[[i]] <- final_df
 }
@@ -81,5 +81,5 @@ cens_enrollment_df <- bind_rows(results_list) |>
 
 write_data(
   cens_enrollment_df,
-  "cens_enrollment_by_period.fst", file.path(drv_root, "outcome")
+  "cens_enrollment_by_period.fst", file.path(drv_root_30_day_treatment, "modified_variables")
 )

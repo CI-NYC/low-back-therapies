@@ -7,7 +7,7 @@
 library(tidyverse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 adhd <- load_data("adhd.rds", file.path(drv_root, "baseline_covariates")) 
 anxiety <- load_data("anxiety.rds", file.path(drv_root, "baseline_covariates"))
 bipolar <- load_data("bipolar.rds", file.path(drv_root, "baseline_covariates"))
@@ -44,38 +44,7 @@ cohort_MH_joined <- cohort |>
          starts_with("outcome")
   )
 
-write_data(cohort_MH_joined, "pain_cohort_with_MH.fst", file.path(drv_root, "final"))
+write_data(cohort_MH_joined, "pain_cohort_with_MH.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 
 
-
-
-
-### 7 days
-rm(cohort)
-rm(cohort_MH_joined)
-
-cohort <- load_data("pain_cohort_7day_gap.fst", file.path(drv_root, "final"))
-
-cohort_MH_joined <- cohort |>
-  left_join(adhd |> select(BENE_ID, adhd_washout_cal)) |> 
-  left_join(anxiety |> select(BENE_ID, anxiety_washout_cal)) |> 
-  left_join(bipolar |> select(BENE_ID, bipolar_washout_cal)) |> 
-  left_join(depression |> select(BENE_ID, depression_washout_cal)) |>
-  left_join(mental_ill |> select(BENE_ID, mental_ill_washout_cal)) |>
-  left_join(baseline_counseling |> select(BENE_ID, counseling_washout_cal)) |>
-  left_join(substance_use_disorder) |>
-  left_join(num_inpatient_outpatient) |>
-  left_join(num_ed_visits) |>
-  select(BENE_ID, 
-         ends_with("dt", ignore.case = FALSE), 
-         starts_with("dem"),
-         ends_with("_washout_cal"),
-         starts_with("exposure"),
-         starts_with("subset"),
-         starts_with("cens"),
-         starts_with("oud"),
-         starts_with("outcome")
-  )
-
-write_data(cohort_MH_joined, "pain_cohort_with_MH_7day_gap.fst", file.path(drv_root, "final"))

@@ -4,6 +4,11 @@
 # Updated:
 # Purpose: Classify unique NDC using ATC
 # Notes: Modified from https://github.com/CI-NYC/rxnorm-paper/blob/main/scripts/00_pipeline.R
+# Steps for running this script and 03_treatment_dts/01_opioid_strength.R:
+#     1. Downloaded rxnav-in-a-box 2025-05-05 (https://lhncbc.nlm.nih.gov/RxNav/applications/RxNav-in-a-Box.html)
+#     2. Started rxnav-in-a-box container in Docker
+#     3. Execute this script (and follow with 03_treatment_dts/01_opioid_strength.R)
+# 
 # -------------------------------------
 
 library(rxnorm)
@@ -20,7 +25,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 local <- FALSE
 
 # Load list of NDCs
-ndc <- read_fst(file.path(drv_root, "exclusion/study_period_unique_ndc.fst")) |> as.data.table()
+ndc <- read_fst(file.path(home_dir, "data/public/study_period_unique_ndc.fst")) |> as.data.table()
 
 # Convert NDC -> RxCUI -> ATC
 plan(multisession, workers = 10)
@@ -97,4 +102,4 @@ rxname <- foreach(code = unclassified[, rxcui]) %dofuture% {
 
 unclassified[, rxname := rxname]
 
-saveRDS(ndc, "~/medicaid/low-back-therapies/data/public/ndc_to_atc_crosswalk.rds")
+saveRDS(ndc, file.path(home_dir, "data/public/ndc_to_atc_crosswalk.rds"))

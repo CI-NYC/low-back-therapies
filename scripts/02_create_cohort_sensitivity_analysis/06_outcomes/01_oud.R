@@ -14,7 +14,7 @@ library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables")) |>
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion")) |>
   select(BENE_ID, day0_dt, exposure_end_dt)
 
 # load component files ----------------------------------------------------
@@ -31,7 +31,7 @@ nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_na
 cohort <- as_tibble(cohort)
 
 start_periods <- (0:(num_periods - 1)) * (follow_up_period_length) + 1 # +1 because the first day is exposure end_dt, and we want non-overlapping periods.
-end_periods   <- start_periods + follow_up_period_length - 1 # -1 because the bookends should both be included in the period length
+end_periods   <- start_periods + follow_up_period_length - 1 # -1 because the follow_up_period_length is meant to be inclusive of the bookends
 
 # Build interval list
 periods <- lapply(seq_len(num_periods), function(i) {
@@ -210,5 +210,5 @@ oud_hillary <-
   select(BENE_ID, starts_with("oud_hillary_period")) |> 
   lmtp::event_locf(paste0("oud_hillary_period_", c("exposure", 1:num_periods)))
 
-write_data(oud, "pain_washout_continuous_enrollment_opioid_requirements_oud_outcomes.fst",file.path(drv_root_30_day_treatment, "modified_variables"))
-write_data(oud_hillary, "pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst",file.path(drv_root_30_day_treatment, "modified_variables"))
+write_data(oud, "pain_washout_continuous_enrollment_opioid_requirements_oud_outcomes.fst",file.path(drv_root, "outcome"))
+write_data(oud_hillary, "pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_outcomes.fst",file.path(drv_root, "outcome"))
