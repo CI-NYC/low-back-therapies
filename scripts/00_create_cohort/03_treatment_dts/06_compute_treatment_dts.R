@@ -2,7 +2,7 @@
 # Script: compute_treatment_dts_30_days
 # Author: Anton Hung
 # Updated:
-# Purpose: Looks through all treatments within 3 months of low back pain diagnosis and 
+# Purpose: Looks through all treatments within 3 months of first treatment and 
 #           identifies the cutoff date for the initial treatment period.
 #          The initial treatment period ends when there is more than a 30 day gap
 #           until the next treatment, or at the end of 3 months
@@ -31,7 +31,7 @@ nonpharma_dts <- load_data("nonpharma_dts.fst", file.path(drv_root, "treatment")
 
 treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_name) |> as.data.table()
 
-# Keep those with at least 1 treatment within the first 3 months
+# Keep those with at least 1 treatment within the first month of diagnosis
 cohort <- cohort |>
   right_join(treatments) |>
   group_by(BENE_ID) |>
