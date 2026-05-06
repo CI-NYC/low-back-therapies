@@ -13,8 +13,7 @@ library(ggplot2)
 library(data.table)
 library(showtext)
 
-font_add_google("Spline Sans", "Spline Sans")
-showtext_au
+showtext_auto()
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -98,7 +97,7 @@ read_relr <- function(Y, intervention1, intervention2) {
 
 # Plot results ------------------------------------------------------------
 
-theme_set(theme_minimal(base_family = "Spline sans", 
+theme_set(theme_minimal(base_family = "sans", 
                         base_size = 3,
                         base_line_size = 0.2,
                         base_rect_size = 0.2))
@@ -165,7 +164,7 @@ plot_diff <- function(data) {
     geom_text(
       aes(label = paste0("  ", sprintf("%.4f", estimate), "  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
-      size = 0.75, family = "Spline sans"
+      size = 0.75, family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -195,7 +194,7 @@ plot_relr <- function(data) {
       aes(label = paste0("  ", sprintf("%2.1f", estimate * 100), "%  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
       size = 0.75, 
-      family = "Spline sans"
+      family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +

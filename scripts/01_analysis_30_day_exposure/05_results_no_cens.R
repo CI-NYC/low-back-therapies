@@ -11,6 +11,9 @@ library(purrr)
 library(dplyr)
 library(ggplot2)
 library(data.table)
+library(showtext)
+
+showtext_auto()
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -95,7 +98,7 @@ read_relr <- function(Y, intervention1, intervention2) {
 
 # Plot results ------------------------------------------------------------
 
-theme_set(theme_minimal(base_family = "Spline Sans", 
+theme_set(theme_minimal(base_family = "sans", 
                         base_size = 3,
                         base_line_size = 0.2,
                         base_rect_size = 0.2))
@@ -162,7 +165,7 @@ plot_diff <- function(data) {
     geom_text(
       aes(label = paste0("  ", sprintf("%.4f", estimate), "  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
-      size = 0.75, family = "Spline Sans"
+      size = 0.75, family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -192,7 +195,7 @@ plot_relr <- function(data) {
       aes(label = paste0("  ", sprintf("%2.1f", estimate * 100), "%  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
       size = 0.75, 
-      family = "Spline Sans"
+      family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -226,22 +229,24 @@ extract_count <- function(x) {
 }
 
 # ragg::agg_png(
-#   glue("~/medicaid/low-back-therapies/figures/30_day_exposure/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff_no_cens.png"), 
+#   glue("~/medicaid/low-back-therapies/figures/30_day_exposure/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff_no_cens.png"),
 #   width = 7, height = 3.5, units = "cm", res = 600
 # )
-# 
-# read_diff(Y, "on", "off") |> 
-#   relabel() |> 
-#   filter(extract_count(cl_n_oud) > 10) |> 
-#   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |> 
-#   plot_diff()
-# 
-# dev.off()
+pdf(glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff_no_cens.pdf"), width = 7/2.54, height = 3.5/2.54)
 
-ragg::agg_pdf(
-  glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.png"), 
-  width = 7, height = 3.5, units = "cm", res = 600
-)
+print(read_diff(Y, "on", "off") |>
+  relabel() |>
+  filter(extract_count(cl_n_oud) > 10) |>
+  mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |>
+  plot_diff())
+
+dev.off()
+
+# ragg::agg_pdf(
+#   glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.png"), 
+#   width = 7, height = 3.5, units = "cm", res = 600
+# )
+pdf(glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.pdf"), width = 7/2.54, height = 3.5/2.54)
 
 print(read_relr(Y, "on", "off") |> 
   relabel() |> 
