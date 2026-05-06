@@ -11,6 +11,10 @@ library(purrr)
 library(dplyr)
 library(ggplot2)
 library(data.table)
+library(showtext)
+
+font_add_google("Spline Sans", "Spline Sans")
+showtext_au
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -19,7 +23,7 @@ data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_tre
 version <- "30_day_exposure" # primary analysis
 # run_index <- 4 # rerun for 1,2,3,4
 
-for (Y in c("oud_period_1", "oud_period_2")){
+for (Y in c("oud_period_1","oud_period_2")){
   
 # Y <- c("oud_period_1", "oud_period_2", "oud_hillary_period_1", "oud_hillary_period_2")[run_index]
 
@@ -94,7 +98,7 @@ read_relr <- function(Y, intervention1, intervention2) {
 
 # Plot results ------------------------------------------------------------
 
-theme_set(theme_minimal(base_family = "sans", 
+theme_set(theme_minimal(base_family = "Spline sans", 
                         base_size = 3,
                         base_line_size = 0.2,
                         base_rect_size = 0.2))
@@ -161,7 +165,7 @@ plot_diff <- function(data) {
     geom_text(
       aes(label = paste0("  ", sprintf("%.4f", estimate), "  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
-      size = 0.75, family = "sans"
+      size = 0.75, family = "Spline sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -191,7 +195,7 @@ plot_relr <- function(data) {
       aes(label = paste0("  ", sprintf("%2.1f", estimate * 100), "%  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
       size = 0.75, 
-      family = "sans"
+      family = "Spline sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -230,11 +234,11 @@ extract_count <- function(x) {
 # )
 pdf(glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_riskdiff.pdf"), width = 7/2.54, height = 3.5/2.54)
 
-read_diff(Y, "on", "off") |>
+print(read_diff(Y, "on", "off") |>
   relabel() |>
   filter(extract_count(cl_n_oud) > 10) |>
   mutate(treatment = forcats::fct_reorder(treatment, estimate, .desc = F)) |>
-  plot_diff()
+  plot_diff())
 
 dev.off()
 
