@@ -14,7 +14,7 @@ library(yaml)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # base cohort
-cohort <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 # Get ED visits first -- pain diagnoses later ---------------------------------
 revenue_cds <- c(paste0("045", 0:9), "0981", # Emergency department

@@ -4,7 +4,7 @@ library(lubridate)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root, "outcome"))
 

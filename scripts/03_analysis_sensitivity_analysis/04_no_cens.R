@@ -5,7 +5,6 @@
 # Notes: Run using `callr::rscript_process` with 01_run_main.R
 # -------------------------------------
 
-.libPaths(c("~/libs", .libPaths()))
 library(data.table)
 library(lmtp)
 library(mlr3superlearner)

@@ -5,7 +5,6 @@
 # Notes:
 # -------------------------------------
 
-.libPaths(c("~/libs", .libPaths()))
 library(lmtp)
 library(glue)
 library(purrr)

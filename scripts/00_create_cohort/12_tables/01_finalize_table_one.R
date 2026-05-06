@@ -11,7 +11,7 @@ oud_no_1 <- table_one_function(data |> filter(subset_oud == 0)) |>
 
 # overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[60:91,]
 oud_no_2 <- table_one_function(data |> filter(subset_oud == 0)) |>
-  slice(which(Characteristic == "\\textbf{Treatments (months 1-3)}"):which(Characteristic == "Uncensored through 15 months"))
+  slice(which(Characteristic == "\\textbf{Treatments (month 1)}"):which(Characteristic == "Uncensored through 13 months"))
 # oud_yes_2 <- table_one_function(data |> filter(subset_oud == 1))[60:91,2]
 
 

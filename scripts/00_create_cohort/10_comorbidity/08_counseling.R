@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 otl <- open_otl()
 
 # Read in cohort and dates
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 codes <- read_yaml(file.path(home_dir, "data/public/mediator_codes.yml"))
 

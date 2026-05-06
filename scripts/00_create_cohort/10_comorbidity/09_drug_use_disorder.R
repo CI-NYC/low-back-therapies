@@ -14,7 +14,7 @@ library(yaml)
 # claims data
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 # Read in OTH
 oth <- open_oth()

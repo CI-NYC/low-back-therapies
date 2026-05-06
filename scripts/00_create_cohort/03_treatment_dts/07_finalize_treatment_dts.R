@@ -16,7 +16,6 @@ library(foreach)
 library(doFuture)
 library(collapse)
 
-
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion"))

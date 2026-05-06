@@ -29,10 +29,10 @@ oth <- open_oth()
 iph <- open_iph()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
 # read in all icd bipolar codes
-bipolar_icds <- read_csv("~/medicaid/low-back-therapies/data/public/bipolar_icd10_20230323.csv", col_names = F) |>
+bipolar_icds <- read_csv(file.path(home_dir, "data/public/bipolar_icd10_20230323.csv"), col_names = F) |>
   rename(ICD9_OR_10 = X1)
 
 ############################################################################

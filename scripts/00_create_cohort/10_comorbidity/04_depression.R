@@ -1,10 +1,10 @@
 ################################################################################
 ################################################################################
-###  CREATE ANXIETY VARIABLES
-###  Shodai Inose, May 2024 (code from Kat Hoffman, March 2023)
-###  Purpose: clean TAFOTH and TAFIPH files for anxiety ICD codes
-###  Output: cleaned data file containing minimum date the beneficiary ("data/final/anxiety.rds")
-###        has a anxiety ICD code in the study duration
+###  CREATE DEPRESSION VARIABLES
+###  Kat Hoffman, March 2023
+###  Purpose: clean TAFOTH and TAFIPH files for depression ICD codes
+###  Output: cleaned data file containing minimum date the beneficiary ("data/final/depression.rds")
+###        has a depression ICD code in the study duration
 ###         and indicators of whether it occurs in washout or overall study duration
 ################################################################################
 ################################################################################
@@ -28,40 +28,38 @@ oth <- open_oth()
 iph <- open_iph()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 
-# read in all icd anxiety codes
-anxiety_icds <- read_csv("~/medicaid/low-back-therapies/data/public/anxiety_icd10_20230323.csv", col_names = F) |>
+# read in all icd depression codes
+depression_icds <- read_csv(file.path(home_dir, "data/public/depression_icd10_20230323.csv"), col_names = F) |>
   rename(ICD9_OR_10 = X1)
 
 ############################################################################
 ############################################################################
 # Step 1: across the 17 beneficiary splits, extract OTH codes and 
-#       keep only the diagnosis codes (1 and 2, separately) which are in the anxiety
-#       ICD code list
+#       keep only the diagnosis codes (1 and 2, separately) which are in the depression
 ############################################################################
 ############################################################################
 
-ids <- dts_cohorts |>  pull(BENE_ID)
+ids <- dts_cohorts |> pull(BENE_ID)
 dg1 <- 
   oth |> 
   filter(BENE_ID %in% ids) |>
   mutate(SRVC_BGN_DT = case_when(is.na(SRVC_BGN_DT) ~ SRVC_END_DT, TRUE ~ SRVC_BGN_DT)) |>
   select(BENE_ID, SRVC_BGN_DT, SRVC_END_DT, DGNS_CD_1) |>
   rename(dgcd = DGNS_CD_1) |>
-  filter(dgcd %in% anxiety_icds$ICD9_OR_10) |>
+  filter(dgcd %in% depression_icds$ICD9_OR_10) |>
   arrange(SRVC_BGN_DT) |>
   collect() 
-
-dg2 <- oth |> 
+dg2 <- 
+  oth |> 
   filter(BENE_ID %in% ids) |>
   mutate(SRVC_BGN_DT = case_when(is.na(SRVC_BGN_DT) ~ SRVC_END_DT, TRUE ~ SRVC_BGN_DT)) |>
   select(BENE_ID, SRVC_BGN_DT, SRVC_END_DT, DGNS_CD_2) |>
   rename(dgcd = DGNS_CD_2) |>
-  filter(dgcd %in% anxiety_icds$ICD9_OR_10) |>
+  filter(dgcd %in% depression_icds$ICD9_OR_10) |>
   arrange(SRVC_BGN_DT) |>
   collect()
-
 all_dg <- bind_rows(dg1, dg2)
 
 rm(dg1)
@@ -71,12 +69,11 @@ rm(dg2)
 ############################################################################
 # Step 2: across the 17 beneficiary splits, extract OTH codes and 
 #       that occur after the washout period begins, and only keep the minimum
-#       ICD code list
 ############################################################################
 ############################################################################
 
 all_dg_clean_function  <- function(data, x)
-{      
+{  
   num_days_start <- days(case_when(
     x == 0 ~ 0,
     x == 1 ~ 30,
@@ -104,7 +101,7 @@ all_dg_clean_function  <- function(data, x)
            SRVC_END_DT >= washout_start_dt + num_days_start) |>
     mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < washout_start_dt + num_days_start, washout_start_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
     mutate(SRVC_BGN_DT = as.Date(SRVC_BGN_DT)) |>
-    summarize(!!paste0("min_anxiety_dt", "_", x) := min(SRVC_BGN_DT)) |>
+    summarize(!!paste0("min_depression_dt", "_", x) := min(SRVC_BGN_DT)) |>
     ungroup()
 }
 
@@ -116,10 +113,9 @@ all_dg_clean <- reduce(results,
 
 ############################################################################
 ############################################################################
-# Step 3: extract anxiety ICD codes from the Inpatient Hospital files
+# Step 3: extract depression ICD codes from the Inpatient Hospital files
 ############################################################################
 ############################################################################
-
 icd_codes_to_check <-
   iph |>
   mutate(SRVC_BGN_DT = case_when(is.na(SRVC_BGN_DT) ~ SRVC_END_DT, TRUE ~ SRVC_BGN_DT)) |>
@@ -127,7 +123,7 @@ icd_codes_to_check <-
   collect()
 
 iph_dg_clean_function  <- function(data, x)
-{
+{ 
   num_days_start <- days(case_when(
     x == 0 ~ 0,
     x == 1 ~ 30,
@@ -149,38 +145,36 @@ iph_dg_clean_function  <- function(data, x)
   ))
   
   data |>
-    mutate(anxiety = +(if_any(starts_with("DGNS_CD"),  ~. %in% anxiety_icds$ICD9_OR_10))) |>
-    filter(anxiety == T) |> # only keep anxiety codes
+    mutate(depression = +(if_any(starts_with("DGNS_CD"),  ~. %in% depression_icds$ICD9_OR_10))) |>
+    filter(depression == T) |> # only keep depression codes
     left_join(dts_cohorts |> select(BENE_ID, washout_start_dt)) |> # join washout start date in
     group_by(BENE_ID) |>
     filter(SRVC_BGN_DT <= washout_start_dt + num_days_end + days(182),
            SRVC_END_DT >= washout_start_dt + num_days_start) |>
     mutate(SRVC_BGN_DT = ifelse(SRVC_BGN_DT < washout_start_dt + num_days_start, washout_start_dt + num_days_start, as.Date(SRVC_BGN_DT))) |>
     mutate(SRVC_BGN_DT = as.Date(SRVC_BGN_DT)) |>
-    summarize(!!paste0("min_anxiety_dt", "_", x, "_iph") := min(SRVC_BGN_DT))
+    summarize(!!paste0("min_depression_dt", "_", x, "_iph") := min(SRVC_BGN_DT))
 }
 
 results <- map(0:0, ~iph_dg_clean_function(icd_codes_to_check,  .x))
 
 iph_dg <- reduce(results,
                  ~full_join(.x, .y))
-
 ############################################################################
 ############################################################################
 # Step 4: across the 17 OTH splits, left join the IPH file
-#   keep only the minimum anxiety date between OTH and IPH for that beneficiary
-#   save as i_clean.parquet in temp folder
+#   keep only the minimum depression date between OTH and IPH for that beneficiary
 ############################################################################
 ############################################################################
 
 # all the cleaned files (all minimum dates except beneficiaries that only occur in IPH)
-all_anxiety_oth <- all_dg_clean |>
+all_depression_oth <- all_dg_clean |>
   left_join(iph_dg) |>
-  mutate(min_anxiety_dt_0 = pmax(min_anxiety_dt_0, min_anxiety_dt_0_iph, na.rm = TRUE)) |>
-  select(BENE_ID, min_anxiety_dt_0)
+  mutate(min_depression_dt_0 = pmax(min_depression_dt_0, min_depression_dt_0_iph, na.rm = TRUE)
+  ) |>
+  select(BENE_ID, min_depression_dt_0)
 
-# iph_dg <- read_parquet("data/tafiph/anxiety_iph.parquet") |> collect()
-
+# iph_dg <- read_parquet("data/tafiph/depression_iph.parquet") |> collect()
 ############################################################################
 ############################################################################
 # Step 5: add in beneficiaries minimum dates that were only in IPH, not OTH
@@ -190,28 +184,28 @@ all_anxiety_oth <- all_dg_clean |>
 # pull out beneficiaries that we don't already have in OTH
 iph_only <-
   iph_dg |>
-  filter(!(BENE_ID %in% all_anxiety_oth$BENE_ID)) |>
-  rename(min_anxiety_dt_0 = min_anxiety_dt_0_iph
+  filter(!(BENE_ID %in% all_depression_oth$BENE_ID)) |>
+  rename(min_depression_dt_0 = min_depression_dt_0_iph
   )
 
-# bind all the rows together (bene_id, anxiety_dt)
-all_anxiety <-
-  bind_rows(all_anxiety_oth, iph_only) #|>
-#arrange(anxiety_dt) |>
+# bind all the rows together (bene_id, depression_dt)
+all_depression <-
+  bind_rows(all_depression_oth, iph_only) #|>
+#arrange(depression_dt) |>
 # distinct(BENE_ID, .keep_all = T)
 
 ############################################################################
 ############################################################################
-# Step 6: add indicators for when the minimum date of anxiety occurred
+# Step 6: add indicators for when the minimum date of depression occurred
 ############################################################################
 ############################################################################
 
-all_anxiety_clean <- 
+all_depression_clean <- 
   dts_cohorts |>
-  left_join(all_anxiety) |>
-  mutate(anxiety_washout_cal = case_when(min_anxiety_dt_0 %within% interval(washout_start_dt, day0_dt - 1) ~ 1,
-                                              TRUE ~ 0)) |>
-  select(BENE_ID, min_anxiety_dt_0, 
-         anxiety_washout_cal)
+  left_join(all_depression) |>
+  mutate(depression_washout_cal = case_when(min_depression_dt_0 %within% interval(washout_start_dt, day0_dt - 1) ~ 1,
+                                                 TRUE ~ 0)) |>
+  select(BENE_ID, min_depression_dt_0,
+         depression_washout_cal)
 
-write_data(all_anxiety_clean, "anxiety.rds", file.path(drv_root, "baseline_covariates")) # save final data file
+write_data(all_depression_clean, "depression.rds", file.path(drv_root, "baseline_covariates")) # save final data file

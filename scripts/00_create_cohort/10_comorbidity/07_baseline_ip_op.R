@@ -21,7 +21,7 @@ iph <- open_iph()
 rxl <- open_rxl()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root, "final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
 ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root, "outcome"))
 
 # # https://resdac.org/sites/datadocumentation.resdac.org/files/2021-01/5011_Identifying_IP_Stays.pdf

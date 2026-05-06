@@ -5,7 +5,6 @@
 # Notes:
 # -------------------------------------
 
-.libPaths(c("~/libs", .libPaths()))
 library(lmtp)
 library(glue)
 library(purrr)
@@ -239,7 +238,7 @@ extract_count <- function(x) {
 # 
 # dev.off()
 
-ragg::agg_png(
+ragg::agg_pdf(
   glue("~/medicaid/low-back-therapies/figures/{Y}/mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.png"), 
   width = 7, height = 3.5, units = "cm", res = 600
 )
