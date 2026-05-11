@@ -12,7 +12,7 @@ script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_sensiti
 
 ### Parameters to modify -------------------------
 
-run_index <- 4 # rerun for 1,2,3,4
+run_index <- 2 # rerun for 1,2,3,4
 
 ### ----------------------------------------------
 

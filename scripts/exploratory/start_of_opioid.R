@@ -28,8 +28,8 @@ p <- ggplot(opioid_data, aes(x = days_until_opioid_start)) +
   theme_minimal()
 
 dim(opioid_data)
-# "Histogram of Days Until Opioid Start among those with Opioid Exposure (n=114294)",
+# "Histogram of Days Until Opioid Start among those with Opioid Exposure (n=119998)",
 table(opioid_data$days_until_opioid_start <= 6)
-# "85897 individuals received opioids in first 7 days") +
+# "91087 individuals received opioids in first 7 days") +
 
 ggsave("/home/amh2389/medicaid/low-back-therapies/scripts/exploratory/days_until_opioid_start_histogram.png", p, width=8, height=6, dpi=300)

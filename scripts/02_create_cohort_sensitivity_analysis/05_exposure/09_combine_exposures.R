@@ -83,7 +83,7 @@ treatments <- rbind(nop_rx_dts, nonpharma_dts) |>
   filter(treatment_start_dt <= last_treatment_dt) |>
   as.data.table()
 
-combinations_wide <- cohort %>%
+exposures <- cohort %>%
   right_join(treatments) %>%
   select(BENE_ID, treatment_name) %>%
   rbind(opioid) |>
