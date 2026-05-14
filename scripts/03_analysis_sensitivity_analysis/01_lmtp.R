@@ -17,13 +17,13 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 ### Uncomment whichever cohort is relevant to your current run -----------------
 
-# sensitivity analysis cohort with 30-day gap between treatments
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
-version <- "opioid_categorized"
+# # sensitivity analysis cohort with 30-day gap between treatments
+# data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root, "final"))
+# version <- "opioid_categorized"
 
-# # sensitivity analysis cohort with 7-day gap between treatments
-# data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final")) 
-# version <- "sensitivity"
+# sensitivity analysis cohort with 7-day gap between treatments
+data <- load_data("pain_cohort_clean_imputed_7day_gap.fst", file.path(drv_root, "final"))
+version <- "sensitivity"
 
 # # cohort with 30 day exposure
 # data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final"))

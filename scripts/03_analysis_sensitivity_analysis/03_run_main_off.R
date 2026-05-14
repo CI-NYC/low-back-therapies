@@ -12,7 +12,7 @@ script <- "/home/amh2389/medicaid/low-back-therapies/scripts/03_analysis_sensiti
 
 ### Parameters to modify -------------------------
 
-run_index <- 4 # rerun for 1,2,3,4
+run_index <- 2 # rerun for 1,2,3,4
 
 ### ----------------------------------------------
 
@@ -41,10 +41,10 @@ n_oud_param <- tribble(~subset, ~mediator, ~func,
 y_oud_param <- n_oud_param
 y_oud_param$subset <- 1
 
-Y <- c("oud_period_1", 
+(Y <- c("oud_period_1", 
        "oud_period_2", 
        "oud_hillary_period_1", 
-       "oud_hillary_period_2")[run_index]
+       "oud_hillary_period_2")[run_index])
 cens <- c("cens_period_1", 
           "cens_period_2", 
           "cens_period_1", 
