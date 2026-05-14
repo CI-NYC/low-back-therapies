@@ -239,7 +239,7 @@ extract_count <- function(x) {
 
 pdf(
   glue("~/medicaid/low-back-therapies/figures/{Y}/30day_mtp_{Y}_outcome_fix_n_oud_relrisk_no_cens.pdf"), 
-  width = 7/2.54, height = 3.5/2.54
+  width = 7/2.54, height = 3.5/2.54)
 
 print(read_relr(Y, "on", "off") |> 
   relabel() |> 
