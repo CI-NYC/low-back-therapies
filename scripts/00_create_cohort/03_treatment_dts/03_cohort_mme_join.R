@@ -50,12 +50,12 @@ otl_opioids <- left_join(cohort, otl_opioids)
 
 rxl_opioids <- 
   rxl_opioids |> 
-  filter((RX_FILL_DT >= diagnosis_dt) & 
+  filter((RX_FILL_DT >= washout_start_dt) & 
            (RX_FILL_DT <= exposure_end_dt_possible_latest))
 
 otl_opioids <- 
   otl_opioids |> 
-  filter((LINE_SRVC_BGN_DT >= diagnosis_dt) & 
+  filter((LINE_SRVC_BGN_DT >= washout_start_dt) & 
            (LINE_SRVC_BGN_DT <= exposure_end_dt_possible_latest))
 
 # calculate strength per day in Milligram Morphine Equivalent (MME) units
@@ -79,7 +79,7 @@ rxl_opioids <-
   rxl_opioids |>
   select(BENE_ID,
          CLM_ID,
-         diagnosis_dt, 
+         washout_start_dt, 
          # last_treatment_dt,
          exposure_end_dt_possible_latest,
          opioid,
@@ -108,7 +108,7 @@ otl_opioids <-
   otl_opioids |>
   select(BENE_ID,
          CLM_ID,
-         diagnosis_dt, 
+         washout_start_dt, 
          # last_treatment_dt,
          exposure_end_dt_possible_latest,
          NDC,

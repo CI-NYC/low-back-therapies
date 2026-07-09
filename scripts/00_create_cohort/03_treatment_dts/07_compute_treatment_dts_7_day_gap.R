@@ -15,7 +15,6 @@ library(foreach)
 library(doFuture)
 library(collapse)
 
-
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
@@ -32,6 +31,7 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_
 # Keep those with at least 1 treatment within the first 3 months
 cohort <- cohort |>
   right_join(treatments) |>
+  filter(treatment_start_dt >= diagnosis_dt) |>
   group_by(BENE_ID) |>
   fsummarise(first_treatment_dt = min(treatment_start_dt),
              has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>

@@ -42,6 +42,12 @@ demo <-
          TPL_INSRNC_CVRG_IND) |> 
   distinct()
 
+# impute missing values for sex, race, primary language, veteran status using the first non-NA value if it exists
+demo <- demo |>
+  group_by(BENE_ID) |>
+  tidyr::fill(SEX_CD, RACE_ETHNCTY_CD, PRMRY_LANG_GRP_CD, VET_IND, .direction = "downup") |>
+  ungroup()
+
 fill_vals <- function(data, x) {
   select(data, BENE_ID, RFRNC_YR, one_of(x))  |>
     roworder(BENE_ID, RFRNC_YR) |>

@@ -116,6 +116,27 @@ exclusion_codes <- exclusion_codes |>
 
 # dual eligibility --------------------------------------------------------
 
+# Identify the Michigan or Arkansas 2016 beneficiaries
+MI_2016_BENES <- demo |>
+  filter(STATE_CD %in% c("MI", "AR"), RFRNC_YR == 2016) |> 
+  pull(BENE_ID)
+
+# Add a temporary unique row ID to the base dataset
+demo_with_id <- demo |> 
+  mutate(row_id = row_number())
+
+# 1. Isolate and perform the fill operation ONLY on the Michigan subset
+filled_subset <- demo_with_id |>
+  filter(BENE_ID %in% MI_2016_BENES) |>
+  group_by(BENE_ID) |>
+  fill(starts_with("DUAL_ELGBL_CD"), .direction = "down") |>
+  ungroup()
+
+# 2. Patch the modified rows back into the original dataset using the row_id
+dual_codes <- demo_with_id |>
+  rows_patch(filled_subset, by = "row_id") |>
+  select(-row_id) # Drop the temporary ID so the final dataset looks clean
+
 dual_codes <- 
   select(demo, BENE_ID, RFRNC_YR, starts_with("DUAL_ELGBL_CD"), -DUAL_ELGBL_CD_LTST) |> 
   pivot(ids = c("BENE_ID", "RFRNC_YR"), 
@@ -135,7 +156,7 @@ exclusion_dual_eligible <-
   fselect(BENE_ID, exclusion_dual_eligible) |> 
   distinct() |> 
   join(fselect(cohort, BENE_ID), how = "right") |> 
-  fmutate(exclusion_dual_eligible = replace_na(as.numeric(exclusion_dual_eligible)))
+  fmutate(exclusion_dual_eligible = replace_na(as.numeric(exclusion_dual_eligible),0))
 
 # join --------------------------------------------------------------------
 

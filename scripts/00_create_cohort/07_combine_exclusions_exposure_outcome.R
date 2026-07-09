@@ -19,6 +19,8 @@ opioid_naive <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst",
 cohort <- load_data(paste0("pain_washout_continuous_enrollment_dts.fst"), file.path(drv_root_30_day_treatment, "modified_variables"))
 # washout pain exclusion
 washout_pain <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
+# washout pain treatment exclusion
+washout_tx <- load_data("previous_tx_exclusions.fst", file.path(drv_root, "exclusion"))
 # debse exclusions
 debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
 # iph exclusions
@@ -44,6 +46,7 @@ cohort <- list(
   opioid_naive,
   # oud_exclusions,
   washout_pain,
+  washout_tx,
   debse_exclusions,
   iph_exclusions,
   oth_exclusions

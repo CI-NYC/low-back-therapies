@@ -23,7 +23,7 @@ hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud
 misuse <- load_data("pain_washout_continuous_enrollment_opioid_requirements_washout_oud_misuse.fst", file.path(drv_root, "exclusion"))
 bup <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_bup_washout.fst", file.path(drv_root, "exclusion"))
 methadone <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root, "exclusion"))
-nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", file.path(drv_root, "exclusion"))
+# nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", file.path(drv_root, "exclusion"))
 
 # combine -----------------------------------------------------------------
 
@@ -65,10 +65,11 @@ cohort <-
           exclusion_oud = 
             as.numeric((exclusion_oud_poison + 
                           exclusion_oud_hillary + 
-                          exclusion_oud_misuse + 
+                          exclusion_oud_misuse +
                           moud_bup_washout + 
-                          moud_methadone_washout + 
-                          moud_nal_washout) >= 1)) |> 
+                          moud_methadone_washout
+                          # moud_nal_washout
+                          ) >= 1)) |> 
   fselect(BENE_ID, exclusion_oud, exclusion_oud_hillary)
 
 # save --------------------------------------------------------------------

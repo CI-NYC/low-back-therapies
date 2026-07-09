@@ -447,6 +447,30 @@ read_relr_no_cens &lt;- function(Y, intervention1) {
              conf.high = conf.high - 1)
   })
 }</code></pre>
+<pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
+
+df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
+df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))</code></pre>
+<pre><code>## # A tibble: 14 × 4
+##    treatment                       estimate conf.low conf.high
+##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 exposure_acetaminophen              19        6.6      31.3
+##  2 exposure_anti_inflammatory           0.5     -4.3       5.4
+##  3 exposure_benzodiazepine             58.7     46.9      70.4
+##  4 exposure_chiropractic              -34.5    -41.4     -27.7
+##  5 exposure_duloxetine                 31.8     20.2      43.4
+##  6 exposure_gabapentin                147.8    132.6     162.9
+##  7 exposure_intervention               51.3     36.6      66.1
+##  8 exposure_muscle_relaxant           -11.8    -16.2      -7.5
+##  9 exposure_massage_therapy           -15.8    -18.2     -13.5
+## 10 exposure_physical_therapy          -30      -38.2     -21.8
+## 11 exposure_steroid                    -3.5    -10.1       3.2
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme     25.7     17.2      34.2
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      93.6     78.4     108.8
+## 14 exposure_opioid_&gt;50mme             128.7    105.6     151.8</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
 df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
@@ -457,20 +481,20 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              16.4      6.1      27.8
-##  2 exposure_anti_inflammatory          -1.1     -5.3       3.2
-##  3 exposure_benzodiazepine             55.6     45.7      66.3
-##  4 exposure_chiropractic              -26.6    -32.2     -20.6
-##  5 exposure_duloxetine                 32.1     21.8      43.4
-##  6 exposure_gabapentin                134.8    122.4     147.9
-##  7 exposure_intervention               38       27.3      49.5
-##  8 exposure_muscle_relaxant            -8.5    -12.5      -4.4
-##  9 exposure_massage_therapy            -5.3     -7.6      -2.9
-## 10 exposure_physical_therapy          -36.6    -43.1     -29.3
-## 11 exposure_steroid                    -5.5    -11.2       0.5
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme     20.9     13.7      28.5
-## 13 exposure_opioid_&gt;7days_&lt;=50mme      93.4     81.2     106.5
-## 14 exposure_opioid_&gt;50mme             121.2    102.4     141.8</code></pre>
+##  1 exposure_acetaminophen              16.5      6.1      26.9
+##  2 exposure_anti_inflammatory          -0.4     -4.6       3.8
+##  3 exposure_benzodiazepine             55.4     45.6      65.3
+##  4 exposure_chiropractic              -28.3    -33.8     -22.8
+##  5 exposure_duloxetine                 31.3     20.2      42.5
+##  6 exposure_gabapentin                130.1    117.8     142.3
+##  7 exposure_intervention               34.9     24.4      45.3
+##  8 exposure_muscle_relaxant           -10.4    -14.3      -6.6
+##  9 exposure_massage_therapy            -7.7     -9.9      -5.4
+## 10 exposure_physical_therapy          -34      -40.9     -27.1
+## 11 exposure_steroid                    -6.2    -11.9      -0.5
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme     20.8     13.8      27.9
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      87.6     75.4      99.8
+## 14 exposure_opioid_&gt;50mme             118.1     99.2     137</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
 
 df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
@@ -481,20 +505,20 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              22       10.2      35  
-##  2 exposure_anti_inflammatory           1.3     -1.1       3.8
-##  3 exposure_benzodiazepine             50.8     40.7      61.7
-##  4 exposure_chiropractic              -31.3    -38.2     -23.6
-##  5 exposure_duloxetine                 40       28.6      52.5
-##  6 exposure_gabapentin                119.1    107.9     130.9
-##  7 exposure_intervention               56       41.6      71.9
-##  8 exposure_muscle_relaxant            -4.3     -7.1      -1.3
-##  9 exposure_massage_therapy           -11.7    -13.9      -9.5
-## 10 exposure_physical_therapy          -29      -36.8     -20.1
-## 11 exposure_steroid                    -1       -6.8       5.2
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme     12.2      5.7      19.1
-## 13 exposure_opioid_&gt;7days_&lt;=50mme      78.9     66.6      92.2
-## 14 exposure_opioid_&gt;50mme             109.6     90.4     130.9</code></pre>
+##  1 exposure_acetaminophen              18.2      6.5      29.9
+##  2 exposure_anti_inflammatory           1.5     -0.9       3.8
+##  3 exposure_benzodiazepine             49.1     39.2      59  
+##  4 exposure_chiropractic              -31.8    -38.8     -24.8
+##  5 exposure_duloxetine                 31       19.9      42.1
+##  6 exposure_gabapentin                116.2    105.2     127.3
+##  7 exposure_intervention               49.7     35.6      63.8
+##  8 exposure_muscle_relaxant            -5.8     -8.6      -3  
+##  9 exposure_massage_therapy           -15.3    -17.3     -13.2
+## 10 exposure_physical_therapy          -27.3    -35.5     -19.1
+## 11 exposure_steroid                    -2       -7.8       3.8
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme     12.6      6.2      19  
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      73.4     61.2      85.7
+## 14 exposure_opioid_&gt;50mme             104.8     85.5     124.1</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
 df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
@@ -505,20 +529,20 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              15.7      5.9      26.5
-##  2 exposure_anti_inflammatory           0.5     -1.6       2.6
-##  3 exposure_benzodiazepine             47.6     39.1      56.6
-##  4 exposure_chiropractic              -23.7    -29.3     -17.7
-##  5 exposure_duloxetine                 31.4     21.5      42.1
-##  6 exposure_gabapentin                107.5     98.3     117.1
-##  7 exposure_intervention               36.8     26.6      47.8
-##  8 exposure_muscle_relaxant            -3.5     -6        -1  
-##  9 exposure_massage_therapy            -5.2     -7.3      -3.1
-## 10 exposure_physical_therapy          -33.8    -40.3     -26.5
-## 11 exposure_steroid                    -4.1     -9.1       1.2
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme      9.1      3.6      14.9
-## 13 exposure_opioid_&gt;7days_&lt;=50mme      74.5     64.6      85  
-## 14 exposure_opioid_&gt;50mme              99.6     83.6     116.9</code></pre>
+##  1 exposure_acetaminophen              15.7      5.9      25.5
+##  2 exposure_anti_inflammatory           1       -1         3.1
+##  3 exposure_benzodiazepine             47.2     38.9      55.5
+##  4 exposure_chiropractic              -25.4    -30.9     -19.9
+##  5 exposure_duloxetine                 30.8     20.1      41.5
+##  6 exposure_gabapentin                104       94.8     113.1
+##  7 exposure_intervention               33.9     23.9      43.9
+##  8 exposure_muscle_relaxant            -4.9     -7.3      -2.4
+##  9 exposure_massage_therapy            -7.6     -9.5      -5.6
+## 10 exposure_physical_therapy          -31.1    -38       -24.2
+## 11 exposure_steroid                    -4.7     -9.6       0.3
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme      9.1      3.7      14.5
+## 13 exposure_opioid_&gt;7days_&lt;=50mme      69.4     59.5      79.3
+## 14 exposure_opioid_&gt;50mme              96.9     81       112.8</code></pre>
 
 
 

@@ -33,6 +33,7 @@ treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_
 # Keep those with at least 1 treatment within the first month of diagnosis
 cohort <- cohort |>
   right_join(treatments) |>
+  filter(treatment_start_dt >= diagnosis_dt) |>
   group_by(BENE_ID) |>
   fsummarise(first_treatment_dt = min(treatment_start_dt),
             has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>

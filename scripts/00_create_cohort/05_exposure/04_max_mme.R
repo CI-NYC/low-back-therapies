@@ -20,7 +20,8 @@ cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   right_join(cohort) |> # keep people who passed enrollment criteria in the cohort
-  filter(treatment_start_dt <= exposure_end_dt) |>
+  filter(treatment_start_dt >= day0_dt,
+         treatment_start_dt <= exposure_end_dt) |>
   mutate(treatment_end_dt = as.Date(pmin(treatment_end_dt, exposure_end_dt)))
 
 setDT(opioids)

@@ -42,11 +42,11 @@ mediators <- c("Physical therapy",
                # "Counseling",
                "Massage therapy",
                "Chiropractic",
-               # "Acupuncture",
+               "Acupuncture",
                "Blocks",
                "Ablative techniques", ##
                "Botulinum toxin injections", ## 
-               "Spinal cord stimulation",
+               # "Spinal cord stimulation",
                "Electrical nerve stimulation", ##
                "Intrathecal drug therapies", ## 
                "Epidural steroids", ##
@@ -65,10 +65,11 @@ for (mediator in mediators) {
 treatments_df <- treatments_df  |>
   mutate(treatment = ifelse(treatment %in% c("Physical therapy",
                                              "Massage therapy",
-                                             # "Acupuncture",
-                                             "Chiropractic",
+                                             "Acupuncture",
+                                             # "Counseling",
+                                             "Chiropractic"
                                              # "Blocks",
-                                             "Spinal cord stimulation"
+                                             # "Spinal cord stimulation"
                                              ), treatment, "Intervention"))
 
 # Filter OTL to claims codes
@@ -88,9 +89,9 @@ claims[, LINE_SRVC_BGN_DT := fifelse(is.na(LINE_SRVC_BGN_DT),
 claims <- unique(merge(claims, cohort, by = "BENE_ID"))
 
 # Filter to claims within mediator time-frame
-claims <- claims[LINE_SRVC_BGN_DT %within% interval(diagnosis_dt, 
+claims <- claims[LINE_SRVC_BGN_DT %within% interval(washout_start_dt, 
                                                     exposure_end_dt_possible_latest), 
-                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, diagnosis_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
+                 .(BENE_ID, LINE_SRVC_BGN_DT, LINE_SRVC_END_DT, washout_start_dt, exposure_end_dt_possible_latest, LINE_PRCDR_CD)]
 
 treatments_dts <- claims |>
   left_join(treatments_df, by = c("LINE_PRCDR_CD" = "cd")) |>
