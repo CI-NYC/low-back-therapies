@@ -65,28 +65,29 @@ oth_vars <- c("BENE_ID", "DGNS_CD_1", "DGNS_CD_2")
 iph_pregnancy <- select(iph, all_of(iph_vars)) |>
   filter(if_any(contains("DGNS_CD"), ~ .x %in% pregnancy_ip_dgns) |
            if_any(contains("PRCDR_CD"), ~ .x %in% pregnancy_ip_pcs)) |>
-  mutate(pregnancy_exclusion = 1) |>
-  select(BENE_ID, pregnancy_exclusion)
+  mutate(exclusion_pregnancy = 1) |>
+  select(BENE_ID, exclusion_pregnancy)
 print(nrow(iph_pregnancy))
 
 # identify outpatient claims on the basis of ICD and CPT codes
 otl_pregnancy <- select(otl, all_of(otl_vars)) %>%
   filter(if_any(contains("LINE_PRCDR_CD"), ~ .x %in% pregnancy_ot) |
            REV_CNTR_CD %in% pregnancy_rev) |>
-  mutate(pregnancy_exclusion = 1) %>%
-  select(BENE_ID, pregnancy_exclusion)
+  mutate(exclusion_pregnancy = 1) %>%
+  select(BENE_ID, exclusion_pregnancy)
 print(nrow(otl_pregnancy))
 
 oth_pregnancy <- select(oth, all_of(oth_vars)) |>
   filter(if_any(contains("DGNS_CD"), ~ .x %in% pregnancy_ip_dgns)) |>
-  mutate(pregnancy_exclusion = 1) %>%
-  select(BENE_ID, pregnancy_exclusion)
+  mutate(exclusion_pregnancy = 1) %>%
+  select(BENE_ID, exclusion_pregnancy)
 print(nrow(oth_pregnancy))
 
 pregnancy_exclusion <- bind_rows(iph_pregnancy, otl_pregnancy, oth_pregnancy) %>% distinct()
 
 pregnancy_exclusion <- cohort |>
   left_join(pregnancy_exclusion) |>
-  mutate(pregnancy_exclusion = replace_na(pregnancy_exclusion,0))
+  mutate(exclusion_pregnancy = replace_na(exclusion_pregnancy,0)) |>
+  select(BENE_ID, exclusion_pregnancy)
 
 write_data(pregnancy_exclusion, "pregnancy_exclusion.fst", file.path(drv_root, "exclusion"))

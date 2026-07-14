@@ -2,9 +2,9 @@ library(tidyverse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
-chronic_pain <- readRDS(file.path(drv_root, "outcome/chronic_pain_wide.rds"))
+chronic_pain <- readRDS(file.path(drv_root_30_day_treatment, "modified_variables/chronic_pain_wide.rds"))
 
 # chronic_pain <- chronic_pain |>
 #   group_by(BENE_ID) |>
@@ -16,11 +16,12 @@ chronic_pain <- readRDS(file.path(drv_root, "outcome/chronic_pain_wide.rds"))
 
 chronic_pain <- cohort |>
   left_join(chronic_pain) |>
-  mutate(outcome_chronic_pain_period_2  = replace_na(chronic_pain_any_month_0,0),
-         outcome_chronic_pain_period_4 = replace_na(chronic_pain_any_month_6,0)
+  mutate(outcome_chronic_pain_period_1  = replace_na(chronic_pain_any_month_0,0),
+         outcome_chronic_pain_period_2 = replace_na(chronic_pain_any_month_6,0),
+         outcome_chronic_pain_period_2 = pmax(outcome_chronic_pain_period_1,outcome_chronic_pain_period_2)
   ) |>
-  select(BENE_ID, outcome_chronic_pain_period_2, outcome_chronic_pain_period_4)
+  select(BENE_ID, outcome_chronic_pain_period_1, outcome_chronic_pain_period_2)
 
 
 
-write_data(chronic_pain, "outcome_chronic_pain.fst", file.path(drv_root, "outcome"))
+write_data(chronic_pain, "outcome_chronic_pain.fst", file.path(drv_root_30_day_treatment, "modified_variables"))

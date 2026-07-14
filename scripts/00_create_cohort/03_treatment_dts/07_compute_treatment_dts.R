@@ -22,18 +22,22 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 cohort <- load_data("low_back_washout_dts.fst", file.path(drv_root, "exclusion")) |>
   as.data.table() |>
   mutate(treatment_start_dt_possible_latest = diagnosis_dt + days(30))
+previous_treatment <- load_data("previous_treatment.fst", file.path(drv_root, "exclusion"))
 
 opioid_dts <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
   select(BENE_ID, treatment_start_dt, treatment_end_dt, treatment_name) |> distinct()
 nop_rx_dts <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment"))
 nonpharma_dts <- load_data("nonpharma_dts.fst", file.path(drv_root, "treatment"))
 
-treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> select(-treatment_name) |> as.data.table()
+treatments <- rbind(opioid_dts, nop_rx_dts, nonpharma_dts) |> 
+  mutate(treatment_name = ifelse(treatment_name %in% c("Other analgesic", "Acupuncture"), "Other treatment", treatment_name)) |>
+  as.data.table()
 
 # Keep those with at least 1 treatment within the first month of diagnosis
 cohort <- cohort |>
   right_join(treatments) |>
   filter(treatment_start_dt >= diagnosis_dt) |>
+  anti_join(previous_treatment, by = c("BENE_ID" = "BENE_ID", "treatment_name" = "previous_treatment")) |>
   group_by(BENE_ID) |>
   fsummarise(first_treatment_dt = min(treatment_start_dt),
             has_treatment = as.numeric(any(treatment_start_dt <= treatment_start_dt_possible_latest))) |>
@@ -46,8 +50,10 @@ cohort <- cohort |>
 # The exposure period is 3 months long
 cohort <- cohort |>
   right_join(treatments) |>
+  fsubset(treatment_start_dt >= first_treatment_dt &
+          treatment_start_dt <= (first_treatment_dt + days(90))) |>
+  anti_join(previous_treatment, by = c("BENE_ID" = "BENE_ID", "treatment_name" = "previous_treatment")) |>
   fselect(BENE_ID, first_treatment_dt, treatment_start_dt, treatment_end_dt) |>
-  fsubset(treatment_start_dt <= (first_treatment_dt + days(90))) |>
   fmutate(treatment_end_dt = pmin(treatment_end_dt, first_treatment_dt + days(90))) |>
   roworder(BENE_ID, treatment_start_dt, treatment_end_dt) |>
   as.data.table()

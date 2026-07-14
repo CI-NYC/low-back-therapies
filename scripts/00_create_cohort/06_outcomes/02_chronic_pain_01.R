@@ -35,7 +35,7 @@ options(future.globals.maxSize = 850 * 1024^2)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_with_exposures.fst", file.path(drv_root, "treatment"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
 
 
 ############################################################################
@@ -58,8 +58,8 @@ low_back_pain_icds <- read.csv("~/medicaid/low-back-therapies/data/public/chroni
 
 codes <- low_back_pain_icds$ICD9_OR_10
 
-start_dt <- as.Date("2016-07-01")
-end_dt <- as.Date("2019-12-31")
+start_dt <- as.Date("2017-01-01")
+end_dt <- as.Date("2019-12-01")
 
 keep <- c("BENE_ID", 
           "CLM_ID", 
@@ -114,7 +114,7 @@ pain_all <- rbindlist(list(oth_pain[, .(BENE_ID, SRVC_BGN_DT)],
                            iph_pain[, .(BENE_ID, SRVC_BGN_DT)]))
 
 cohort <- cohort |>
-  mutate(followup_start_dt = exposure_period_end_dt + days(1)) |>
+  mutate(followup_start_dt = exposure_end_dt + days(1)) |>
   select(BENE_ID, followup_start_dt) |>
   left_join(pain_all)
 
@@ -172,9 +172,9 @@ overall_pain_by_month <- function(month_number){
 }
 
 chronic_pain_all_months <- map_dfr(c(0,6), overall_pain_by_month)
-saveRDS(chronic_pain_all_months, file.path(drv_root, "outcome/chronic_pain_all_months.rds"))
+saveRDS(chronic_pain_all_months, file.path(drv_root_30_day_treatment, "modified_variables/chronic_pain_all_months.rds"))
 
-chronic_pain_all_months <- read_rds(file.path(drv_root, "outcome/chronic_pain_all_months.rds"))
+chronic_pain_all_months <- read_rds(file.path(drv_root_30_day_treatment, "modified_variables/chronic_pain_all_months.rds"))
 
 chronic_pain_wide <- pivot_wider(chronic_pain_all_months,
                                  id_cols = BENE_ID,
@@ -184,4 +184,4 @@ chronic_pain_wide <- pivot_wider(chronic_pain_all_months,
                                  values_fill = 0) |>
   mutate(chronic_pain_n_months = rowSums(across(where(is.numeric))))
 
-saveRDS(chronic_pain_wide, file.path(drv_root, "outcome/chronic_pain_wide.rds"))
+saveRDS(chronic_pain_wide, file.path(drv_root_30_day_treatment, "modified_variables/chronic_pain_wide.rds"))

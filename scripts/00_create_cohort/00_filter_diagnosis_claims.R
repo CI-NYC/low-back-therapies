@@ -31,8 +31,8 @@ diagnosis_icds <- read.csv(file.path(home_dir, "data/public/chronic_pain_icd10_2
 
 codes <- diagnosis_icds$ICD9_OR_10
 
-start_dt <- as.Date("2016-07-01")
-end_dt <- as.Date("2019-10-01")
+start_dt <- as.Date("2017-01-01")
+end_dt <- as.Date("2019-12-01")
 
 keep <- c("BENE_ID", 
           "CLM_ID", 
@@ -64,7 +64,7 @@ oth_claims <- oth_claims[!is.na(BENE_ID)]
 setorder(oth_claims, BENE_ID, SRVC_BGN_DT)
 oth_claims[, let(washout_start_dt = min(SRVC_BGN_DT)), BENE_ID]
 oth_claims <- oth_claims[SRVC_BGN_DT == washout_start_dt]
-oth_claims[, let(washout_start_dt = washout_start_dt - days(182))]
+oth_claims[, let(washout_start_dt = washout_start_dt - days(365))]
 
 # temporary - recording what the pain diagnosis code is so we can join with pain categories later
 oth_claims[, let(dgns_cd = ifelse(DGNS_CD_1 %in% codes, DGNS_CD_1, DGNS_CD_2))]

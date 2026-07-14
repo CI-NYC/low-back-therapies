@@ -8,3 +8,4 @@ scripts/logs/
 scripts/lmtp_logs/
 notused*
 old/
+exploratory_checks/

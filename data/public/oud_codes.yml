@@ -233,22 +233,22 @@ mcneely:
 
 cochran_poison:
   - "T400X1A"    # Poisoning by opium, accidental (unintentional), initial encounter
-  - "T400X3A"    # Poisoning by opium, assault, initial encounter
+  # - "T400X3A"    # Poisoning by opium, assault, initial encounter
   - "T400X4A"    # Poisoning by opium, undetermined, initial encounter
   - "T403X1A"    # Poisoning by methadone, accidental (unintentional), initial encounter
-  - "T403X3A"    # Poisoning by methadone, assault, initial encounter
+  # - "T403X3A"    # Poisoning by methadone, assault, initial encounter
   - "T403X4A"    # Poisoning by methadone, undetermined, initial encounter
   - "T402X1A"    # Poisoning by other opioids, accidental (unintentional), initial encounter
-  - "T402X3A"    # Poisoning by other opioids, assault, initial encounter
+  # - "T402X3A"    # Poisoning by other opioids, assault, initial encounter
   - "T402X4A"    # Poisoning by other opioids, undetermined, initial encounter
   - "T404X1A"    # Poisoning by other synthetic narcotics, accidental (unintentional), initial encounter
-  - "T404X3A"    # Poisoning by other synthetic narcotics, assault, initial encounter
+  # - "T404X3A"    # Poisoning by other synthetic narcotics, assault, initial encounter
   - "T404X4A"    # Poisoning by other synthetic narcotics, undetermined, initial encounter
   - "T40601A"    # Poisoning by unspecified narcotics, accidental (unintentional), initial encounter
-  - "T40603A"    # Poisoning by unspecified narcotics, assault, initial encounter
+  # - "T40603A"    # Poisoning by unspecified narcotics, assault, initial encounter
   - "T40604A"    # Poisoning by unspecified narcotics, undetermined, initial encounter
   - "T40691A"    # Poisoning by other narcotics, accidental (unintentional), initial encounter
-  - "T40693A"    # Poisoning by other narcotics, assault, initial encounter
+  # - "T40693A"    # Poisoning by other narcotics, assault, initial encounter
   - "T40694A"    # Poisoning by other narcotics, undetermined, initial encounter
 
 cochran_abuse:

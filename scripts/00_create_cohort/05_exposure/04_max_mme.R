@@ -19,6 +19,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
 
 opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
+  select(-washout_start_dt) |>
   right_join(cohort) |> # keep people who passed enrollment criteria in the cohort
   filter(treatment_start_dt >= day0_dt,
          treatment_start_dt <= exposure_end_dt) |>

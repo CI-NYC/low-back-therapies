@@ -404,11 +404,11 @@ Alcohol:
 
 Other substances:
     ICD10:
-        "F12":
-        "F13":
-        "F14":
-        "F15":
+        "F12": Cannabis
+        "F13": Sedatives
+        "F14": Cocaine
+        "F15": Other stimulants
         "F16": Hallucinogen
-        "F17": Nicotine
+        # "F17": Nicotine
         "F18": Inhalant
         "F19": Other psychoactive substance
