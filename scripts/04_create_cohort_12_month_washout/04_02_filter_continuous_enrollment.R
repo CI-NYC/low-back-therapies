@@ -121,7 +121,7 @@ washout <- merge(washout, cohort)
 # washout_7day_gap <- merge(washout_7day_gap, cohort)
 
 # export
-write_data(distinct(washout), "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+write_data(distinct(washout), "pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 # write_data(distinct(washout_7day_gap), "pain_washout_continuous_enrollment_dts_7day_gap.fst", file.path(drv_root, "exclusion"))
 
 # 1680252
