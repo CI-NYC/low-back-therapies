@@ -14,7 +14,7 @@ library(yaml)
 # claims data
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 # Read in OTH
 oth <- open_oth()
@@ -68,4 +68,4 @@ cohort <- cohort |>
   left_join(sud_other_washout_cal) |>
   mutate(across(starts_with("sud_"), ~replace(., is.na(.), 0)))
 
-write_data(cohort, "substance_use_disorder_washout_cal.fst", file.path(drv_root, "baseline_covariates"))
+write_data(cohort, "substance_use_disorder_washout_cal.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))

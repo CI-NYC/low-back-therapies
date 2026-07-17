@@ -18,41 +18,9 @@ library(data.table)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
-otl <- open_otl()
-
-codes <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$methadone
-
-# - Limit otl to MOUD methadone codes
-otl_methadone <- 
-  filter(otl, LINE_PRCDR_CD %in% codes) |>
-  select(BENE_ID,
-         STATE_CD, 
-         NDC,
-         NDC_UOM_CD, 
-         NDC_QTY,
-         LINE_SRVC_BGN_DT,
-         LINE_SRVC_END_DT,
-         LINE_PRCDR_CD) |>
-  collect()
-
-# - Limit to those in the initial cohort
-# - Calculate the moud end date
-otl_methadone <- 
-  fsubset(otl_methadone, BENE_ID %in% cohort$BENE_ID) |> 
-  fmutate(LINE_SRVC_BGN_DT = case_when(
-    is.na(LINE_SRVC_BGN_DT) ~ LINE_SRVC_END_DT, 
-    TRUE ~ LINE_SRVC_BGN_DT
-  )) |> 
-  fsubset((LINE_PRCDR_CD == "S0109" & STATE_CD == "IA" & year(LINE_SRVC_BGN_DT) == 2016) | 
-            LINE_PRCDR_CD != "S0109") |> 
-  fmutate(moud_start_dt = LINE_SRVC_BGN_DT, 
-          moud_end_dt = moud_start_dt + 21) |> 
-  fselect(BENE_ID, moud_start_dt, moud_end_dt)
-
-# # - Save all moud periods for the initial cohort
-write_data(otl_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", file.path(drv_root, "exclusion"))
+otl_methadone <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_intervals.fst", file.path(drv_root, "exclusion"))
 
 # - Filter to moud periods where the start or end date is within the washout period
 # - If any moud periods are within the washout period, obs is considered as having moud in washout
@@ -72,4 +40,4 @@ moud_methadone <-
   fmutate(moud_methadone_washout = replace_na(moud_methadone_washout, 0)) |>
   select(BENE_ID, moud_methadone_washout)
 
-write_data(moud_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root, "exclusion"))
+write_data(moud_methadone, "pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root_12_month_washout, "exclusion"))

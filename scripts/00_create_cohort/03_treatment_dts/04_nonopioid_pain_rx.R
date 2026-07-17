@@ -39,7 +39,7 @@ nonopioid_names_df <- data.frame(code = c(names(codes$Benzodiazepines[["ATC"]]),
                                           "M03", "M01", "N06AX",
                                           names(codes$Steroids[["ATC"]]),
                                           "N02BE",
-                                          "N02B", "MO2A", "N06BA"),
+                                          "N02B", "MO2A"),
                                  nonopioid_name = c(rep("Benzodiazepine", 3),
                                                     "Gabapentin",
                                                     "Muscle relaxant",
@@ -47,7 +47,7 @@ nonopioid_names_df <- data.frame(code = c(names(codes$Benzodiazepines[["ATC"]]),
                                                     "Duloxetine",
                                                     "Glucocorticoid",
                                                     "Acetaminophen",
-                                                    rep("Other analgesic", 3)))
+                                                    rep("Other analgesic", 2)))
 
 rx_flag <- foreach(code = ndc[, atc], .combine = "c") %do% {
   any(sapply(nonopioid_names_df$code, \(x) grepl(x, code)), na.rm = TRUE)
@@ -93,7 +93,7 @@ ndc_rx <- rbind(ndc_rx |> filter(!atc=="N06AX", !atc=="N02BE"),
     # atc == "N06AX" ~ "Duloxetine",
     grepl("H02AB", atc) ~ "Steroid",
     atc == "N02BE" ~ "Acetaminophen",
-    grepl("N02B|MO2A|N06BA",atc) ~ "Other analgesic",
+    grepl("N02B|MO2A",atc) ~ "Other analgesic",
     TRUE ~ NA
   )) |>
   filter(!is.na(treatment_name))

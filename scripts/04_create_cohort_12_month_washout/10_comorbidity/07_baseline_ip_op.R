@@ -21,8 +21,8 @@ iph <- open_iph()
 rxl <- open_rxl()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
-ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root, "outcome"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
+ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
 
 # # https://resdac.org/sites/datadocumentation.resdac.org/files/2021-01/5011_Identifying_IP_Stays.pdf
 # inpatient_cds <- c("001", "060", "084", "086", "090", "091", "092", "093")
@@ -102,5 +102,5 @@ cohort <- cohort |>
          # num_rxl_washout_cal = ifelse(num_rxl_washout_cal > 40, 40, num_rxl_washout_cal)
          )
 
-write_data(cohort, "baseline_ip_op_rx.fst", file.path(drv_root, "baseline_covariates"))
+write_data(cohort, "baseline_ip_op_rx.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
 

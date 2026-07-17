@@ -26,7 +26,7 @@ opioid <- left_join(mme, days_supply) |>
     exposure_max_daily_dose_mme <= 50 & exposure_days_supply > 7    ~ "Opioid >7days <=50mme",
     exposure_max_daily_dose_mme > 50                                ~ "Opioid >50mme",
     TRUE ~ NA
-  )) |>
+  ))|>
   select(BENE_ID, treatment_name)
 
 

@@ -24,7 +24,7 @@ codes <- read_yaml(file.path(home_dir, "data/public/icd_codes.yml"))
 # Read in IPH dataset
 iph <- open_iph()
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
 icd <-
   iph |>
@@ -67,4 +67,4 @@ icd_exclusions <-
   fselect(BENE_ID, exclusion_pall_iph, exclusion_cancer_iph, exclusion_monthprior_hospitalization)
 
 # export
-write_data(icd_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root, "exclusion"))
+write_data(icd_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root_12_month_washout, "exclusion"))

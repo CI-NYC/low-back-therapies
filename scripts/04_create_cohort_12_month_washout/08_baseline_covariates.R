@@ -15,9 +15,9 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 demo <- open_demo()
 
 # load cohort
-cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("inclusion_exclusion_cohort_with_exposure_outcomes.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
-probable_income <- load_data("probable_high_income_cal.fst", file.path(drv_root, "exclusion"))
+probable_income <- load_data("probable_high_income_cal.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
 demo <- 
   filter(demo, BENE_ID %in% cohort$BENE_ID) |> 
@@ -120,7 +120,7 @@ cohort <-
          starts_with("outcome")
         )
 
-write_data(cohort, "pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+write_data(cohort, "pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 
 

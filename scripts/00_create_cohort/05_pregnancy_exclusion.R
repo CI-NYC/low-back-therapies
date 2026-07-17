@@ -61,7 +61,7 @@ otl_vars <- c("BENE_ID", "LINE_PRCDR_CD", "REV_CNTR_CD")
 
 oth_vars <- c("BENE_ID", "DGNS_CD_1", "DGNS_CD_2")
 
-# identify inpatient claims on the basis of ICD and DRG codes
+# identify inpatient claims on the basis of ICD-CM and ICD-PCS codes
 iph_pregnancy <- select(iph, all_of(iph_vars)) |>
   filter(if_any(contains("DGNS_CD"), ~ .x %in% pregnancy_ip_dgns) |
            if_any(contains("PRCDR_CD"), ~ .x %in% pregnancy_ip_pcs)) |>
@@ -69,7 +69,7 @@ iph_pregnancy <- select(iph, all_of(iph_vars)) |>
   select(BENE_ID, exclusion_pregnancy)
 print(nrow(iph_pregnancy))
 
-# identify outpatient claims on the basis of ICD and CPT codes
+# identify outpatient claims on the basis of CPT codes and revenue codes
 otl_pregnancy <- select(otl, all_of(otl_vars)) %>%
   filter(if_any(contains("LINE_PRCDR_CD"), ~ .x %in% pregnancy_ot) |
            REV_CNTR_CD %in% pregnancy_rev) |>
@@ -77,6 +77,7 @@ otl_pregnancy <- select(otl, all_of(otl_vars)) %>%
   select(BENE_ID, exclusion_pregnancy)
 print(nrow(otl_pregnancy))
 
+# identify outpatient claims on the basis of ICD-CM codes
 oth_pregnancy <- select(oth, all_of(oth_vars)) |>
   filter(if_any(contains("DGNS_CD"), ~ .x %in% pregnancy_ip_dgns)) |>
   mutate(exclusion_pregnancy = 1) %>%

@@ -23,7 +23,6 @@ iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requireme
 oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
 oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
 pain_washout <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
-benefits_exclusion <- load_data("exclusion_benefits.fst", file.path(drv_root, "exclusion"))
 pregnancy_exclusion <- load_data("pregnancy_exclusion.fst", file.path(drv_root, "exclusion"))
 
 
@@ -36,7 +35,6 @@ cohort <- list(
   oth_exclusions, 
   oud_exclusions,
   pain_washout,
-  benefits_exclusion,
   pregnancy_exclusion
 ) |> 
   reduce(join, how = "left") |>

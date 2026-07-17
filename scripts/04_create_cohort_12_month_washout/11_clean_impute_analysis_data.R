@@ -11,7 +11,7 @@ library(readr)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-df <- load_data("pain_cohort_with_MH.fst", file.path(drv_root_30_day_treatment, "modified_final")) |> as.data.table()
+df <- load_data("pain_cohort_with_MH.fst", file.path(drv_root_12_month_washout, "modified_final")) |> as.data.table()
 
 # Check for NAs in all variables before addressing
 na_check <- sapply(df, \(x) any(is.na(x)))
@@ -96,4 +96,4 @@ df[, `:=`(dem_sex_m = fifelse(dem_sex == "M", 1, 0), # Sex (reference category s
 # # 240 MME
 
 # Save in the mediation folder
-write_data(df, "pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+write_data(df, "pain_cohort_clean_imputed.fst", file.path(drv_root_12_month_washout, "modified_final"))

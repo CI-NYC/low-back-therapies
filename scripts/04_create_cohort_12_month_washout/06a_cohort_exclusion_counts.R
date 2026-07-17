@@ -15,16 +15,15 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 
 
 # opioid naive exclusion
-opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root, "exclusion"))
+opioid_naive_exclusion <- load_data("pain_washout_continuous_enrollment_opioid_naive.fst", file.path(drv_root_12_month_washout, "exclusion"))
 # base cohort
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
-debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root, "exclusion"))
-iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root, "exclusion"))
-oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
-oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
+debse_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafdebse_exclusions.fst", file.path(drv_root_12_month_washout, "exclusion"))
+iph_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafiph_exclusions.fst", file.path(drv_root_12_month_washout, "exclusion"))
+oth_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root_12_month_washout, "exclusion"))
+oud_exclusions <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst", file.path(drv_root_12_month_washout, "exclusion"))
 pain_washout <- load_data("pain_washout_continuous_enrollment_washout_pain.fst", file.path(drv_root, "exclusion"))
-benefits_exclusion <- load_data("exclusion_benefits.fst", file.path(drv_root, "exclusion"))
-pregnancy_exclusion <- load_data("pregnancy_exclusion.fst", file.path(drv_root, "exclusion"))
+pregnancy_exclusion <- load_data("pregnancy_exclusion.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
 
 
@@ -36,7 +35,6 @@ cohort <- list(
   oth_exclusions, 
   oud_exclusions,
   pain_washout,
-  benefits_exclusion,
   pregnancy_exclusion
 ) |> 
   reduce(join, how = "left") |>

@@ -14,7 +14,7 @@ library(yaml)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
 # base cohort
-cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 # Get ED visits first -- pain diagnoses later ---------------------------------
 revenue_cds <- c(paste0("045", 0:9), "0981", # Emergency department
@@ -82,4 +82,4 @@ cohort <- dg |>
   as.data.table()
 
 
-write_data(cohort, "ED_visits_unclean.fst", file.path(drv_root, "outcome"))
+write_data(cohort, "ED_visits_unclean.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))

@@ -4,9 +4,9 @@ library(lubridate)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
-ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root, "outcome"))
+ED_visits <- load_data("ED_visits_cleaned_with_procedures_and_inpatients_excluded.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
 
 ED_visits <- ED_visits |>
   filter(BENE_ID %in% cohort$BENE_ID)
@@ -28,4 +28,4 @@ cohort <- cohort |>
 cohort <- cohort |>
     mutate(n_ED_visits_washout_cal = ifelse(n_ED_visits_washout_cal > 5, 5, n_ED_visits_washout_cal))
 
-write_data(cohort, "cohort_num_ED_visits.fst", file.path(drv_root, "baseline_covariates"))
+write_data(cohort, "cohort_num_ED_visits.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))

@@ -14,15 +14,15 @@ library(fst)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 # save_dir <- "/mnt/general-data/disability/pain-severity/undertreated-pain-cohort/exclusion"
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
 # load component files ----------------------------------------------------
 
-poison <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_poison_dts.fst", file.path(drv_root, "exclusion"))
-hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_dts.fst", file.path(drv_root, "exclusion"))
+poison <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_poison_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
+hillary <- load_data("pain_washout_continuous_enrollment_opioid_requirements_oud_hillary_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 # misuse <- load_data("pain_washout_continuous_enrollment_opioid_requirements_washout_oud_misuse.fst", file.path(drv_root, "exclusion"))
-bup <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_bup_washout.fst", file.path(drv_root, "exclusion"))
-methadone <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root, "exclusion"))
+bup <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_bup_washout.fst", file.path(drv_root_12_month_washout, "exclusion"))
+methadone <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_methadone_washout.fst", file.path(drv_root_12_month_washout, "exclusion"))
 # nal <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_nal_washout.fst", file.path(drv_root, "exclusion"))
 
 # combine -----------------------------------------------------------------
@@ -76,6 +76,6 @@ cohort <-
 
 write_fst(
   cohort, 
-  file.path(drv_root, "exclusion", 
+  file.path(drv_root_12_month_washout, "exclusion", 
             "pain_washout_continuous_enrollment_opioid_requirements_oud_exclusion.fst")
 )

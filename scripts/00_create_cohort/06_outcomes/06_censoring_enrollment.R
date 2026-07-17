@@ -38,6 +38,19 @@ for (i in seq_along(files)) {
   # join dt to washout using data table
   dt <- washout[tmp, on = "BENE_ID", nomatch = 0]
   
+  setorder(dt, BENE_ID, ENRLMT_START_DT)
+  
+  # Identify where a gap of > 90 days occurs
+  # We check if the current start date is greater than the previous cumulative max end date + 90 days
+  dt[, gap_group := cumsum(ENRLMT_START_DT > shift(cummax(as.numeric(ENRLMT_END_DT)), fill = -Inf) + 90), 
+     by = BENE_ID]
+  
+  # Collapse the overlapping/adjacent intervals (within 90 days)
+  dt <- dt[, .(
+    ENRLMT_START_DT = min(ENRLMT_START_DT),
+    ENRLMT_END_DT = max(ENRLMT_END_DT)
+  ), by = .(BENE_ID, exposure_end_dt, gap_group)]
+  
   # defined period_1_end_dt, period_2_end_dt, etc. based on washout_start_dt
   dt[, c(paste0("period_", 1:num_periods, "_end_dt")) := 
        lapply(1:num_periods, function(p) exposure_end_dt + days(p * follow_up_period_length))]

@@ -17,7 +17,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 otl <- open_otl()
 
 # Read in cohort and dates
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 codes <- read_yaml(file.path(home_dir, "data/public/mediator_codes.yml"))
 
@@ -51,4 +51,4 @@ baseline_counseling <-
   select(BENE_ID, counseling_washout_cal)
 
 # write_data(unique(treatments_dts), "nonpharma_dts.fst", file.path(drv_root, "treatment"))
-write_data(baseline_counseling, "counseling.fst", file.path(drv_root, "baseline_covariates"))
+write_data(baseline_counseling, "counseling.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))

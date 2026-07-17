@@ -7,7 +7,7 @@ library(tidyverse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 otl <- open_otl()
 iph <- open_iph()
@@ -67,4 +67,4 @@ iph <- select(iph, all_of(iph_vars)) |>
 
 claims <- rbind(otl, iph)
 
-write_data(claims, "procedures_and_IP.rds", file.path(drv_root, "outcome"))
+write_data(claims, "procedures_and_IP.rds", file.path(drv_root_12_month_washout, "baseline_covariates"))

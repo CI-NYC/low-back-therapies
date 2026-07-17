@@ -21,10 +21,6 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 # Load cohort
 cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
-bup_list <- read_fst("~/medicaid/low-back-therapies/data/public/bup_list.fst")
-hcpcs <- read_yaml("~/medicaid/low-back-therapies/data/public/hcpcs_codes.yml")$buprenorphine
-
-
 bup <- load_data("pain_washout_continuous_enrollment_opioid_requirements_moud_bup_intervals.fst", file.path(drv_root, "exclusion"))
 
 moud_bup <- 

@@ -28,7 +28,7 @@ oth <- open_oth()
 iph <- open_iph()
 
 # read in cohort dates file
-dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 # read in all icd depression codes
 depression_icds <- read_csv(file.path(home_dir, "data/public/depression_icd10_20230323.csv"), col_names = F) |>
@@ -208,4 +208,4 @@ all_depression_clean <-
   select(BENE_ID, min_depression_dt_0,
          depression_washout_cal)
 
-write_data(all_depression_clean, "depression.rds", file.path(drv_root, "baseline_covariates")) # save final data file
+write_data(all_depression_clean, "depression.rds", file.path(drv_root_12_month_washout, "baseline_covariates")) # save final data file

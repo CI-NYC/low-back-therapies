@@ -33,7 +33,7 @@ library(data.table)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root, "exclusion"))
+cohort <- load_data("pain_washout_continuous_enrollment_dts.fst", file.path(drv_root_12_month_washout, "exclusion"))
 
 # Load icd codes
 codes <- read_yaml(file.path(home_dir, "data/public/icd_codes.yml"))
@@ -92,4 +92,4 @@ oth_exclusions <- oth_exclusions_washout |>
   ungroup()
 
 # export
-write_data(oth_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root, "exclusion"))
+write_data(oth_exclusions, "pain_washout_continuous_enrollment_opioid_requirements_tafoth_exclusions.fst", file.path(drv_root_12_month_washout, "exclusion"))

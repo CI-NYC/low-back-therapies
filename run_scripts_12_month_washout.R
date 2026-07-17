@@ -5,7 +5,7 @@ library(future.apply)
 print(renv::paths$library())
 print(.libPaths())
 
-setwd("~/medicaid/low-back-therapies/scripts/04_create_cohort")
+setwd("~/medicaid/low-back-therapies/scripts/04_create_cohort_12_month_washout")
 
 
 job_groups <- list(
@@ -55,7 +55,7 @@ if (all(exists_vec)) {
 
 
 
-run_jobs_future <- function(groups, log_dir = "../logs") {
+run_jobs_future <- function(groups, log_dir = "../logs_12_month_washout") {
   on.exit(future::plan(sequential), add = TRUE)
   
   # make sure log directory exists

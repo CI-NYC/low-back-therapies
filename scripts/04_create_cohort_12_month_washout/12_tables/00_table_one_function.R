@@ -4,7 +4,7 @@ library(tidyverse)
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 # opioids <- load_data("exposure_period_opioids.fst", file.path(drv_root, "treatment")) |>
 #   select(BENE_ID, treatment_start_dt, opioid, dose_form)
@@ -134,7 +134,7 @@ table_one_function <- function(df){
       # outcome_prolonged_opioid_use,
       # outcome_chronic_opioid_therapy,
       # outcome_chronic_pain_period_2,
-      outcome_chronic_pain_period_2,
+      # outcome_chronic_pain_period_2,
       # censoring
       cens_period_1,
       cens_period_2
@@ -252,7 +252,7 @@ table_one_function <- function(df){
                     # "At least monthly opioid prescribing",
                     # "$\\ge$90 days supply for opioids",
                     # "Chronic LBP by 9 months",
-                    "Chronic LBP by 13 months",
+                    # "Chronic LBP by 13 months",
                     "\\textbf{Censoring}",
                     "Uncensored through 7 months",
                     "Uncensored through 13 months"

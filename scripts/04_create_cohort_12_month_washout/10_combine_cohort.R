@@ -7,17 +7,17 @@
 library(tidyverse)
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
-cohort <- load_data("pain_cohort.fst", file.path(drv_root_30_day_treatment, "modified_final"))
-adhd <- load_data("adhd.rds", file.path(drv_root, "baseline_covariates")) 
-anxiety <- load_data("anxiety.rds", file.path(drv_root, "baseline_covariates"))
-bipolar <- load_data("bipolar.rds", file.path(drv_root, "baseline_covariates"))
-depression <- load_data("depression.rds", file.path(drv_root, "baseline_covariates"))
-mental_ill <- load_data("mental_ill.rds", file.path(drv_root, "baseline_covariates"))
-baseline_counseling <- load_data("counseling.fst", file.path(drv_root, "baseline_covariates"))
-substance_use_disorder <- load_data("substance_use_disorder_washout_cal.fst", file.path(drv_root, "baseline_covariates"))
-num_inpatient_outpatient <- load_data("baseline_ip_op_rx.fst", file.path(drv_root, "baseline_covariates")) |>
+cohort <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
+adhd <- load_data("adhd.rds", file.path(drv_root_12_month_washout, "baseline_covariates")) 
+anxiety <- load_data("anxiety.rds", file.path(drv_root_12_month_washout, "baseline_covariates"))
+bipolar <- load_data("bipolar.rds", file.path(drv_root_12_month_washout, "baseline_covariates"))
+depression <- load_data("depression.rds", file.path(drv_root_12_month_washout, "baseline_covariates"))
+mental_ill <- load_data("mental_ill.rds", file.path(drv_root_12_month_washout, "baseline_covariates"))
+baseline_counseling <- load_data("counseling.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
+substance_use_disorder <- load_data("substance_use_disorder_washout_cal.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
+num_inpatient_outpatient <- load_data("baseline_ip_op_rx.fst", file.path(drv_root_12_month_washout, "baseline_covariates")) |>
   mutate(num_iph_washout_cal = as.numeric(num_iph_washout_cal >= 1))
-num_ed_visits <- load_data("cohort_num_ED_visits.fst", file.path(drv_root, "baseline_covariates")) |>
+num_ed_visits <- load_data("cohort_num_ED_visits.fst", file.path(drv_root_12_month_washout, "baseline_covariates")) |>
   mutate(n_ED_visits_0_washout_cal = as.numeric(n_ED_visits_washout_cal == 0),
          n_ED_visits_1_washout_cal = as.numeric(n_ED_visits_washout_cal %in% c(1,2)),
          n_ED_visits_3_washout_cal = as.numeric(n_ED_visits_washout_cal >= 3)) |>
@@ -44,7 +44,7 @@ cohort_MH_joined <- cohort |>
          starts_with("outcome")
   )
 
-write_data(cohort_MH_joined, "pain_cohort_with_MH.fst", file.path(drv_root_30_day_treatment, "modified_final"))
+write_data(cohort_MH_joined, "pain_cohort_with_MH.fst", file.path(drv_root_12_month_washout, "modified_final"))
 
 
 

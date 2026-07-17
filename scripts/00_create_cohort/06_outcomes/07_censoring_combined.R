@@ -81,12 +81,18 @@ dual_codes <-
   select(demo, BENE_ID, RFRNC_YR, starts_with("DUAL_ELGBL_CD"), -DUAL_ELGBL_CD_LTST) |> 
   pivot(ids = c("BENE_ID", "RFRNC_YR"), 
         how = "l", 
-        names = list("month", "code"), 
-        na.rm = TRUE) |> 
-  fsubset(code %!=% "00") |> 
+        names = list("month", "code")#,
+        # na.rm=T
+        ) |> 
   fmutate(month = str_extract(month, "\\d+$"), 
           year = as.numeric(RFRNC_YR),
           elig_dt = as.Date(paste0(year, "-", month, "-01"))) |> 
+  arrange(elig_dt) |>
+  group_by(BENE_ID) |>
+  fill(code, .direction = "up") |>
+  mutate(code = replace_na(code, "99")) |> # can be anything other than 00. we just want to exclude people who have all NAs for dual eligibility code
+  ungroup() |>
+  fsubset(code %!=% "00") |> 
   fselect(BENE_ID, code, elig_dt)
 
 dual_cens <- 
@@ -111,7 +117,7 @@ dual_codes2 <-
   fmutate(month = str_extract(month, "\\d+$"), 
           year = as.numeric(RFRNC_YR),
           elig_dt = as.Date(paste0(year, "-", month, "-01"))) |> 
-  join(cohort, how = "inner") |> 
+  join(cohort, how = "inner", multiple = TRUE) |> 
   fselect(BENE_ID, washout_start_dt, day0_dt, code, elig_dt) |> 
   fsubset(code %in% codes$dual_eligibility)
 
@@ -128,6 +134,34 @@ dual_cens2 <-
   mutate(across(starts_with("dual_elig2_cens"), replace_na)) |> 
   select(BENE_ID, starts_with("dual_elig2_cens"))
 
+# Loss of comprehensive or full-scope benefits ------------------------------
+
+benefits_cens <- 
+  select(demo, BENE_ID, RFRNC_YR, starts_with("RSTRCTD_BNFTS_CD"), -RSTRCTD_BNFTS_CD_LTST) |>
+  pivot(ids = c("BENE_ID", "RFRNC_YR"), 
+        how = "l", 
+        names = list("month", "code")) |> 
+  mutate(code = replace_na(code, "0")) |>
+  fmutate(month = str_extract(month, "\\d+$"), 
+          year = as.numeric(RFRNC_YR),
+          elig_dt = as.Date(paste0(year, "-", month, "-01"))) |> 
+  join(cohort, how = "inner", multiple = TRUE) |> 
+  fselect(BENE_ID, washout_start_dt, washout_end_dt, code, elig_dt) |>
+  fsubset(!code %in% c("1","7","A","D"))
+
+benefits_cens <- 
+  inner_join(cohort, benefits_cens) |> 
+  filter(elig_dt %within% interval(day0_dt, exposure_end_dt + days(num_periods*follow_up_period_length))) |> 
+  group_by(BENE_ID) |>
+  arrange(elig_dt) |> 
+  filter(row_number() == 1) |> 
+  ungroup() |> 
+  add_all_periods(elig_dt, "benefits_cens") |> 
+  select(BENE_ID, starts_with("benefits_cens")) |> 
+  right_join(cohort) |> 
+  mutate(across(starts_with("benefits_cens"), replace_na)) |> 
+  select(BENE_ID, starts_with("benefits_cens"))
+
 enrollment_cens <- load_data("cens_enrollment_by_period.fst", file.path(drv_root_30_day_treatment, "modified_variables"))
 
 cens <- 
@@ -136,7 +170,8 @@ cens <-
     enrollment_cens,
     dec_cens, 
     dual_cens, 
-    dual_cens2
+    dual_cens2,
+    benefits_cens
   ) |> 
   reduce(left_join) |> 
   mutate(cens_period_1 = if_any(.cols = ends_with("period_1"), \(x) x == 1), 
