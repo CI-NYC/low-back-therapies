@@ -1,6 +1,6 @@
 library(xtable)
 
-path <- "~/medicaid/low-back-therapies/scripts/02_create_cohort_sensitivity_analysis/12_tables"
+path <- "~/medicaid/low-back-therapies/scripts/20_create_cohort_sensitivity_analysis/12_tables"
 
 source(file.path(path, "00_table_one_function.R"))
 

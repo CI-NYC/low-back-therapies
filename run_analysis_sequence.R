@@ -7,18 +7,24 @@ scripts <- c(
   # "11_run_analysis_30_day_exposure/03_2_run_main_off.R",
   # "11_run_analysis_30_day_exposure/04_1_no_cens.R",
   # "11_run_analysis_30_day_exposure/04_2_no_cens.R"
-  "21_run_sensitivity_analysis_3_month_exposure/02_1_run_main_on_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/02_2_run_main_on_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/03_1_run_main_off_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/03_2_run_main_off_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/02_1_run_main_on_30_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/02_2_run_main_on_30_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/03_1_run_main_off_30_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/03_2_run_main_off_30_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/04_1_no_cens_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/04_1_no_cens_30_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/04_2_no_cens_7_day_gap.R",
-  "21_run_sensitivity_analysis_3_month_exposure/04_2_no_cens_30_day_gap.R"
+  # "21_run_sensitivity_analysis_3_month_exposure/02_1_run_main_on_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/02_2_run_main_on_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/03_1_run_main_off_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/03_2_run_main_off_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/02_1_run_main_on_30_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/02_2_run_main_on_30_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/03_1_run_main_off_30_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/03_2_run_main_off_30_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/04_1_no_cens_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/04_1_no_cens_30_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/04_2_no_cens_7_day_gap.R",
+  # "21_run_sensitivity_analysis_3_month_exposure/04_2_no_cens_30_day_gap.R"
+  "31_run_sensitivity_analysis_12_month_washout/02_1_run_main_on.R",
+  # "31_run_sensitivity_analysis_12_month_washout/02_2_run_main_on.R",
+  "31_run_sensitivity_analysis_12_month_washout/03_1_run_main_off.R",
+  # "31_run_sensitivity_analysis_12_month_washout/03_2_run_main_off.R",
+  "31_run_sensitivity_analysis_12_month_washout/04_1_no_cens.R"
+  # "31_run_sensitivity_analysis_12_month_washout/04_2_no_cens.R"
 )
 
 for (script in scripts) {
