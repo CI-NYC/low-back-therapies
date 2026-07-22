@@ -380,7 +380,10 @@ library(data.table)</code></pre>
 <pre><code>## The following object is masked from &#39;package:purrr&#39;:
 ## 
 ##     transpose</code></pre>
-<pre class="r"><code>source(&quot;~/medicaid/low-back-therapies/R/helpers.R&quot;)</code></pre>
+<pre class="r"><code>library(knitr)
+
+
+source(&quot;~/medicaid/low-back-therapies/R/helpers.R&quot;)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;arrow&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:utils&#39;:
@@ -472,8 +475,8 @@ read_diff_no_cens &lt;- function(Y, intervention1, intervention2) {
 <pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
 print(&quot;6 months, on vs off relative risk&quot;)</code></pre>
 <pre><code>## [1] &quot;6 months, on vs off relative risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_1_onvsoff_relrisk &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
+df_1_onvsoff_relrisk[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
@@ -498,8 +501,8 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 
 print(&quot;12 months, on vs off relative risk&quot;)</code></pre>
 <pre><code>## [1] &quot;12 months, on vs off relative risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_2_onvsoff_relrisk &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
+df_2_onvsoff_relrisk[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
@@ -524,8 +527,8 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 
 print(&quot;6 months, on vs observed relative risk&quot;)</code></pre>
 <pre><code>## [1] &quot;6 months, on vs observed relative risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_1_onvsobserved_relrisk &lt;- read_relr_no_cens(Y, &quot;on&quot;)
+df_1_onvsobserved_relrisk[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
@@ -550,8 +553,8 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 
 print(&quot;12 months, on vs observed relative risk&quot;)</code></pre>
 <pre><code>## [1] &quot;12 months, on vs observed relative risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr_no_cens(Y, &quot;on&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_2_onvsobserved_relrisk &lt;- read_relr_no_cens(Y, &quot;on&quot;)
+df_2_onvsobserved_relrisk[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
@@ -575,54 +578,111 @@ df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;
 <pre class="r"><code>Y &lt;- &quot;oud_period_1&quot;
 print(&quot;6 months, on vs off absolute risk&quot;)</code></pre>
 <pre><code>## [1] &quot;6 months, on vs off absolute risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_1_onvsoff_riskdiff &lt;- read_diff(Y, &quot;on&quot;, &quot;off&quot;)
+df_1_onvsoff_riskdiff[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              36.5     19.4      53.6
-##  2 exposure_anti_inflammatory           1.9     -4.3       8.1
-##  3 exposure_benzodiazepine             49.9     32.3      67.6
-##  4 exposure_chiropractic              -37.6    -45.7     -29.4
-##  5 exposure_other_treatment            24.6     12.9      36.3
-##  6 exposure_gabapentin                120.1     99.9     140.3
-##  7 exposure_intervention               68.7     50.7      86.7
-##  8 exposure_muscle_relaxant           -12.2    -17.5      -6.8
-##  9 exposure_massage_therapy           -16.2    -19.1     -13.2
-## 10 exposure_physical_therapy          -23.2    -33.9     -12.5
-## 11 exposure_steroid                    -0.9     -9.3       7.6
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme     33       22.5      43.6
-## 13 exposure_opioid_&gt;7days_&lt;=50mme     103.7     84.3     123.1
-## 14 exposure_opioid_&gt;50mme             156.7    126.8     186.6</code></pre>
+##  1 exposure_acetaminophen               0.5      0.3       0.7
+##  2 exposure_anti_inflammatory           0       -0.1       0.1
+##  3 exposure_benzodiazepine              0.7      0.4       0.9
+##  4 exposure_chiropractic               -0.6     -0.7      -0.4
+##  5 exposure_other_treatment             0.3      0.2       0.5
+##  6 exposure_gabapentin                  1.6      1.3       1.8
+##  7 exposure_intervention                1        0.7       1.2
+##  8 exposure_muscle_relaxant            -0.2     -0.3      -0.1
+##  9 exposure_massage_therapy            -0.2     -0.3      -0.2
+## 10 exposure_physical_therapy           -0.3     -0.5      -0.2
+## 11 exposure_steroid                     0       -0.1       0.1
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme      0.4      0.3       0.5
+## 13 exposure_opioid_&gt;7days_&lt;=50mme       1.3      1         1.5
+## 14 exposure_opioid_&gt;50mme               1.9      1.6       2.3</code></pre>
 <pre class="r"><code>Y &lt;- &quot;oud_period_2&quot;
 
 print(&quot;12 months, on vs off absolute risk&quot;)</code></pre>
 <pre><code>## [1] &quot;12 months, on vs off absolute risk&quot;</code></pre>
-<pre class="r"><code>df &lt;- read_relr(Y, &quot;on&quot;, &quot;off&quot;)
-df[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
+<pre class="r"><code>df_2_onvsoff_riskdiff &lt;- read_diff(Y, &quot;on&quot;, &quot;off&quot;)
+df_2_onvsoff_riskdiff[, c(&quot;treatment&quot;, &quot;estimate&quot;, &quot;conf.low&quot;, &quot;conf.high&quot;)] |&gt;
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))</code></pre>
 <pre><code>## # A tibble: 14 × 4
 ##    treatment                       estimate conf.low conf.high
 ##    &lt;chr&gt;                              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1 exposure_acetaminophen              35       20        50.1
-##  2 exposure_anti_inflammatory          -1       -6.5       4.4
-##  3 exposure_benzodiazepine             37.9     24.7      51  
-##  4 exposure_chiropractic              -35.4    -41.4     -29.5
-##  5 exposure_other_treatment            11.6      5.2      17.9
-##  6 exposure_gabapentin                102.3     85.6     119.1
-##  7 exposure_intervention               55.1     43.4      66.8
-##  8 exposure_muscle_relaxant           -12.3    -17.2      -7.4
-##  9 exposure_massage_therapy           -11.6    -14.5      -8.8
-## 10 exposure_physical_therapy          -31.6    -40.6     -22.7
-## 11 exposure_steroid                    -1.8     -9.4       5.8
-## 12 exposure_opioid_&lt;=7days_&lt;=50mme     29.8     20.4      39.2
-## 13 exposure_opioid_&gt;7days_&lt;=50mme     103.6     87.3     119.8
-## 14 exposure_opioid_&gt;50mme             143.4    118.5     168.3</code></pre>
+##  1 exposure_acetaminophen               0.8      0.4       1.1
+##  2 exposure_anti_inflammatory           0       -0.1       0.1
+##  3 exposure_benzodiazepine              0.8      0.5       1.1
+##  4 exposure_chiropractic               -0.8     -1        -0.7
+##  5 exposure_other_treatment             0.3      0.1       0.4
+##  6 exposure_gabapentin                  2.1      1.8       2.5
+##  7 exposure_intervention                1.2      0.9       1.4
+##  8 exposure_muscle_relaxant            -0.3     -0.4      -0.2
+##  9 exposure_massage_therapy            -0.3     -0.3      -0.2
+## 10 exposure_physical_therapy           -0.7     -0.9      -0.5
+## 11 exposure_steroid                     0       -0.2       0.1
+## 12 exposure_opioid_&lt;=7days_&lt;=50mme      0.6      0.4       0.7
+## 13 exposure_opioid_&gt;7days_&lt;=50mme       2        1.7       2.3
+## 14 exposure_opioid_&gt;50mme               2.8      2.3       3.2</code></pre>
+<pre class="r"><code>print(&quot;Make latex table&quot;)</code></pre>
+<pre><code>## [1] &quot;Make latex table&quot;</code></pre>
+<pre class="r"><code>result &lt;- cbind(
+  df_1_onvsoff_relrisk[, 1],
+  sprintf(&quot;%.3f (%.3f, %.3f)&quot;,
+          df_1_onvsoff_riskdiff$estimate,
+          df_1_onvsoff_riskdiff$conf.low,
+          df_1_onvsoff_riskdiff$conf.high),
+  sprintf(&quot;%.2f (%.2f, %.2f)&quot;,
+          df_1_onvsoff_relrisk$estimate + 1,
+          df_1_onvsoff_relrisk$conf.low + 1,
+          df_1_onvsoff_relrisk$conf.high + 1),
+  sprintf(&quot;%.3f (%.3f, %.3f)&quot;,
+          df_2_onvsoff_riskdiff$estimate,
+          df_2_onvsoff_riskdiff$conf.low,
+          df_2_onvsoff_riskdiff$conf.high),
+  sprintf(&quot;%.2f (%.2f, %.2f)&quot;,
+          df_2_onvsoff_relrisk$estimate + 1,
+          df_2_onvsoff_relrisk$conf.low + 1,
+          df_2_onvsoff_relrisk$conf.high + 1)
+)
+
+cat(knitr::kable(
+  result,
+  format = &quot;latex&quot;,
+  booktabs = TRUE,
+  col.names = c(
+    &quot;Treatment&quot;,
+    &quot;6-month RD (95\\% CI)&quot;,
+    &quot;6-month RR (95\\% CI)&quot;,
+    &quot;12-month RD (95\\% CI)&quot;,
+    &quot;12-month RR (95\\% CI)&quot;
+  )
+))</code></pre>
+<pre><code>## 
+## \begin{tabular}{lllll}
+## \toprule
+## Treatment &amp; 6-month RD (95\textbackslash{}\% CI) &amp; 6-month RR (95\textbackslash{}\% CI) &amp; 12-month RD (95\textbackslash{}\% CI) &amp; 12-month RR (95\textbackslash{}\% CI)\\
+## \midrule
+## exposure\_acetaminophen &amp; 0.005 (0.003, 0.007) &amp; 1.36 (1.19, 1.54) &amp; 0.008 (0.004, 0.011) &amp; 1.35 (1.20, 1.50)\\
+## exposure\_anti\_inflammatory &amp; 0.000 (-0.001, 0.001) &amp; 1.02 (0.96, 1.08) &amp; -0.000 (-0.001, 0.001) &amp; 0.99 (0.94, 1.04)\\
+## exposure\_benzodiazepine &amp; 0.007 (0.004, 0.009) &amp; 1.50 (1.32, 1.68) &amp; 0.008 (0.005, 0.011) &amp; 1.38 (1.25, 1.51)\\
+## exposure\_chiropractic &amp; -0.006 (-0.007, -0.004) &amp; 0.62 (0.54, 0.71) &amp; -0.008 (-0.010, -0.007) &amp; 0.65 (0.59, 0.70)\\
+## exposure\_other\_treatment &amp; 0.003 (0.002, 0.005) &amp; 1.25 (1.13, 1.36) &amp; 0.003 (0.001, 0.004) &amp; 1.12 (1.05, 1.18)\\
+## \addlinespace
+## exposure\_gabapentin &amp; 0.016 (0.013, 0.018) &amp; 2.20 (2.00, 2.40) &amp; 0.021 (0.018, 0.025) &amp; 2.02 (1.86, 2.19)\\
+## exposure\_intervention &amp; 0.010 (0.007, 0.012) &amp; 1.69 (1.51, 1.87) &amp; 0.012 (0.009, 0.014) &amp; 1.55 (1.43, 1.67)\\
+## exposure\_muscle\_relaxant &amp; -0.002 (-0.003, -0.001) &amp; 0.88 (0.82, 0.93) &amp; -0.003 (-0.004, -0.002) &amp; 0.88 (0.83, 0.93)\\
+## exposure\_massage\_therapy &amp; -0.002 (-0.003, -0.002) &amp; 0.84 (0.81, 0.87) &amp; -0.003 (-0.003, -0.002) &amp; 0.88 (0.86, 0.91)\\
+## exposure\_physical\_therapy &amp; -0.003 (-0.005, -0.002) &amp; 0.77 (0.66, 0.87) &amp; -0.007 (-0.009, -0.005) &amp; 0.68 (0.59, 0.77)\\
+## \addlinespace
+## exposure\_steroid &amp; -0.000 (-0.001, 0.001) &amp; 0.99 (0.91, 1.08) &amp; -0.000 (-0.002, 0.001) &amp; 0.98 (0.91, 1.06)\\
+## exposure\_opioid\_&lt;=7days\_&lt;=50mme &amp; 0.004 (0.003, 0.005) &amp; 1.33 (1.22, 1.44) &amp; 0.006 (0.004, 0.007) &amp; 1.30 (1.20, 1.39)\\
+## exposure\_opioid\_&gt;7days\_&lt;=50mme &amp; 0.013 (0.010, 0.015) &amp; 2.04 (1.84, 2.23) &amp; 0.020 (0.017, 0.023) &amp; 2.04 (1.87, 2.20)\\
+## exposure\_opioid\_&gt;50mme &amp; 0.019 (0.016, 0.023) &amp; 2.57 (2.27, 2.87) &amp; 0.028 (0.023, 0.032) &amp; 2.43 (2.18, 2.68)\\
+## \bottomrule
+## \end{tabular}</code></pre>
 
 
 

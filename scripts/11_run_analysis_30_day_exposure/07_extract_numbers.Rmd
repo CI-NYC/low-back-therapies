@@ -21,6 +21,8 @@ library(purrr)
 library(dplyr)
 library(ggplot2)
 library(data.table)
+library(knitr)
+
 
 source("~/medicaid/low-back-therapies/R/helpers.R")
 
@@ -113,11 +115,12 @@ read_diff_no_cens <- function(Y, intervention1, intervention2) {
 Y <- "oud_period_1"
 print("6 months, on vs off relative risk")
 
-df <- read_relr(Y, "on", "off")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_1_onvsoff_relrisk <- read_relr(Y, "on", "off")
+df_1_onvsoff_relrisk[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
+
 ```
 
 ```{r}
@@ -125,11 +128,12 @@ Y <- "oud_period_2"
 
 print("12 months, on vs off relative risk")
 
-df <- read_relr(Y, "on", "off")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_2_onvsoff_relrisk <- read_relr(Y, "on", "off")
+df_2_onvsoff_relrisk[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
+
 ```
 
 
@@ -140,11 +144,12 @@ Y <- "oud_period_1"
 
 print("6 months, on vs observed relative risk")
 
-df <- read_relr_no_cens(Y, "on")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_1_onvsobserved_relrisk <- read_relr_no_cens(Y, "on")
+df_1_onvsobserved_relrisk[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
+
 ```
 
 ```{r}
@@ -152,11 +157,12 @@ Y <- "oud_period_2"
 
 print("12 months, on vs observed relative risk")
 
-df <- read_relr_no_cens(Y, "on")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_2_onvsobserved_relrisk <- read_relr_no_cens(Y, "on")
+df_2_onvsobserved_relrisk[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
+
 ```
 
 
@@ -165,11 +171,12 @@ df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
 Y <- "oud_period_1"
 print("6 months, on vs off absolute risk")
 
-df <- read_relr(Y, "on", "off")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_1_onvsoff_riskdiff <- read_diff(Y, "on", "off")
+df_1_onvsoff_riskdiff[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
+
 ```
 
 ```{r}
@@ -177,9 +184,51 @@ Y <- "oud_period_2"
 
 print("12 months, on vs off absolute risk")
 
-df <- read_relr(Y, "on", "off")
-df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+df_2_onvsoff_riskdiff <- read_diff(Y, "on", "off")
+df_2_onvsoff_riskdiff[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
          conf.high = round(conf.high * 100, 1))
 ```
+
+
+
+```{r}
+
+print("Make latex table")
+
+result <- cbind(
+  df_1_onvsoff_relrisk[, 1],
+  sprintf("%.3f (%.3f, %.3f)",
+          df_1_onvsoff_riskdiff$estimate,
+          df_1_onvsoff_riskdiff$conf.low,
+          df_1_onvsoff_riskdiff$conf.high),
+  sprintf("%.2f (%.2f, %.2f)",
+          df_1_onvsoff_relrisk$estimate + 1,
+          df_1_onvsoff_relrisk$conf.low + 1,
+          df_1_onvsoff_relrisk$conf.high + 1),
+  sprintf("%.3f (%.3f, %.3f)",
+          df_2_onvsoff_riskdiff$estimate,
+          df_2_onvsoff_riskdiff$conf.low,
+          df_2_onvsoff_riskdiff$conf.high),
+  sprintf("%.2f (%.2f, %.2f)",
+          df_2_onvsoff_relrisk$estimate + 1,
+          df_2_onvsoff_relrisk$conf.low + 1,
+          df_2_onvsoff_relrisk$conf.high + 1)
+)
+
+cat(knitr::kable(
+  result,
+  format = "latex",
+  booktabs = TRUE,
+  col.names = c(
+    "Treatment",
+    "6-month RD (95\\% CI)",
+    "6-month RR (95\\% CI)",
+    "12-month RD (95\\% CI)",
+    "12-month RR (95\\% CI)"
+  )
+))
+
+```
+
