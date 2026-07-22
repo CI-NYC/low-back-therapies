@@ -228,7 +228,7 @@ extract_count <- function(x) {
 
 
 pdf(
-  glue("~/medicaid/low-back-therapies/figures/{version}/relative_risks/{version}_onvsoff_{Y}.pdf"), 
+  glue("~/medicaid/low-back-therapies/figures/{version}/relative_risks/{version}_onvsobserved_{Y}.pdf"), 
   width = 7/2.54, height = 3.5/2.54
 )
 
