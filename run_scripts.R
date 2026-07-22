@@ -5,7 +5,7 @@ library(future.apply)
 print(renv::paths$library())
 print(.libPaths())
 
-setwd("~/medicaid/low-back-therapies/scripts/04_create_cohort")
+setwd("~/medicaid/low-back-therapies/scripts/11_run_analysis_30_day_exposure")
 
 
 job_groups <- list(
@@ -21,26 +21,30 @@ job_groups <- list(
   # group7 = paste0("05_exposure/", c("03_days_supply.R", "04_max_mme.R")),
   # group8 = "05_exposure/09_combine_exposures.R",
   # group9 = c("05_opioid_naive_exclusions.R","05_other_pain_exclusions.R","05_pregnancy_exclusion.R"),
-  # group9 = c("05_opioid_naive_exclusions.R","05_pregnancy_exclusion.R"),
   # group10 = paste0("06_oud/", c("00_bup.R", "00_hillary.R", "00_methadone.R", "00_poison.R")),
-  # group11 = paste0("06_oud/", c("00_poison.R")),
   # group13 = c("06_oud/01_oud_washout.R", "06_outcomes/05_getting_enrollment_dates.R", "06_outcomes/02_chronic_pain_01.R"),
   # group14 = paste0("06_outcomes/", c("06_censoring_enrollment.R", "01_oud.R", "02_chronic_pain_02.R")),
-  # group15 = "06_outcomes/07_censoring_combined.R",
-  # group20 = c("06_tafdebse_exclusions.R", "06_tafiph_exclusions.R", "06_tafoth_exclusions.R"),
-  group21 = c("07_combine_exclusions_exposure_outcome.R"),
-  group22 = c("08_baseline_covariates.R"),
+  # group20 = c("06_tafdebse_exclusions.R", "06_tafiph_exclusions.R", "06_tafoth_exclusions.R", "06_outcomes/07_censoring_combined.R"),
+  # group20 = "06_outcomes/07_censoring_combined.R",
+  # group21 = c("07_combine_exclusions_exposure_outcome.R"),
+  # group22 = c("08_baseline_covariates/00_baseline_covariates.R"),
   # group23 = paste0("10_comorbidity/", c("02_anxiety.R","04_depression.R", "06_ed_visits/04_ED_visits_find_all.R", "06_ed_visits/05_surgeries_and_IP_admissions.R")),
   # group24 = paste0("10_comorbidity/", c("01_adhd.R", "03_bipolar.R", "05_mental_illness.R", "06_ed_visits/06_ED_visits_clean.R")),
   # group25 = paste0("10_comorbidity/", c("07_baseline_ip_op.R", "08_counseling.R", "09_drug_use_disorder.R", "06_ed_visits/07_count_ED_visits.R")),
-  group26 = c("10_combine_cohort.R"),
-  group27 = c("11_clean_impute_analysis_data.R"),
-  group28 = "12_tables/01_finalize_table_one.R"
+  # group26 = c("10_combine_cohort.R"),
+  # group27 = c("11_clean_impute_analysis_data.R"),
+  # group28 = "12_tables/01_finalize_table_one.R",
+  group30 = "02_1_run_main_on.R",
+  group31 = "02_2_run_main_on.R",
+  group32 = "03_1_run_main_off.R",
+  group33 = "03_2_run_main_off.R",
+  group34 = "04_1_no_cens.R",
+  group35 = "04_2_no_cens.R"
 )
 
 
 # 1a. Flatten all paths
-all_paths <- unlist(job_groups, use.names = FALSE)
+all_paths <- normalizePath(unlist(job_groups, use.names = FALSE), mustWork = FALSE)
 
 # 1b. Test existence
 exists_vec <- file.exists(all_paths)
@@ -50,8 +54,7 @@ if (all(exists_vec)) {
   message("✅ All files exist.")
 } else {
   missing <- all_paths[!exists_vec]
-  warning("❌ Missing files:\n", paste(missing, collapse = "\n"))
-}
+  stop("❌ Missing files:\n", paste(missing, collapse = "\n"), call. = FALSE)}
 
 
 
@@ -85,7 +88,7 @@ run_jobs_future <- function(groups, log_dir = "../logs") {
 }
 
 
-plan(multisession, workers = 4)
+# plan(multisession, workers = 4)
 
 tryCatch(
   run_jobs_future(job_groups),
@@ -95,4 +98,4 @@ tryCatch(
   }
 )
 
-plan(sequential)
+# plan(sequential)

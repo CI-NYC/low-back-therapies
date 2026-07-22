@@ -5,7 +5,7 @@ library(future.apply)
 print(renv::paths$library())
 print(.libPaths())
 
-setwd("~/medicaid/low-back-therapies/scripts/04_create_cohort_12_month_washout")
+setwd("~/medicaid/low-back-therapies/scripts/30_create_cohort_12_month_washout")
 
 
 job_groups <- list(
@@ -23,13 +23,12 @@ job_groups <- list(
   # group9 = c("05_opioid_naive_exclusions.R","05_other_pain_exclusions.R","05_pregnancy_exclusion.R"),
   # group9 = c("05_opioid_naive_exclusions.R","05_pregnancy_exclusion.R"),
   # group10 = paste0("06_oud/", c("00_bup.R", "00_hillary.R", "00_methadone.R", "00_poison.R")),
-  # group11 = paste0("06_oud/", c("00_poison.R")),
-  # group13 = c("06_oud/01_oud_washout.R", "06_outcomes/05_getting_enrollment_dates.R", "06_outcomes/02_chronic_pain_01.R"),
+  # group13 = c("06_oud/01_oud_washout.R"),
   # group14 = paste0("06_outcomes/", c("06_censoring_enrollment.R", "01_oud.R", "02_chronic_pain_02.R")),
   # group15 = "06_outcomes/07_censoring_combined.R",
   # group20 = c("06_tafdebse_exclusions.R", "06_tafiph_exclusions.R", "06_tafoth_exclusions.R"),
   group21 = c("07_combine_exclusions_exposure_outcome.R"),
-  group22 = c("08_baseline_covariates.R"),
+  group22 = c("08_baseline_covariates/00_baseline_covariates.R"),
   # group23 = paste0("10_comorbidity/", c("02_anxiety.R","04_depression.R", "06_ed_visits/04_ED_visits_find_all.R", "06_ed_visits/05_surgeries_and_IP_admissions.R")),
   # group24 = paste0("10_comorbidity/", c("01_adhd.R", "03_bipolar.R", "05_mental_illness.R", "06_ed_visits/06_ED_visits_clean.R")),
   # group25 = paste0("10_comorbidity/", c("07_baseline_ip_op.R", "08_counseling.R", "09_drug_use_disorder.R", "06_ed_visits/07_count_ED_visits.R")),

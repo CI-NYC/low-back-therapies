@@ -1,0 +1,132 @@
+---
+title: "05_extract_numbers"
+author: "Anton Hung"
+date: "2025-12-05"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(pillar.sigfig = 4)
+```
+
+
+```{r}
+.libPaths(c("~/libs", .libPaths()))
+library(lmtp)
+library(glue)
+library(purrr)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+
+source("~/medicaid/low-back-therapies/R/helpers.R")
+
+data <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_treatment, "modified_final")) |> as.data.table()
+
+version <- "30_day_exposure"
+
+A <- (c("exposure_acetaminophen",
+        # "exposure_acupuncture",
+        "exposure_anti_inflammatory",
+        "exposure_benzodiazepine",
+        "exposure_chiropractic",
+        "exposure_duloxetine",
+        "exposure_gabapentin",
+        "exposure_intervention",
+        "exposure_muscle_relaxant",
+        "exposure_massage_therapy",
+        "exposure_physical_therapy",
+        "exposure_steroid",
+        # "exposure_opioid",
+        # "exposure_max_daily_dose_mme",
+        # "exposure_days_supply"
+            "exposure_opioid_<=7days_<=50mme",
+            "exposure_opioid_>7days_<=50mme",
+            "exposure_opioid_>50mme"
+))
+
+read_res <- function(Y, intervention) {
+  map_dfr(A, function(treatment) {
+    file.path(drv_root, "analysis", version,
+              glue("fit_{intervention}_outcome_{Y}_treatment_{treatment}.rds")) |> 
+      readRDS() |> 
+      tidy() |> 
+      mutate(treatment = treatment, .before = "estimate")
+  })
+}
+
+read_relr <- function(Y, intervention1, intervention2) {
+  map_dfr(A, function(treatment) {
+    diff <- file.path(drv_root, "analysis", version,
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
+      readRDS() |> 
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{intervention2}_outcome_{Y}_treatment_{treatment}.rds"))), 
+                    type = "rr")
+    mutate(diff$estimates, treatment = treatment, .before = "shift") |> 
+      mutate(estimate = estimate - 1,
+             conf.low = conf.low - 1,
+             conf.high = conf.high - 1)
+  })
+}
+
+read_relr_no_cens <- function(Y, intervention1) {
+  map_dfr(A, function(treatment) {
+    diff <- file.path(drv_root, "analysis", version,
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
+      readRDS() |> 
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_outcome_{Y}_no_cens.rds"))), 
+                    type = "rr")
+    mutate(diff$estimates, treatment = treatment, .before = "shift") |> 
+      mutate(estimate = estimate - 1,
+             conf.low = conf.low - 1,
+             conf.high = conf.high - 1)
+  })
+}
+
+```
+
+```{r}
+Y <- "oud_period_1"
+
+df <- read_relr(Y, "on", "off")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+```{r}
+Y <- "oud_period_2"
+
+df <- read_relr(Y, "on", "off")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+
+
+
+```{r}
+Y <- "oud_period_1"
+
+df <- read_relr_no_cens(Y, "on")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+```{r}
+Y <- "oud_period_2"
+
+df <- read_relr_no_cens(Y, "on")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
