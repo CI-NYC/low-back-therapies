@@ -33,7 +33,7 @@ A <- (c("exposure_acetaminophen",
         "exposure_anti_inflammatory",
         "exposure_benzodiazepine",
         "exposure_chiropractic",
-        "exposure_duloxetine",
+        "exposure_other_treatment",
         "exposure_gabapentin",
         "exposure_intervention",
         "exposure_muscle_relaxant",
@@ -86,10 +86,32 @@ read_relr_no_cens <- function(Y, intervention1) {
   })
 }
 
+read_diff <- function(Y, intervention1, intervention2) {
+  map_dfr(A, function(treatment) {
+    diff <- file.path(drv_root, "analysis", version,
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
+      readRDS() |> 
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_{intervention2}_outcome_{Y}_treatment_{treatment}.rds"))))
+    mutate(diff$estimates, treatment = treatment, .before = "shift") #|>
+      # mutate(estimate = shift - ref)
+  })
+}
+
+read_diff_no_cens <- function(Y, intervention1, intervention2) {
+  map_dfr(A, function(treatment) {
+    diff <- file.path(drv_root, "analysis", version,
+                      glue("fit_{intervention1}_outcome_{Y}_treatment_{treatment}.rds")) |> 
+      readRDS() |> 
+      lmtp_contrast(ref = readRDS(file.path(drv_root, "analysis", version, glue("fit_outcome_{Y}_no_cens.rds"))))
+    mutate(diff$estimates, treatment = treatment, .before = "shift") #|>
+    # mutate(estimate = shift - ref)
+  })
+}
 ```
 
 ```{r}
 Y <- "oud_period_1"
+print("6 months, on vs off relative risk")
 
 df <- read_relr(Y, "on", "off")
 df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
@@ -101,6 +123,8 @@ df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
 ```{r}
 Y <- "oud_period_2"
 
+print("12 months, on vs off relative risk")
+
 df <- read_relr(Y, "on", "off")
 df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
@@ -114,6 +138,8 @@ df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
 ```{r}
 Y <- "oud_period_1"
 
+print("6 months, on vs observed relative risk")
+
 df <- read_relr_no_cens(Y, "on")
 df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
@@ -124,7 +150,34 @@ df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
 ```{r}
 Y <- "oud_period_2"
 
+print("12 months, on vs observed relative risk")
+
 df <- read_relr_no_cens(Y, "on")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+
+
+```{r}
+Y <- "oud_period_1"
+print("6 months, on vs off absolute risk")
+
+df <- read_relr(Y, "on", "off")
+df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
+  mutate(estimate = round(estimate * 100, 1),
+         conf.low = round(conf.low * 100, 1),
+         conf.high = round(conf.high * 100, 1))
+```
+
+```{r}
+Y <- "oud_period_2"
+
+print("12 months, on vs off absolute risk")
+
+df <- read_relr(Y, "on", "off")
 df[, c("treatment", "estimate", "conf.low", "conf.high")] |>
   mutate(estimate = round(estimate * 100, 1),
          conf.low = round(conf.low * 100, 1),
