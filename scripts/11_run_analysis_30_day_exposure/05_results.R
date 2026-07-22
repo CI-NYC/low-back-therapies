@@ -1,7 +1,7 @@
 # -------------------------------------
-# Script: 02_results.R
+# Script: results.R
 # Author: Nick Williams
-# Purpose: Load and combine results from runs of 01_run_main.R
+# Purpose: Load and combine results from runs of run_main.R
 # Notes:
 # -------------------------------------
 
