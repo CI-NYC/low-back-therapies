@@ -112,13 +112,18 @@ cohort <- cohort |>
          exclusion_cancer_oth == 0,
          exclusion_cancer_iph == 0)
 
-# exclusion institution or palliative
-print(paste("Institutionalized:", nrow(filter(cohort, exclusion_pall_iph == 1 | exclusion_pall_oth == 1 | exclusion_institution == 1))))
+# exclusion palliative
+print(paste("Palliative:", nrow(filter(cohort, exclusion_pall_iph == 1 | exclusion_pall_oth == 1))))
 
 cohort <- cohort |>
   filter(exclusion_pall_iph == 0,
-         exclusion_pall_oth == 0,
-         exclusion_institution == 0)
+         exclusion_pall_oth == 0)
+
+# exclusion institution or palliative
+print(paste("Institutionalized:", nrow(filter(cohort, exclusion_institution == 1))))
+
+cohort <- cohort |>
+  filter(exclusion_institution == 0)
 
 # exclusion inpatient
 print(paste("Inpatient:", nrow(filter(cohort, exclusion_monthprior_hospitalization == 1 | exclusion_monthprior_otherinpatient == 1))))
@@ -127,6 +132,11 @@ cohort <- cohort |>
   filter(exclusion_monthprior_hospitalization == 0,
          exclusion_monthprior_otherinpatient == 0)
 
+# exclusion managed care
+print(paste("Managed care in CO or AR:", nrow(filter(cohort, exclusion_managed_care == 1))))
+
+cohort <- cohort |>
+  filter(exclusion_managed_care == 0)
 
 print(paste("Final remaining:", nrow(cohort)))
 
