@@ -19,6 +19,7 @@ source("~/medicaid/low-back-therapies/R/helpers.R")
 oth <- open_oth()
 iph <- open_iph()
 rxl <- open_rxl()
+otl <- open_otl()
 
 # read in cohort dates file
 dts_cohorts <- load_data("pain_cohort.fst", file.path(drv_root_12_month_washout, "modified_final"))
@@ -34,6 +35,21 @@ pos_codes_acute <- c(13, 21, 32, 24, 55, 31, 09, 51,  # inpatient
 # outpatient_TOS_CD <- c("002", "003", "028", "060", "061", "014", "049")
 ed_visit_cds <- c(paste0("045", 0:9), "0981", # Emergency department
                  "0526", "0516" # Urgent care
+)
+
+tos_exclude <- c(
+  "005", "006",  # Laboratory
+  "033", #Prescribed drugs X
+  "034", #Over-the-counter medications X
+  "029","035", #Dental X
+  "036", #Medical equipment/prosthetic devices X X
+  "037", #Eyeglasses X
+  "038", #Hearing Aids X
+  "056", #Transportation services X
+  # Financial / administrative payments
+  "119", "120", "121", "122", "123",
+  "131", "132", "133", "134", "135",
+  "138", "139", "140", "141", "142", "143", "144"
 )
 
 # inpatient hospitalizations --------------------------------------------------------------------------------
@@ -59,7 +75,7 @@ icd_codes_to_check_oth <-
   filter(BENE_ID %in% dts_cohorts$BENE_ID,
          !CLM_ID %in% ED_visits$ed_visit_ID,
          !POS_CD %in% pos_codes_acute) |>
-  select(BENE_ID, SRVC_BGN_DT, POS_CD) |>
+  select(BENE_ID, CLM_ID, SRVC_BGN_DT) |>
   collect()
 
 # obtain the date for all outpatient visits within washout period
@@ -68,9 +84,15 @@ all_oth_icds_in_washout_cal <-
   inner_join(dts_cohorts |> select(BENE_ID, washout_start_dt, washout_end_dt)) |>
   filter(SRVC_BGN_DT %within% interval(washout_start_dt, washout_end_dt))  
 
+oth_tos_cd <- otl |>
+  select(CLM_ID, TOS_CD) |>
+  right_join(all_oth_icds_in_washout_cal, by="CLM_ID") |>
+  filter(!TOS_CD %in% tos_exclude) |>
+  collect()
+
 # count number of outpatient visits during washout period
 num_oth_washout_cal <-
-  all_oth_icds_in_washout_cal |>
+  oth_tos_cd |>
   distinct(BENE_ID, SRVC_BGN_DT) |>
   group_by(BENE_ID) |>
   summarise(num_oth_washout_cal = n(), .groups = "drop")
@@ -102,9 +124,10 @@ cohort <- dts_cohorts |>
 # cap at a reasonable number (99th percentile)
 cohort <- cohort |>
   mutate(num_iph_washout_cal = ifelse(num_iph_washout_cal > 1, 1, num_iph_washout_cal),
-         num_oth_washout_cal = ifelse(num_oth_washout_cal > 60, 60, num_oth_washout_cal),
+         num_oth_washout_cal = ifelse(num_oth_washout_cal > quantile(cohort$num_oth_washout_cal, 0.99), 
+                                      quantile(cohort$num_oth_washout_cal, 0.99), num_oth_washout_cal),
          # num_rxl_washout_cal = ifelse(num_rxl_washout_cal > 40, 40, num_rxl_washout_cal)
-         )
+  )
 
 write_data(cohort, "baseline_ip_op_rx.fst", file.path(drv_root_12_month_washout, "baseline_covariates"))
 

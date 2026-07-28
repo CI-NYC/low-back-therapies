@@ -6,7 +6,7 @@ source(file.path(path, "00_table_one_function.R"))
 
 # overall_1 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[1:52,]
 oud_no_1 <- table_one_function(data |> filter(subset_oud == 0)) |>
-  slice(1:which(Characteristic == "\\hspace{0.5cm}26+"))
+  slice(1:which(Characteristic == "\\hspace{0.5cm}21+"))
 # oud_yes_1 <- table_one_function(data |> filter(subset_oud == 1))[1:52,2]
 
 # overall_2 <- table_one_function(data |> filter(subset_oud %in% c(0,1)))[60:91,]

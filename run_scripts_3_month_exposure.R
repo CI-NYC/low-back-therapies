@@ -14,8 +14,8 @@ job_groups <- list(
   # group1 = paste0("05_exposure/", c("04_max_mme_7day.R", "04_max_mme.R")),
   # group2 = paste0("05_exposure/", c("09_combine_exposures.R")),
   # group3 = paste0("06_outcomes/", c("05_getting_enrollment_dates.R", "01_oud.R")),
-  # group4 = paste0("06_outcomes/", c("06_censoring_enrollment.R")),
-  # group5 = "06_outcomes/07_censoring_combined.R",
+  group4 = paste0("06_outcomes/", c("06_censoring_enrollment.R")),
+  group5 = "06_outcomes/07_censoring_combined.R",
   group21 = c("07_combine_exclusions_exposure_outcome.R"),
   group22 = c("08_baseline_covariates.R"),
 

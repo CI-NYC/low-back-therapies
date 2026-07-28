@@ -48,8 +48,8 @@ for (i in seq_along(files)) {
   # Collapse the overlapping/adjacent intervals (within 90 days)
   dt <- dt[, .(
     ENRLMT_START_DT = min(ENRLMT_START_DT),
-    ENRLMT_END_DT = max(ENRLMT_END_DT)
-  ), by = .(BENE_ID, exposure_end_dt, gap_group)]
+    ENRLMT_END_DT = max(ENRLMT_END_DT) + 90
+  ), by = .(BENE_ID, exposure_end_dt, gap_group)][gap_group == 1]
   
   # defined period_1_end_dt, period_2_end_dt, etc. based on washout_start_dt
   dt[, c(paste0("period_", 1:num_periods, "_end_dt")) := 

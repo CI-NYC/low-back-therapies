@@ -145,7 +145,8 @@ exclusion_dual_eligible <-
 # Managed care beneficiaries in Colorado and Arkansas -------------------------
 
 mco_codes <- demo |>
-  filter(STATE_CD %in% c("CO", "AR")) |>
+  filter((STATE_CD == "CO" & RFRNC_YR == 2016) |
+           (STATE_CD == "AR" & RFRNC_YR == 2019)) |>
   select(BENE_ID, RFRNC_YR, starts_with("MC")) |>
   pivot(ids = c("BENE_ID", "RFRNC_YR"), 
         how = "l", 

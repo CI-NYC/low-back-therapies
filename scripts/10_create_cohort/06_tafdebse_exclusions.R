@@ -142,10 +142,11 @@ exclusion_dual_eligible <-
   join(fselect(cohort, BENE_ID), how = "right") |> 
   fmutate(exclusion_dual_eligible = replace_na(as.numeric(exclusion_dual_eligible),0))
 
-# Managed care beneficiaries in Colorado and Arkansas -------------------------
+# Managed care beneficiaries in Colorado in 2016 and Arkansas in 2019 ----------
 
 mco_codes <- demo |>
-  filter(STATE_CD %in% c("CO", "AR")) |>
+  filter((STATE_CD == "CO" & RFRNC_YR == 2016) |
+           (STATE_CD == "AR" & RFRNC_YR == 2019)) |>
   select(BENE_ID, RFRNC_YR, starts_with("MC")) |>
   pivot(ids = c("BENE_ID", "RFRNC_YR"), 
         how = "l", 
