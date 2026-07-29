@@ -95,7 +95,7 @@ read_relr <- function(Y, intervention1, intervention2) {
 # Plot results ------------------------------------------------------------
 
 theme_set(theme_minimal(base_family = "sans", 
-                        base_size = 3,
+                        base_size = 6,
                         base_line_size = 0.2,
                         base_rect_size = 0.2))
 theme_update(
@@ -106,7 +106,7 @@ theme_update(
   axis.title.y = element_blank(),
   plot.margin = margin(10, 15, 10, 15),
   text = element_text(color = "black", 
-                      size = 3)
+                      size = 6)
 )
 
 label_counts <- function(data, subset, m) {
@@ -118,8 +118,6 @@ label_counts <- function(data, subset, m) {
 
 cl_n_oud <-setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 0, m)),
                     A[1:length(A)])
-# cl_y_oud <- setNames(map_chr(A[1:length(A)], \(m) label_counts(data, 1, m)), 
-#                   A[1:length(A)])
 
 
 relabel <- function(data) {
@@ -151,17 +149,17 @@ plot_diff <- function(data) {
     geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), 
                    height = 0.2, 
                    position = position_nudge(y = 0.4), 
-                   size = 0.15) + 
+                   size = 0.25) + 
     geom_vline(xintercept = 0, 
                linetype = "dashed", 
-               size = 0.15, 
+               size = 0.25, 
                color = "grey50") + 
     scale_y_discrete() +
-    scale_x_continuous(name = "Risk difference (95% CI)") + 
+    scale_x_continuous(name = "Risk difference, % (95% CI)") + 
     geom_text(
       aes(label = paste0("  ", sprintf("%.4f", estimate), "  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
-      size = 0.75, family = "sans"
+      size = 1.75, family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
     scale_fill_manual(values = c("#1D785A", "red3"), guide = "none") +
@@ -179,18 +177,18 @@ plot_relr <- function(data) {
     geom_errorbarh(aes(xmin = conf.low, xmax = conf.high),
                    height = 0.2,
                    position = position_nudge(y = 0.4), 
-                   size = 0.1) +
+                   size = 0.25) +
     geom_vline(xintercept = 0, 
                linetype = "dashed", 
-               size = 0.15, 
+               size = 0.25, 
                color = "grey50") + 
     scale_y_discrete() +
-    scale_x_continuous(name = "Relative risk (95% CI)", 
+    scale_x_continuous(name = "Relative risk, % (95% CI)", 
                        labels = scales::label_percent()) +
     geom_text(
       aes(label = paste0("  ", sprintf("%2.1f", estimate * 100), "%  "), 
           hjust = ifelse(estimate < 0, 1, 0)),
-      size = 0.75, 
+      size = 1.75, 
       family = "sans"
     ) +
     scale_color_manual(values = c("black"), guide = "none") + 
@@ -227,7 +225,7 @@ extract_count <- function(x) {
 
 pdf(
   glue("~/medicaid/low-back-therapies/figures/{version}/relative_risks/{version}_onvsobserved_{Y}.pdf"), 
-  width = 7/2.54, height = 3.5/2.54
+  width = 5, height = 2.5
 )
 
 print(read_relr(Y, "on", "off") |> 
