@@ -1,0 +1,27 @@
+---
+1title: "export_table"
+author: "Anton Hung"
+date: "2026-08-04"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+path <- "~/medicaid/low-back-therapies/scripts/10_create_cohort/12_tables"
+
+part1 <- read.csv(file.path(path, "table_one_part1_all.csv"))
+part2 <- read.csv(file.path(path, "table_one_part2_all.csv"))
+```
+
+```{r}
+kable(part1)
+```
+
+```{r}
+kable(part2)
+```
+

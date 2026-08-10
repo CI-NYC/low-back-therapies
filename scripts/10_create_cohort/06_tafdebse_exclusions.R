@@ -156,7 +156,7 @@ mco_codes <- demo |>
   fmutate(month = str_extract(month, "\\d+$"), 
           year = as.numeric(RFRNC_YR),
           mc_dt = as.Date(paste0(year, "-", month, "-01"))) |>
-  fsubset(code %in% c("01","04")) |>  # these are the MC codes we want to exclude. 04 doesn't appear in our data, but just in case, it is left in the code.
+  fsubset(!code %in% c("14","15")) |>  # these are the MC codes we want to exclude. 04 doesn't appear in our data, but just in case, it is left in the code.
   fselect(BENE_ID, code, mc_dt)
 
 exclusion_mco <- 

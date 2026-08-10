@@ -14,7 +14,8 @@ dat <- load_data("pain_cohort_clean_imputed.fst", file.path(drv_root_30_day_trea
 
 # treatment_end_dt <- load_data("exposure_end_dt_30_days.fst", file.path(drv_root, "treatment"))
 gaba <- load_data("nonopioid_rx_dts.fst", file.path(drv_root, "treatment")) |>
-  filter(treatment_name == "Gabapentin") |>
+  filter(BENE_ID %in% (dat |> filter(exposure_gabapentin==1) |> pull(BENE_ID)),
+          treatment_name == "Gabapentin") |>
   inner_join(dat, by="BENE_ID") |>
   filter(treatment_start_dt >= day0_dt, treatment_start_dt<= exposure_end_dt) |>
   select(BENE_ID, gaba_start_dt = treatment_start_dt, gaba_end_dt = treatment_end_dt)
@@ -40,7 +41,7 @@ has_overlapping_treatments <- check_overlap |>
 # Count number belonging to each gaba-opioid combination (overlapping) ------------------------------------------------------
 
 dat2 <- dat |>
-  mutate(exposure_gabapentin = as.integer(BENE_ID %in% gaba$BENE_ID)) |>
+  # mutate(exposure_gabapentin = as.integer(BENE_ID %in% gaba$BENE_ID)) |>
   select(BENE_ID, exposure_gabapentin, "exposure_opioid_>50mme", "exposure_opioid_>7days_<=50mme", "exposure_opioid_<=7days_<=50mme") |>
   left_join(has_overlapping_treatments, by="BENE_ID") |>
   # groups:
@@ -52,23 +53,32 @@ dat2 <- dat |>
   # 6. opioid >7 days, <=50 MME w/o overlapping gabapentin
   # 7. opioid >50 MME w/o overlapping gabapentin
   mutate(group = case_when(
-    exposure_gabapentin == 1 & overlap == FALSE ~ "gabapentin w/o overlapping opioid",
+    # exposure_gabapentin == 1 & overlap == FALSE ~ "gabapentin w/o overlapping opioid",
     exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid $\\le7$ days, $\\le50$ MME",
     exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>7days_<=50mme` == 1 ~ "gabapentin w/ overlapping opioid $>7$ days, $\\le50$ MME",
     exposure_gabapentin == 1 & overlap == TRUE & `exposure_opioid_>50mme` == 1 ~ "gabapentin w/ overlapping opioid $>50$ MME",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "opioid $\\le7$ days, $\\le50$ MME w/o overlapping gabapentin",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>7days_<=50mme` == 1 ~ "opioid $>7$ days, $\\le50$ MME w/o overlapping gabapentin",
-    exposure_gabapentin == 0 & overlap == FALSE & `exposure_opioid_>50mme` == 1 ~ "opioid $>50$ MME w/o overlapping gabapentin",
+    overlap == FALSE & `exposure_opioid_<=7days_<=50mme` == 1 ~ "opioid $\\le7$ days, $\\le50$ MME w/o overlapping gabapentin",
+    overlap == FALSE & `exposure_opioid_>7days_<=50mme` == 1 ~ "opioid $>7$ days, $\\le50$ MME w/o overlapping gabapentin",
+    overlap == FALSE & `exposure_opioid_>50mme` == 1 ~ "opioid $>50$ MME w/o overlapping gabapentin",
     TRUE ~ "neither gabapentin nor opioid"
   )) 
 
+gaba_wo_overlapping_opioid = dat2 |>
+  filter(exposure_gabapentin == 1 & overlap == FALSE) |>
+  nrow()
+
 group <- names(table(dat2$group))
 number <- table(dat2$group)
-proportion <- prop.table(number)
+
+# the neither group isn't needed, and just slotting in the gaba w/o overlapping opioid category instead
+number[4] <- gaba_wo_overlapping_opioid
+names(number)[4] <- "gabapentin w/o overlapping opioid"
+
+proportion <- number/nrow(dat)
 number_proportion <- paste0(number, " (", round(proportion*100,1), "\\%)")
 
-dat2 <- as.data.frame(cbind(group, number_proportion)) |>
-  slice(-5)
+dat2 <- as.data.frame(cbind(names(number), number_proportion))# |>
+  # slice(-5)
 
 
 #                                                  group number_proportion
